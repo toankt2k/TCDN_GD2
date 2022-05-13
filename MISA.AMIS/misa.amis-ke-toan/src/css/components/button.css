@@ -1,0 +1,41 @@
+.m-button {
+    height: 34px;
+    cursor: pointer;
+}
+
+.m-button .button {
+    height: 100%;
+    border-radius: 3px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.m-button.default button {
+    background-color: transparent;
+    border: 1px solid #8d9096;
+    padding: 6px 16px;
+}
+
+.m-button.default button:hover {
+    /* background-color: #d2d3d6; */
+    background-color: transparent;
+}
+
+.m-button.default button:active {
+    background-color: #bbbcbc;
+}
+
+.m-button.primary button {
+    background-color: #2ca01c;
+    border: 1px solid transparent;
+    padding: 6px 16px;
+    color: #fff;
+}
+
+.m-button.primary button:hover {
+    background-color: #35bf22;
+}
+
+.m-button.primary button:active {
+    background-color: #248b15;
+}

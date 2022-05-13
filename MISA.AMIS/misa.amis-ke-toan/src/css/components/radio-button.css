@@ -1,0 +1,74 @@
+.group-button {
+    display: flex;
+    align-items: center;
+    min-height: 32px;
+}
+
+.m-radio-button {
+    position: relative;
+    margin-right: 20px;
+}
+
+.radio-btn-area {
+    display: flex;
+}
+
+.radio-btn-area .m-radio-button {
+    padding-right: 32px;
+    padding-top: 4px;
+}
+
+.m-radio-button input {
+    display: none;
+}
+
+.m-radio-button label {
+    display: flex;
+    align-items: center;
+    appearance: none;
+    font-weight: 400 !important;
+}
+
+.m-radio-button label>span {
+    color: #111 !important;
+}
+
+.m-radio-button label>span:hover {
+    cursor: pointer;
+}
+
+.m-radio-button input:checked~label .check {
+    border: 1px solid #2ca01c;
+    /* border: none; */
+}
+
+.m-radio-button input:checked~label .check::after {
+    display: block;
+}
+
+.m-radio-button label .check::after {
+    position: absolute;
+    display: none;
+    content: "";
+    top: 4px;
+    left: 4px;
+    width: 10px;
+    height: 10px;
+    min-width: 10px;
+    min-height: 10px;
+    background-color: #2ca01c;
+    border-radius: 50%;
+}
+
+.m-radio-button label .check {
+    background-size: contain;
+    width: 18px;
+    height: 18px;
+    min-width: 18px;
+    min-height: 18px;
+    content: "";
+    border: 1px solid #afafaf;
+    border-radius: 50%;
+    box-sizing: border-box;
+    margin-right: 10px;
+}

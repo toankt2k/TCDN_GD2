@@ -1,0 +1,11 @@
+{
+  "Version": 1,
+  "Hash": "iDH0IFQz3TNVd9LlK6aEDqTgJWp3Zc6s2tJPRiybZxo=",
+  "Source": "MISA.Web02.Api",
+  "BasePath": "_content/MISA.Web02.Api",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": []
+}

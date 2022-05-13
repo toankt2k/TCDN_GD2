@@ -1,0 +1,26 @@
+.m-content {
+    width: calc(100vw - 178px);
+    height: 100vh;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+.m-content .m-container::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+    background-color: #f1f1f1;
+}
+
+.m-content .m-container::-webkit-scrollbar-thumb {
+    background-color: #b8bcc3;
+    /* border-radius: 5px; */
+}
+
+.m-content .m-container::-webkit-scrollbar-thumb:hover {
+    background-color: #a5a5a5;
+}
+
+.m-content .m-container::-webkit-scrollbar-track {
+    background-color: #f1f1f1;
+    /* border-radius: 5px; */
+}

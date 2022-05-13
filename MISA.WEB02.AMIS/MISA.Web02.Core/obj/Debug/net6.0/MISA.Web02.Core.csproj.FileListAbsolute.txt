@@ -1,0 +1,15 @@
+C:\project\Misa\Misa\edu\TCDN_GD2\MISA.WEB02.AMIS\MISA.Web02.Core\bin\Debug\net6.0\MISA.Web02.Core.deps.json
+C:\project\Misa\Misa\edu\TCDN_GD2\MISA.WEB02.AMIS\MISA.Web02.Core\bin\Debug\net6.0\MISA.Web02.Core.dll
+C:\project\Misa\Misa\edu\TCDN_GD2\MISA.WEB02.AMIS\MISA.Web02.Core\bin\Debug\net6.0\MISA.Web02.Core.pdb
+C:\project\Misa\Misa\edu\TCDN_GD2\MISA.WEB02.AMIS\MISA.Web02.Core\obj\Debug\net6.0\MISA.Web02.Core.csproj.AssemblyReference.cache
+C:\project\Misa\Misa\edu\TCDN_GD2\MISA.WEB02.AMIS\MISA.Web02.Core\obj\Debug\net6.0\MISA.Web02.Core.Resourses.EnumResource.resources
+C:\project\Misa\Misa\edu\TCDN_GD2\MISA.WEB02.AMIS\MISA.Web02.Core\obj\Debug\net6.0\MISA.Web02.Core.Resourses.MISAMessageResource.resources
+C:\project\Misa\Misa\edu\TCDN_GD2\MISA.WEB02.AMIS\MISA.Web02.Core\obj\Debug\net6.0\MISA.Web02.Core.csproj.GenerateResource.cache
+C:\project\Misa\Misa\edu\TCDN_GD2\MISA.WEB02.AMIS\MISA.Web02.Core\obj\Debug\net6.0\MISA.Web02.Core.GeneratedMSBuildEditorConfig.editorconfig
+C:\project\Misa\Misa\edu\TCDN_GD2\MISA.WEB02.AMIS\MISA.Web02.Core\obj\Debug\net6.0\MISA.Web02.Core.AssemblyInfoInputs.cache
+C:\project\Misa\Misa\edu\TCDN_GD2\MISA.WEB02.AMIS\MISA.Web02.Core\obj\Debug\net6.0\MISA.Web02.Core.AssemblyInfo.cs
+C:\project\Misa\Misa\edu\TCDN_GD2\MISA.WEB02.AMIS\MISA.Web02.Core\obj\Debug\net6.0\MISA.Web02.Core.csproj.CoreCompileInputs.cache
+C:\project\Misa\Misa\edu\TCDN_GD2\MISA.WEB02.AMIS\MISA.Web02.Core\obj\Debug\net6.0\MISA.Web02.Core.dll
+C:\project\Misa\Misa\edu\TCDN_GD2\MISA.WEB02.AMIS\MISA.Web02.Core\obj\Debug\net6.0\refint\MISA.Web02.Core.dll
+C:\project\Misa\Misa\edu\TCDN_GD2\MISA.WEB02.AMIS\MISA.Web02.Core\obj\Debug\net6.0\MISA.Web02.Core.pdb
+C:\project\Misa\Misa\edu\TCDN_GD2\MISA.WEB02.AMIS\MISA.Web02.Core\obj\Debug\net6.0\ref\MISA.Web02.Core.dll

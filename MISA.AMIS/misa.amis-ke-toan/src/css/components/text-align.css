@@ -1,0 +1,23 @@
+.m-text-center {
+    text-align: center !important;
+}
+
+.m-text-left {
+    text-align: left !important;
+}
+
+.m-text-right {
+    text-align: right !important;
+}
+
+.m-px-left {
+    padding-left: 10px !important;
+}
+
+.m-px-right {
+    padding-left: 10px !important;
+}
+
+.m-px {
+    padding: auto 10px !important;
+}

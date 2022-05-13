@@ -1,0 +1,357 @@
+.m-navbar {
+    box-sizing: border-box;
+    width: 178px;
+    height: 100vh;
+    background-color: #393a3d;
+}
+
+.m-navbar .logo-container {
+    height: 48px;
+    width: 100%;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.m-navbar .logo-container .logo-app {
+    height: 32px;
+    width: 100px;
+    background-image: url('@/assets/img/Logo_Module_TiengViet_White.66947422.svg');
+    /* background-position: ; */
+    background-size: contain;
+    background-repeat: no-repeat;
+    /* bac */
+}
+
+.m-navbar .logo-container .toggle {
+    margin-right: 10px;
+    height: 24px;
+    width: 24px;
+    background-image: url('@/assets/img/Sprites.64af8f61.svg');
+    background-position: -424px -88px;
+    background-repeat: no-repeat;
+}
+
+.m-navbar .menu-container {
+    box-sizing: border-box;
+    padding-top: 14px;
+    height: calc(100vh - 48px);
+    width: 100%;
+    overflow-y: auto;
+}
+
+.m-navbar .menu-container .navbar-item {
+    height: 42px;
+    box-sizing: border-box;
+}
+
+.m-navbar .menu-container .navbar-item:hover {
+    background-color: #5d5d61;
+    cursor: pointer;
+}
+
+.m-navbar .menu-container .navbar-item:active {
+    background-color: #5d5d61;
+}
+
+.m-navbar .menu-container .navbar-item .item-content {
+    box-sizing: border-box;
+    height: 100%;
+    width: 100%;
+    padding-right: 14px;
+    display: flex;
+    align-items: center;
+    color: #fff;
+    border-left: 6px solid transparent;
+}
+
+.m-navbar .menu-container .navbar-item .item-content.router-link-exact-active {
+    border-left-color: #2ca01c;
+    background-color: #5d5d61;
+    font-weight: 600;
+    /* border-left-color: #2ca01c; */
+}
+
+.m-navbar .menu-container .navbar-item .item-content.router-link-active {
+    border-left-color: #2ca01c;
+    background-color: #5d5d61;
+    font-weight: 600;
+    /* border-left-color: #2ca01c; */
+}
+
+
+/*css cho cacs item menu*/
+
+.m-navbar .menu-container .navbar-item .item-content .logo-link.overview {
+    width: 24px;
+    height: 24px;
+    background-image: url('@/assets/img/Sprites.64af8f61.svg');
+    background-position: -30px -1628px;
+    background-repeat: no-repeat;
+    margin-right: 8px;
+    margin-left: 8px;
+}
+
+.m-navbar .menu-container .navbar-item:hover .overview {
+    background-position: -30px -1585px !important;
+}
+
+.m-navbar .menu-container .navbar-item .item-content.selected .overview {
+    background-position: -30px -1585px !important;
+}
+
+.m-navbar .menu-container .navbar-item .item-content .logo-link.money {
+    width: 24px;
+    height: 24px;
+    background-image: url('@/assets/img/Sprites.64af8f61.svg');
+    background-position: -73px -1628px;
+    background-repeat: no-repeat;
+    margin-right: 8px;
+    margin-left: 8px;
+}
+
+.m-navbar .menu-container .navbar-item:hover .money {
+    background-position: -73px -1585px !important;
+}
+
+.m-navbar .menu-container .navbar-item .item-content.selected .money {
+    background-position: -73px -1585px !important;
+}
+
+.m-navbar .menu-container .navbar-item .item-content .logo-link.bank {
+    width: 24px;
+    height: 24px;
+    background-image: url('@/assets/img/Sprites.64af8f61.svg');
+    background-position: -117px -1628px;
+    background-repeat: no-repeat;
+    margin-right: 8px;
+    margin-left: 8px;
+}
+
+.m-navbar .menu-container .navbar-item:hover .bank {
+    background-position: -117px -1585px !important;
+}
+
+.m-navbar .menu-container .navbar-item .item-content.selected .bank {
+    background-position: -117px -1585px !important;
+}
+
+.m-navbar .menu-container .navbar-item .item-content .logo-link.buy {
+    width: 24px;
+    height: 24px;
+    background-image: url('@/assets/img/Sprites.64af8f61.svg');
+    background-position: -161px -1628px;
+    background-repeat: no-repeat;
+    margin-right: 8px;
+    margin-left: 8px;
+}
+
+.m-navbar .menu-container .navbar-item:hover .buy {
+    background-position: -161px -1585px !important;
+}
+
+.m-navbar .menu-container .navbar-item .item-content.selected .buy {
+    background-position: -161px -1585px !important;
+}
+
+.m-navbar .menu-container .navbar-item .item-content .logo-link.sell {
+    width: 24px;
+    height: 24px;
+    background-image: url('@/assets/img/Sprites.64af8f61.svg');
+    background-position: -204px -1628px;
+    background-repeat: no-repeat;
+    margin-right: 8px;
+    margin-left: 8px;
+}
+
+.m-navbar .menu-container .navbar-item:hover .sell {
+    background-position: -204px -1585px !important;
+}
+
+.m-navbar .menu-container .navbar-item .item-content.selected .sell {
+    background-position: -204px -1585px !important;
+}
+
+.m-navbar .menu-container .navbar-item .item-content .logo-link.invoice {
+    width: 24px;
+    height: 24px;
+    background-image: url('@/assets/img/Sprites.64af8f61.svg');
+    background-position: -249px -1628px;
+    background-repeat: no-repeat;
+    margin-right: 8px;
+    margin-left: 8px;
+}
+
+.m-navbar .menu-container .navbar-item:hover .invoice {
+    background-position: -249px -1585px !important;
+}
+
+.m-navbar .menu-container .navbar-item .item-content.selected .invoice {
+    background-position: -249px -1585px !important;
+}
+
+.m-navbar .menu-container .navbar-item .item-content .logo-link.stock {
+    width: 24px;
+    height: 24px;
+    background-image: url('@/assets/img/Sprites.64af8f61.svg');
+    background-position: -291px -1628px;
+    background-repeat: no-repeat;
+    margin-right: 8px;
+    margin-left: 8px;
+}
+
+.m-navbar .menu-container .navbar-item:hover .stock {
+    background-position: -291px -1585px !important;
+}
+
+.m-navbar .menu-container .navbar-item .item-content.selected .stock {
+    background-position: -291px -1585px !important;
+}
+
+.m-navbar .menu-container .navbar-item .item-content .logo-link.tools {
+    width: 24px;
+    height: 24px;
+    background-image: url('@/assets/img/Sprites.64af8f61.svg');
+    background-position: -336px -1628px;
+    background-repeat: no-repeat;
+    margin-right: 8px;
+    margin-left: 8px;
+}
+
+.m-navbar .menu-container .navbar-item:hover .tools {
+    background-position: -336px -1585px !important;
+}
+
+.m-navbar .menu-container .navbar-item .item-content.selected .tools {
+    background-position: -336px -1585px !important;
+}
+
+.m-navbar .menu-container .navbar-item .item-content .logo-link.fix-asset {
+    width: 24px;
+    height: 24px;
+    background-image: url('@/assets/img/Sprites.64af8f61.svg');
+    background-position: -378px -1630px;
+    background-repeat: no-repeat;
+    margin-right: 8px;
+    margin-left: 8px;
+}
+
+.m-navbar .menu-container .navbar-item:hover .fix-asset {
+    background-position: -378px -1587px !important;
+}
+
+.m-navbar .menu-container .navbar-item .item-content.selected .fix-asset {
+    background-position: -378px -1587px !important;
+}
+
+.m-navbar .menu-container .navbar-item .item-content .logo-link.tax {
+    width: 24px;
+    height: 24px;
+    background-image: url('@/assets/img/Sprites.64af8f61.svg');
+    background-position: -423px -1630px;
+    background-repeat: no-repeat;
+    margin-right: 8px;
+    margin-left: 8px;
+}
+
+.m-navbar .menu-container .navbar-item:hover .tax {
+    background-position: -423px -1587px !important;
+}
+
+.m-navbar .menu-container .navbar-item .item-content.selected .tax {
+    background-position: -423px -1587px !important;
+}
+
+.m-navbar .menu-container .navbar-item .item-content .logo-link.price {
+    width: 24px;
+    height: 24px;
+    background-image: url('@/assets/img/Sprites.64af8f61.svg');
+    background-position: -467px -1628px;
+    background-repeat: no-repeat;
+    margin-right: 8px;
+    margin-left: 8px;
+}
+
+.m-navbar .menu-container .navbar-item:hover .price {
+    background-position: -467px -1585px !important;
+}
+
+.m-navbar .menu-container .navbar-item .item-content.selected .price {
+    background-position: -467px -1585px !important;
+}
+
+.m-navbar .menu-container .navbar-item .item-content .logo-link.general {
+    width: 24px;
+    height: 24px;
+    background-image: url('@/assets/img/Sprites.64af8f61.svg');
+    background-position: -510px -1628px;
+    background-repeat: no-repeat;
+    margin-right: 8px;
+    margin-left: 8px;
+}
+
+.m-navbar .menu-container .navbar-item:hover .general {
+    background-position: -510px -1585px !important;
+}
+
+.m-navbar .menu-container .navbar-item .item-content.selected .general {
+    background-position: -510px -1585px !important;
+}
+
+.m-navbar .menu-container .navbar-item .item-content .logo-link.budget {
+    width: 24px;
+    height: 24px;
+    background-image: url('@/assets/img/Sprites.64af8f61.svg');
+    background-position: -378px -1659px;
+    background-repeat: no-repeat;
+    margin-right: 8px;
+    margin-left: 8px;
+}
+
+.m-navbar .menu-container .navbar-item:hover .budget {
+    background-position: -423px -1659px !important;
+}
+
+.m-navbar .menu-container .navbar-item .item-content.selected .budget {
+    background-position: -423px -1659px !important;
+}
+
+.m-navbar .menu-container .navbar-item .item-content .logo-link.finace {
+    width: 24px;
+    height: 24px;
+    background-image: url('@/assets/img/Sprites.64af8f61.svg');
+    background-position: -204px -1664px;
+    background-repeat: no-repeat;
+    margin-right: 8px;
+    margin-left: 8px;
+}
+
+.m-navbar .menu-container .navbar-item:hover .finace {
+    background-position: -248px -1664px !important;
+}
+
+.m-navbar .menu-container .navbar-item .item-content.selected .finace {
+    background-position: -248px -1664px !important;
+}
+
+.m-navbar .menu-container .navbar-item .item-content .logo-link.report {
+    width: 24px;
+    height: 24px;
+    background-image: url('@/assets/img/Sprites.64af8f61.svg');
+    background-position: -547px -1628px;
+    background-repeat: no-repeat;
+    margin-right: 8px;
+    margin-left: 8px;
+}
+
+.m-navbar .menu-container .navbar-item:hover .report {
+    background-position: -547px -1585px !important;
+}
+
+.m-navbar .menu-container .navbar-item .item-content.selected .report {
+    background-position: -547px -1585px !important;
+}
+
+
+/*end*/

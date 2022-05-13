@@ -1,0 +1,79 @@
+.m-checkbox {
+    width: 16px;
+    height: 16px;
+}
+
+.m-checkbox input {
+    display: none;
+}
+
+@keyframes m-rotate {
+    from {
+        transform: rotate(-90deg);
+    }
+    to {
+        transform: rotate(0deg);
+    }
+}
+
+.m-checkbox input:checked~.checkmark {
+    background: url('@/assets/img/Sprites.64af8f61.svg') no-repeat;
+    background-position: -1224px -360px;
+    border: 1px solid #2ca01c;
+    animation: m-rotate 0.2s;
+}
+
+.m-checkbox input:checked~.checkmark:hover {
+    border: 1px solid #2ca01c;
+}
+
+.m-checkbox input:active~.checkmark::after {
+    position: absolute;
+    display: block;
+    content: "";
+    top: -4px;
+    left: -4px;
+    width: 22px;
+    height: 22px;
+    border: 1px solid #aeb3eb;
+    border-radius: 2px;
+}
+
+.m-checkbox label {
+    position: relative;
+    width: 16px;
+    height: 16px;
+}
+
+
+/* .m-checkbox label .text {
+    position: relative;
+    top: 10px;
+    right: 0px
+} */
+
+.m-checkbox label .checkmark {
+    cursor: pointer;
+    top: 0px;
+    left: 0px;
+    position: absolute;
+    background: #fff;
+    width: 18px;
+    height: 18px;
+    border-radius: 2px;
+    border: 1px solid #BBB;
+}
+
+.m-checkbox label .checkmark::before {
+    content: "";
+    display: none;
+}
+
+.m-checkbox label .checkmark::after {
+    content: "";
+    display: none;
+}
+
+.m-checkbox label .checkmark:hover {
+    border: 1px solid rgb(122, 122, 122);
+}

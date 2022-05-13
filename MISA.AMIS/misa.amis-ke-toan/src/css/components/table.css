@@ -1,0 +1,384 @@
+.m-table {
+    width: calc(100% - 20px);
+    height: 100%;
+    position: relative;
+    background-color: #fff;
+    margin-right: 30px;
+}
+
+.m-table::-webkit-scrollbar {
+    height: 10px;
+}
+
+.table-tool {
+    padding: 16px;
+    height: 68px;
+    position: sticky;
+    left: 0px;
+    /*test*/
+}
+
+.table-tool .tool-search {
+    max-width: 250px;
+    margin-right: 10px;
+}
+
+.table-tool .m-right {
+    display: flex;
+    align-items: center;
+}
+
+.table-tool .m-right .ultility-button {
+    display: flex;
+    align-items: center;
+}
+
+.table-tool .m-right .ultility-button>div {
+    margin: 0 6px;
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+}
+
+.table-tool .m-right .ultility-button .refresh {
+    background: url('@/assets/img/Sprites.64af8f61.svg') no-repeat;
+    background-position: -423px -201px;
+}
+
+.table-tool .m-right .ultility-button .refresh:hover {
+    background-position: -1097px -88px;
+}
+
+.table-tool .m-right .ultility-button .export {
+    background: url('@/assets/img/Sprites.64af8f61.svg') no-repeat;
+    background-position: -704px -200px;
+}
+
+.table-tool .m-right .ultility-button .export:hover {
+    background-position: -704px -256px;
+}
+
+.table-tool .m-right .ultility-button .setting {
+    background: url('@/assets/img/Sprites.64af8f61.svg') no-repeat;
+    background-position: -88px -200px;
+}
+
+.table-tool .m-right .ultility-button .setting:hover {
+    background-position: -88px -256px;
+}
+
+
+/*end table tool*/
+
+.m-table .table-content {
+    width: 100%;
+    /* height: calc(100% - 68px); */
+    /* overflow: scroll; */
+    /* padding-bottom: 56px; */
+}
+
+.m-table .table-content::-webkit-scrollbar {
+    position: absolute;
+    width: 5px;
+    height: 10px;
+    background-color: #f1f1f1;
+}
+
+.m-table .table-content::-webkit-scrollbar-thumb {
+    background-color: #b8bcc3;
+}
+
+.m-table .table-content::-webkit-scrollbar-thumb:hover {
+    background-color: #a5a5a5;
+}
+
+.m-table .table-content::-webkit-scrollbar-track {
+    background-color: #f1f1f1;
+}
+
+table {
+    border-collapse: separate;
+    border-spacing: 0;
+    /* overflow: hidden; */
+    width: 100%;
+}
+
+.table-content thead>tr>th {
+    border-bottom: 1px solid #c7c7c7;
+    margin: 0;
+    /* min-width: 120px; */
+    position: sticky;
+    top: 0;
+    font-size: 12px;
+    text-transform: uppercase;
+    font-style: bold;
+    padding: 0 10px;
+    text-align: left;
+    border-right: 1px solid #c7c7c7;
+}
+
+.table-content thead>tr {
+    margin: 0;
+    height: 35px;
+    z-index: 2;
+    background-color: #eceef1;
+}
+
+.table-content tbody>tr td {
+    border-right: 1px dotted #c7c7c7;
+    padding: 0 10px;
+}
+
+.table-content tfoot>tr td {
+    padding: 0 10px;
+}
+
+.table-content tbody>tr>td {
+    border-bottom: 1px solid #c7c7c7;
+    box-sizing: border-box;
+    min-height: 44px;
+    height: 44px;
+}
+
+.table-content tfoot>tr>td {
+    box-sizing: border-box;
+    min-height: 44px;
+    height: 44px;
+}
+
+.table-content tbody>tr:last-child {
+    border-bottom: 1px solid #c7c7c7;
+}
+
+.table-content thead th {
+    border-right: 1px solid #c7c7c7;
+    background-color: #eceef1;
+    z-index: 2;
+}
+
+.table-content tbody td {
+    background-color: #fff;
+}
+
+.table-content tfoot td {
+    background-color: #eceef1;
+    position: sticky;
+    bottom: 0px;
+}
+
+.table-content tbody tr.selected>td {
+    background-color: #e5f3ff;
+}
+
+.table-content tbody tr.checked>td {
+    background-color: #e5f3ff;
+}
+
+.table-content tbody tr:hover>td {
+    background-color: #f2f9ff;
+}
+
+.table-content thead th.table-checkbox {
+    position: sticky;
+    left: 16px;
+    z-index: 3;
+    max-width: 40px;
+    min-width: 40px;
+    box-sizing: border-box;
+}
+
+.table-content thead th.table-function {
+    border-right: none;
+    position: sticky;
+    right: 40px;
+    z-index: 3;
+    width: 120px;
+    text-align: center;
+    border-left: 1px solid #c7c7c7;
+}
+
+.table-content tbody td.table-function {
+    border-right: none;
+    position: sticky;
+    right: 40px;
+    z-index: 2;
+    border-left: 1px dotted #c7c7c7;
+    /* min-width: 120px; */
+    text-align: center;
+}
+
+.table-content tfoot td.table-function {
+    border-right: none;
+    position: sticky;
+    right: 40px;
+    z-index: 2;
+    text-align: center;
+    background-color: #eceef1;
+}
+
+.table-content tbody td.table-checkbox {
+    position: sticky;
+    left: 16px;
+    z-index: 2;
+    max-width: 40px;
+    min-width: 40px;
+    box-sizing: border-box;
+}
+
+.table-content tfoot td.table-checkbox {
+    position: sticky;
+    left: 16px;
+    z-index: 2;
+    max-width: 40px;
+    min-width: 40px;
+    box-sizing: border-box;
+    background-color: #eceef1;
+}
+
+.table-content .hidden-left {
+    position: sticky;
+    left: 0px;
+    z-index: 4;
+    max-width: 16px;
+    min-width: 16px;
+    border: none;
+    padding: 0;
+    background-color: #fff;
+    pointer-events: none;
+}
+
+.table-content .hidden-right {
+    pointer-events: none;
+    position: sticky;
+    right: 0px;
+    padding: 0;
+    z-index: 4;
+    max-width: 20px;
+    min-width: 20px;
+    border: none;
+    background-color: #fff;
+}
+
+
+/* table function*/
+
+.table-function .table-function-button {
+    /* height: 36px; */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.table-function .table-function-button .button-edit {
+    color: #0075c0;
+    margin-left: 10px;
+    font-weight: 600;
+}
+
+.table-function .table-function-button .arrow-down-button {
+    /* height: 16px; */
+    padding: 0px 5px;
+    margin: 0px 9px;
+    border: 1px solid transparent;
+}
+
+.table-function .table-function-button .arrow-down-button .icon {
+    background: url('@/assets/img/Sprites.64af8f61.svg') no-repeat;
+    background-position: -896px -359px;
+    width: 16px;
+    height: 16px;
+}
+
+.table-function .table-function-button .arrow-down-button:hover {
+    border: 1px solid #0075c0;
+}
+
+.table-function .table-function-button .button-edit:hover {
+    cursor: pointer;
+}
+
+.table-function .table-function-button .arrow-down-button:hover {
+    cursor: pointer;
+}
+
+
+/*table footer , paging*/
+
+.table-footer {
+    position: sticky;
+    bottom: 0px;
+    height: 56px;
+    width: 100%;
+    z-index: 5;
+    padding-right: 5px;
+    left: 0;
+    top: calc(100% - 56px);
+}
+
+.table-footer .footer {
+    background-color: #fff;
+    height: 100%;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 16px;
+}
+
+.table-footer .footer .count {
+    font-weight: 600;
+}
+
+.table-footer .footer .paging {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.table-footer .footer .paging .select-max-row {
+    min-width: 200px;
+}
+
+.table-footer .footer .count-row {
+    display: flex;
+    align-items: center;
+}
+
+.table-footer .footer .paging-index {
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    margin-left: 5px;
+    cursor: pointer;
+}
+
+.table-footer .footer .paging-index .index {
+    height: 20px;
+    margin-left: 5px;
+    display: flex;
+    align-items: center;
+}
+
+.table-footer .footer .paging-index .index .number-index {
+    height: 20px;
+    margin-left: 5px;
+    display: flex;
+    align-items: center;
+    padding: 0 6.5px;
+}
+
+.table-footer .footer .paging-index .index .number-index.selected {
+    border: 1px solid #00000021;
+}
+
+.table-footer .footer .paging-index .next {
+    height: 20px;
+    margin-left: 5px;
+}
+
+.table-footer .footer .paging-index .prev {
+    height: 20px;
+    margin-left: 5px;
+}
