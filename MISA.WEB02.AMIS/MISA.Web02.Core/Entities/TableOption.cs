@@ -19,7 +19,7 @@ namespace MISA.Web02.Core.Entities
         /// <summary>
         /// danh sách các cột hiển thị trong bảng
         /// </summary>
-        public string? ListColunms { get; set; }
+        public string? ListColumns { get; set; }
         /// <summary>
         /// tên bảng
         /// </summary>

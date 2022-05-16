@@ -126,12 +126,17 @@ namespace MISA.Web02.Core.Services
             {
                 //lấy mã code của đối tượng đã có trong database
                 var oldCode = typeof(T).GetProperty($"{entityName}Code").GetValue(oldEntity).ToString();
-                if (oldCode == newCode)//nếu bằng mã mới có nghĩa mã code đã tồn tại
+                if (oldCode != newCode)//nếu bằng mã mới có nghĩa khô sửa code
                 {
-                    //thêm 1 lỗi vào danh sách lỗi
-                    errorMsg.Add($"{entityName}Code", MISAMessageResource.VN_CodeDuplicate);
-                    //throw exception
-                    throw new MISAExceptions(MISAMessageResource.VN_DataInvalid, errorMsg);
+                    var existCode = _baseRepository.FindByCode(newCode);
+                    if(existCode != null)//nếu khác null có nghĩa mã code đã tồn tại
+                    {
+                        //thêm 1 lỗi vào danh sách lỗi
+                        errorMsg.Add($"{entityName}Code", MISAMessageResource.VN_CodeDuplicate);
+                        //throw exception
+                        throw new MISAExceptions(MISAMessageResource.VN_DataInvalid, errorMsg);
+                    }
+                    
                 }
             }
             if (errorMsg.Count() > 0)

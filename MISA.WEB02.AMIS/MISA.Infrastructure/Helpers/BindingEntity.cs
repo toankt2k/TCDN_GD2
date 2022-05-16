@@ -1,8 +1,12 @@
-﻿using Npgsql;
+﻿using Newtonsoft.Json;
+using Npgsql;
 using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Dynamic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace MISA.Infrastructure.Helpers
@@ -10,37 +14,177 @@ namespace MISA.Infrastructure.Helpers
     public class BindingEntity
     {
         /// <summary>
-        /// 
+        /// dùng khi muốn lấy dữ liêụ trả về từ database
         /// </summary>
-        /// <typeparam name="T">class cần trả về</typeparam>
-        /// <param name="reader">kết quả trả về từ database</param>
-        /// <returns></returns>
+        /// <param name="connectionString">kết nối database</param>
+        /// <param name="commandType">kiểu truy vấn là store hay text</param>
+        /// <param name="commandText">câu query hoặc tên function</param>
+        /// <param name="param">list các tham số cho câu query</param>
+        /// <returns>
+        /// danh sách kết quả cho đối tượng cần lấy
+        /// </returns>
         /// Author: Nguyễn Đức Toán - 11/05/2022
-        public async static Task<IEnumerable<T>> Query<T>(NpgsqlDataReader reader)
+        public async static Task<IEnumerable<T>> Query<T>(string commandText, string connectionString, CommandType commandType, List<NpgsqlParameter> param)
         {
-            var data = new List<T>();
-            var listColunmsName = reader.GetColumnSchemaAsync().Result.Select(col => col.ColumnName.ToString()).ToList();
-            while (reader.Read())
+            using (NpgsqlConnection? conn = new NpgsqlConnection(connectionString))
             {
-                var item = (T)Activator.CreateInstance(typeof(T));
-                var props = typeof(T).GetProperties();
-                foreach (var prop in props)
+                conn.Open();
+                var result = new List<T>();
+                using (var cmd = new NpgsqlCommand(commandText, conn))
                 {
-                    if (!listColunmsName.Contains(ToSnakeCase(prop.Name))) continue;
-                    var value = reader[ToSnakeCase(prop.Name)];
-                    prop.SetValue(item, value, null);
+                    cmd.CommandType = commandType;
+                    cmd.Parameters.AddRange(param.ToArray());
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            dynamic entity = new ExpandoObject();
+                            for (int i = 0; i < reader.FieldCount; i++)
+                            {
+                                var propName = ToPascalCase(reader.GetName(i));
+                                var propValue = reader.GetValue(i);
+                                if (typeof(T).IsPrimitive || typeof(T).Name == "String")
+                                {
+                                    entity = propValue;
+                                    continue;
+                                }
+                                ((IDictionary<string, object>)entity).Add(propName, propValue);
+                            }
+
+                            var entityData = JsonConvert.DeserializeObject<T>(JsonConvert.SerializeObject(entity));
+                            result.Add(entityData);
+                        }
+                    }
                 }
-                data.Add(item);
+                conn.Close();
+                return result;
             }
-            return data;
+
         }
+
+        /// <summary>
+        /// dùng khi muốn lấy dữ liêụ trả về từ database
+        /// </summary>
+        /// <param name="connectionString">kết nối database</param>
+        /// <param name="commandType">kiểu truy vấn là store hay text</param>
+        /// <param name="commandText">câu query hoặc tên function</param>
+        /// <returns>
+        /// danh sách kết quả cho đối tượng cần lấy
+        /// </returns>
+        /// Author: Nguyễn Đức Toán - 11/05/2022
+        public async static Task<IEnumerable<T>> Query<T>(string commandText, string connectionString, CommandType commandType)
+        {
+            using (NpgsqlConnection? conn = new NpgsqlConnection(connectionString))
+            {
+                conn.Open();
+                var result = new List<T>();
+                using (var cmd = new NpgsqlCommand(commandText, conn))
+                {
+                    cmd.CommandType = commandType;
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            dynamic entity = new ExpandoObject();
+                            for (int i = 0; i < reader.FieldCount; i++)
+                            {
+                                var propName = ToPascalCase(reader.GetName(i));
+                                var propValue = reader.GetValue(i);
+                                if (typeof(T).IsPrimitive || typeof(T).Name == "String")
+                                {
+                                    entity = propValue;
+                                    continue;
+                                }
+                                ((IDictionary<string, object>)entity).Add(propName, propValue);
+                            }
+
+                            var entityData = JsonConvert.DeserializeObject<T>(JsonConvert.SerializeObject(entity));
+
+                            result.Add(entityData);
+                        }
+                    }
+                }
+                conn.Close();
+                return result;
+            }
+
+        }
+
+        /// <summary>
+        /// dùng khi muốn lấy dữ liêụ trả về từ database
+        /// </summary>
+        /// <param name="connectionString">kết nối database</param>
+        /// <param name="commandType">kiểu truy vấn là store hay text</param>
+        /// <param name="commandText">câu query hoặc tên function</param>
+        /// <param name="param">list param cho câu query</param>
+        /// <returns>
+        /// danh sách kết quả cho đối tượng cần lấy
+        /// </returns>
+        /// Author: Nguyễn Đức Toán - 11/05/2022
+        public async static Task<int> Execute(string commandText, string connectionString, CommandType commandType, List<NpgsqlParameter> param)
+        {
+            using (NpgsqlConnection? conn = new NpgsqlConnection(connectionString))
+            {
+                conn.Open();
+                var result = new List<int>();
+                using (var cmd = new NpgsqlCommand(commandText, conn))
+                {
+                    cmd.CommandType = commandType;
+                    cmd.Parameters.AddRange(param.ToArray());
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            result.Add(reader.GetInt32(0));
+                        }
+                    }
+                }
+                conn.Close();
+                return result.FirstOrDefault();
+            }
+
+        }
+
+        /// <summary>
+        /// dùng khi goị function k trả về query 
+        /// </summary>
+        /// <param name="connectionString">kết nối database</param>
+        /// <param name="commandType">kiểu truy vấn là store hay text</param>
+        /// <param name="commandText">câu query hoặc tên function</param>
+        /// <returns>
+        /// số lượng bản ghi thay đổi 0 là lỗi hoặc k có thay đổi
+        /// </returns>
+        /// Author: Nguyễn Đức Toán - 11/05/2022
+        public async static Task<int> Execute(string commandText, string connectionString, CommandType commandType)
+        {
+            using (NpgsqlConnection? conn = new NpgsqlConnection(connectionString))
+            {
+                conn.Open();
+                var result = new List<int>();
+                using (var cmd = new NpgsqlCommand(commandText, conn))
+                {
+                    cmd.CommandType = commandType;
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            result.Add(reader.GetInt32(0));
+                        }
+                    }
+                }
+                conn.Close();
+                return result.FirstOrDefault();
+            }
+
+        }
+
         /// <summary>
         /// chuyển key từ pascal case to snake
         /// </summary>
         /// <param name="key"></param>
         /// <returns></returns>
         /// <exception cref="ArgumentNullException"></exception>
-        private static string ToSnakeCase(string key)
+        public static string ToSnakeCase(string key)
         {
             if (key == null)
             {
@@ -66,6 +210,23 @@ namespace MISA.Infrastructure.Helpers
                 }
             }
             return sb.ToString();
+        }
+
+        /// <summary>
+        /// convert key to pascal case
+        /// </summary>
+        /// <param name="str"></param>
+        /// <returns></returns>
+        public static string ToPascalCase(string str)
+        {
+            string result = Regex.Replace(str, "_[a-z]", delegate (Match m)
+            {
+                return m.ToString().TrimStart('_').ToUpper();
+            });
+
+            result = char.ToUpper(result[0]) + result.Substring(1);
+
+            return result;
         }
     }
 }

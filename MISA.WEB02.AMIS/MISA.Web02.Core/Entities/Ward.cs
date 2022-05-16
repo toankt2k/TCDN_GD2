@@ -31,6 +31,7 @@ namespace MISA.Web02.Core.Entities
         /// <summary>
         /// khóa ngoại bảng District
         /// </summary>
+        [MISADisplay(Name ="Id quận/huyện")]
         public Guid DistrictId { get; set; }
     }
 }

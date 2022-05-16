@@ -70,5 +70,15 @@ namespace MISA.Web02.Core.Interfaces.Base
         /// Author: Nguyễn Đức Toán-MF1095 (13/04/2022)
         public T FindByCode(string entityCode);
 
+
+        /// <summary>
+        /// Filter, phân trang 
+        /// </summary>
+        /// <param name="entityCode"></param>
+        /// <returns> chỗi json</returns>
+        /// Author: Nguyễn Đức Toán-MF1095 (13/04/2022)
+        public string Filter(int currentPage, int pageSize, string? filterText);
+
+
     }
 }

@@ -10,12 +10,13 @@ using MySqlConnector;
 using Npgsql;
 using System.Text.RegularExpressions;
 using MISA.Infrastructure.Helpers;
+using System.Data;
 
 namespace MISA.Infrastructure.Respository
 {
     public class EmployeeRepository : BaseRespository<Employee>, IEmployeeRepository
     {
-        public string _sqlPostgreslqString= "Host=140.238.38.197;Port=5432;Database=MISA_WEB02_AMIS;User Id=admin;Password=Anhtoankt12@";
+        
         #region Methods
         /// <summary>
         /// thực hiện lấy dữ liệu phân trang cho employee
@@ -27,10 +28,10 @@ namespace MISA.Infrastructure.Respository
         /// count: tổng số bản ghi phù hợp với kq tìm kiếm;
         /// list: danh sách nhân viên đã được filter
         /// </returns>
-        public object Filter(int currentPage, int pageSize, string? filterText)
+        public object Filters(int currentPage, int pageSize, string? filterText)
         {
             //khởi tạo kết nối
-            var sqlConnection = new MySqlConnection(_sqlConnectionString);
+            var sqlConnection = new MySqlConnection(_sqlPostgreslqString);
             //set option cho filter
             //vị trí bắt đầu lấy
             var offset = (currentPage - 1) * pageSize;
@@ -75,10 +76,10 @@ namespace MISA.Infrastructure.Respository
         /// Danh sách nhân viên 
         /// </returns>
         /// Author: Nguyễn Đức Toán-MF1095 (13/04/2022)
-        public override IEnumerable<Employee> Get()
+        public IEnumerable<Employee> Gets()
         {
             //khởi tạo kết nối
-            var sqlConnection = new MySqlConnection(_sqlConnectionString);
+            var sqlConnection = new MySqlConnection(_sqlPostgreslqString);
             //lấy dữ liệu
             string sqlCommand = "SELECT *"
             + " FROM Employee as e"
@@ -97,12 +98,12 @@ namespace MISA.Infrastructure.Respository
         /// nhân viên tìm được/null
         /// </returns>
         /// Author: Nguyễn Đức Toán-MF1095 (13/04/2022)
-        public override Employee GetById(Guid id)
+        public Employee GetByIds(Guid id)
         {
 
 
             //khởi tạo kết nối
-            var sqlConnection = new MySqlConnection(_sqlConnectionString);
+            var sqlConnection = new MySqlConnection(_sqlPostgreslqString);
             //lấy dữ liệu
             string sqlCommand = "SELECT *"
             + " FROM Employee as e"
@@ -119,43 +120,10 @@ namespace MISA.Infrastructure.Respository
         }
 
 
-        public async Task<object> testPostgre()
+        public object testPostgre()
         {
-            var sqlConnection = new NpgsqlConnection(_sqlPostgreslqString);
-            sqlConnection.Open();
-            string commandText = $"select * from test_table d ";
-            var cmd = new NpgsqlCommand(commandText, sqlConnection);
-            var reader = cmd.ExecuteReader();
-            //list tên các colunm trong database
-            var result = await BindingEntity.Query<TableOption>(reader);
-            return result;
-        }
-        public string ToSnakeCase(string key)
-        {
-            if (key == null)
-            {
-                throw new ArgumentNullException(nameof(key));
-            }
-            if (key.Length < 2)
-            {
-                return key;
-            }
-            var sb = new StringBuilder();
-            sb.Append(char.ToLowerInvariant(key[0]));
-            for (int i = 1; i < key.Length; ++i)
-            {
-                char c = key[i];
-                if (char.IsUpper(c))
-                {
-                    sb.Append('_');
-                    sb.Append(char.ToLowerInvariant(c));
-                }
-                else
-                {
-                    sb.Append(c);
-                }
-            }
-            return sb.ToString();
+            
+            return null;
         }
         #endregion
     }

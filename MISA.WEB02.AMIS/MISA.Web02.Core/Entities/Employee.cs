@@ -27,45 +27,6 @@ namespace MISA.Web02.Core.Entities
         [MISADisplay(Name = "Tên nhân viên")]
         [MISARequired]
         public string? EmployeeName { get; set; }
-        /// <summary>
-        /// tên nhân viên
-        /// </summary>
-        [NotMap]
-        public string? FirstName
-        {
-            get
-            {
-                //lấy index cuối của ký tự ' '
-                var lastIndexOfSpace = EmployeeName == null ? -1 : EmployeeName.LastIndexOf(" ");
-                //cắt chuỗi từ vị trí đầu đến vị trí cuối của ký tự ' '
-                var name = EmployeeName;
-                if (lastIndexOfSpace != -1)
-                {
-                    name = EmployeeName.Substring(0, lastIndexOfSpace).Trim();
-                }
-                return name;
-            }
-        }
-        /// <summary>
-        /// tên nhân viên
-        /// </summary>
-        [NotMap]
-        public string? LastName
-        {
-            get
-            {
-                //lấy index cuối của ký tự ' '
-                var lastIndexOfSpace = EmployeeName == null ? -1 : EmployeeName.LastIndexOf(" ");
-                //cắt chuỗi từ vị trí cuối của ký tự ' ' đến hết
-                var name = EmployeeName;
-                if (lastIndexOfSpace != -1)
-                {
-                    name = EmployeeName.Substring(lastIndexOfSpace).Trim();
-                }
-                return name;
-
-            }
-        }
 
         /// <summary>
         /// mã code nhân viên
@@ -122,7 +83,7 @@ namespace MISA.Web02.Core.Entities
         /// <summary>
         /// Số điện thoại cố định của nhân viên
         /// </summary>
-        public string? LandlineNumber { get; set; }
+        public string? LandLineNumber { get; set; }
 
         /// <summary>
         /// Địa chỉ của nhân viên

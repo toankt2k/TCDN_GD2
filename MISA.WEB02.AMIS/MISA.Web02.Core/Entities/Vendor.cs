@@ -15,7 +15,7 @@ namespace MISA.Web02.Core.Entities
         /// Id Bảng nhà cung cấp
         /// </summary>
         [MISARequired]
-        public Guid Id { get; set; }
+        public Guid VendorId { get; set; }
 
         /// <summary>
         /// Mã Nhà cung cấp
@@ -26,6 +26,7 @@ namespace MISA.Web02.Core.Entities
         /// <summary>
         /// Tên đầy đủ Nhà cung cấp = tên prefix + tên nhà cung cấp
         /// </summary>
+        [NotMap]
         public string? VendorFullName
         {
             get
@@ -33,11 +34,14 @@ namespace MISA.Web02.Core.Entities
                 return $"{PrefixName} {VendorName}";
             }
         }
+
         /// <summary>
         /// Tên Nhà cung cấp
         /// </summary>
         [MISARequired]
+        [MISADisplay(Name = "Tên nhà cung cấp")]
         public string? VendorName { get; set; }
+
         /// <summary>
         /// Tên tiền tố(xưng hô)
         /// </summary>
@@ -47,34 +51,78 @@ namespace MISA.Web02.Core.Entities
         /// <summary>
         /// mã số thuế
         /// </summary>
-        public string? VendorTaxCode { get; set; }
+        public string? TaxCode { get; set; }
+
         /// <summary>
         /// số điện thoại
         /// </summary>
         public string? PhoneNumber { get; set; }
+
         /// <summary>
         /// số điện thoại bàn
         /// </summary>
         public string? LandLineNumber { get; set; }
-        //public string? ContactAddress { get; set; }
+
         public string? Website { get; set; }
+
         /// <summary>
         /// Loại nhà cung cấp: 0 - tổ chức; 1 - cá nhân
         /// </summary>
         public int VendorType { get; set; }
+
+        /// <summary>
+        /// là khách hàng hay không hay không
+        /// </summary>
         public bool IsCustomer { get; set; }
 
         /// <summary>
         /// Xưng hô ( người liên hệ)
         /// </summary>
-        public string? ContactPronoun { get; set; }
+        public string? ContactPrefixId { get; set; }
+       
+        /// <summary>
+        /// tên xưng hô
+        /// </summary>
+        public string? ContactPrefixName
+        {
+            get
+            {
+                return "";
+            }
+        }
+
+        /// <summary>
+        /// tên người liên hệ
+        /// </summary>
         public string? ContactName { get; set; }
+        
+        /// <summary>
+        /// tên đại diện pháp luật
+        /// </summary>
         public string? ContactLegalRep { get; set; }
+        
+        /// <summary>
+        /// email liên hệ
+        /// </summary>
         public string? ContactEmail { get; set; }
+        
+        /// <summary>
+        /// số điện thoại liên hệ
+        /// </summary>
         public string? ContactPhoneNumber { get; set; }
 
         #region Điều khoản
-        public Guid? ContractId { get; set; }
+        
+        /// <summary>
+        /// điều khoản được định nghĩa trong enum
+        /// </summary>
+        public int ContractId { get; set; }
+        
+        /// <summary>
+        /// tên điều khoản
+        /// </summary>
+        [NotMap]
+        public string? ContractName { get; set; }
 
         /// <summary>
         /// Số ngày nợ tối đa
@@ -84,54 +132,54 @@ namespace MISA.Web02.Core.Entities
         /// <summary>
         /// Số nợ tối đa
         /// </summary>
-        public float? MaxDebitAmount { get; set; }
+        public double? MaxDebitAmount { get; set; }
 
-        /// <summary>
-        /// Tài khoản công nợ nhận
-        /// </summary>
-        public Guid? DebitReceiptAccount { get; set; }
+        ///// <summary>
+        ///// Tài khoản công nợ nhận
+        ///// </summary>
+        //public Guid? DebitReceiptAccountId { get; set; }
 
-
-        /// <summary>
-        /// Tài khoản công nợ trả
-        /// </summary>
-        public Guid? DebitPaymentAccount { get; set; }
+        ///// <summary>
+        ///// Tài khoản công nợ trả
+        ///// </summary>
+        //public Guid? DebitPaymentAccountId { get; set; }
 
         #endregion
 
         #region Tài khoản ngân hàng
-        public List<Guid>? BankAccounts { get; set; }
+        public string? Bank { get; set; }
         #endregion
 
         #region Địa chỉ khác
-        ///// <summary>
-        ///// địa chỉ khác: lưu dạng Json
-        ///// các thuộc tính gồm: Country,City,District,Ward,DeliveryAddresses
-        ///// </summary>
-        //public string? OtherAddress { get; set; }
+
         /// <summary>
         /// tên quốc gia
         /// </summary>
-        public string? CountryName { get; set; }
+        public string? CountryId { get; set; }
+
         /// <summary>
         /// tên tỉnh
         /// </summary>
-        public string? ProvinceName { get; set; }
+        public string? ProvinceId { get; set; }
+
         /// <summary>
         /// tên huyện
         /// </summary>
-        public string? DistrictName { get; set; }
+        public string? DistrictId { get; set; }
+
         /// <summary>
         /// tên xã
         /// </summary>
-        public string? WardName { get; set; }
+        public string? WardId { get; set; }
+
         /// <summary>
-        /// danh sách các địac hỉ giap hàng
+        /// danh sách các địac hỉ giao hàng là chuỗi json
         /// </summary>
-        public List<string>? DeliveryAddresses { get; set; }
+        public string? DeliveryAddresses { get; set; }
         #endregion
 
         #region Ghi chú
+
         /// <summary>
         /// ghi chú
         /// </summary>
@@ -143,6 +191,11 @@ namespace MISA.Web02.Core.Entities
         /// ngày cấp chứng minh nhân dân
         /// </summary>
         public DateTime? IdentityDate { get; set; }
+
+        /// <summary>
+        /// số cmnd
+        /// </summary>
+        public string? IdentityNumber { get; set; }
         /// <summary>
         /// nơi cấp chứng minh nhân dân
         /// </summary>

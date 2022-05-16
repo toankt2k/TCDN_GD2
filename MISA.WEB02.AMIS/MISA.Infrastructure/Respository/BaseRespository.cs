@@ -1,11 +1,15 @@
 ﻿using Dapper;
+using MISA.Infrastructure.Helpers;
 using MISA.Web02.Core.Entities;
 using MISA.Web02.Core.Interfaces.Base;
 using MySqlConnector;
+using Npgsql;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace MISA.Infrastructure.Respository
@@ -14,17 +18,17 @@ namespace MISA.Infrastructure.Respository
     /// kết nối database và thực thi các câu lệnh sql dùng chung cho các thực thể
     /// </summary>
     /// <typeparam name="T"> class truyền vào</typeparam>
-    public class BaseRespository<T>:IBaseRepository<T>
+    public class BaseRespository<T> : IBaseRepository<T>
     {
         #region Fields
-        public string _sqlConnectionString;
-        
+        public string _sqlPostgreslqString;
+
         #endregion
         #region Constructor
         public BaseRespository()
         {
             //_sqlConnectionString = "Host=3.0.89.182;Port=3306;Database=MISA.WEB02.NDTOAN;User Id=dev;Password=12345678";
-            _sqlConnectionString = "Host=140.238.38.197;Port=3306;Database=MISA.WEB02.NDTOAN;User Id=admin;Password=Anhtoankt12@";
+            _sqlPostgreslqString = "Host=140.238.38.197;Port=5432;Database=MISA_WEB02_AMIS;User Id=admin;Password=Anhtoankt12@";
             //_sqlConnectionString = "Host=localhost;Port=3306;Database=MISA.WEB02.NDTOAN;User Id=root;Password=''";
         }
         #endregion
@@ -39,15 +43,11 @@ namespace MISA.Infrastructure.Respository
         public virtual IEnumerable<T> Get()
         {
             var entityName = typeof(T).Name;
-            //khởi tạo kết nối
-            var sqlConnection = new MySqlConnection(_sqlConnectionString);
-            //lấy dữ liệu
-            string sqlCommand = $"SELECT * FROM {entityName}";
-            //dữ liệu trả về gồm các propperty của Employee
-            //và thêm các property: DeparmentId,DeparmentCode,PositionCode,PositionId
-            var data = sqlConnection.Query<T>(sql: sqlCommand);
+            string commandText = $"SELECT * FROM {BindingEntity.ToSnakeCase(entityName)}";
+            //dữ liệu trả về gồm các propperty của T
+            var data = BindingEntity.Query<T>(commandText, _sqlPostgreslqString, CommandType.Text);
             //trả về kết quả
-            return data;
+            return data.Result;
         }
 
         /// <summary>
@@ -57,22 +57,27 @@ namespace MISA.Infrastructure.Respository
         /// Author: Nguyễn Đức Toán-MF1095 (13/04/2022)
         public virtual string GetNewCode()
         {
-            //khởi tạo kết nối
-            var sqlConnection = new MySqlConnection(_sqlConnectionString);
-            //lấy entityName
-            var entityName = typeof(T).Name;
+            //table name snake
+            var tableName = BindingEntity.ToSnakeCase(typeof(T).Name);
             //sql query
-            var sqlCommand = $"SELECT e.{entityName}Code FROM {entityName} as e";
-            //Lấy danh sách code của entity:string
-            var listEntityCode = sqlConnection.Query<string>(sql: sqlCommand);
+            var commandText = $"SELECT e.{tableName}_code FROM {tableName} as e";
+            //trả về danh sách các code với các key và value
+            var data = BindingEntity.Query<string>(commandText, _sqlPostgreslqString, CommandType.Text);
+            var listEntityCode = data.Result;
             //danh sách code khi tách 2 chữ đầu
             var listCode = new List<int>();
+            //xóa hết các kí tự là chữ trong code
+            string pattern = @"\D";
             for (int i = 0; i < listEntityCode.Count(); i++)
             {
                 var code = listEntityCode.ElementAt(i);
-                listCode.Add(int.Parse(code.Substring(3, code.Length - 3)));
+                listCode.Add(int.Parse(Regex.Replace(code.ToString(), pattern, "")));
             }
-            var newCode = $"{listCode.Max() + 1}";
+            var newCode = $"1";
+            if (listCode.Count > 0)
+            {
+                newCode = $"{listCode.Max() + 1}";
+            }
             return newCode;
         }
 
@@ -94,25 +99,27 @@ namespace MISA.Infrastructure.Respository
             var propId = typeof(T).GetProperty($"{typeof(T).Name}Id");
             //set giá trị cho prop id
             propId.SetValue(entity, Guid.NewGuid());
-            //khởi tạo kết nối
-            var sqlConnection = new MySqlConnection(_sqlConnectionString);
-            //lấy dữ liệu chèn tên bảng vào
-            var sqlCommand = $"Proc_Insert{entityName}";
-            //truyền tham số cho Procedure
-            var dynamicParam = new DynamicParameters();
+            //set commandText gọi function
+            string commandText = $"func_insert_{BindingEntity.ToSnakeCase(entityName)}";
+            //tạo tham số
+            var param = new List<NpgsqlParameter>(); 
             //lấy danh sách property của entity
             var listProperties = typeof(T).GetProperties();
-            foreach(var prop in listProperties)
+            foreach (var prop in listProperties)
             {
+                //chuyển qua snake case
+                var tableColunm = BindingEntity.ToSnakeCase(prop.Name);
                 //xem prop có cho phép map vào database không
                 var isNotMap = prop.IsDefined(typeof(NotMap), false);
-                if (!isNotMap){
-                    dynamicParam.Add($"@m_{prop.Name}", entity.GetType().GetProperty(prop.Name).GetValue(entity));
+                var value = entity.GetType().GetProperty(prop.Name).GetValue(entity);
+                if (!isNotMap)
+                {
+                    param.Add(new NpgsqlParameter($"@m_{tableColunm}", value == null ? DBNull.Value : value.ToString()));
                 }
             }
-            var res = sqlConnection.Execute(sql: sqlCommand, param: dynamicParam, commandType: System.Data.CommandType.StoredProcedure);
+            var res = BindingEntity.Execute(commandText,_sqlPostgreslqString,CommandType.StoredProcedure,param);
             //trả về kết quả
-            return res;
+            return res.Result;
         }
 
         /// <summary>
@@ -125,29 +132,30 @@ namespace MISA.Infrastructure.Respository
         public virtual int Update(T entity)
         {
             var entityName = typeof(T).Name;
-            //khởi tạo kết nối
-            var sqlConnection = new MySqlConnection(_sqlConnectionString);
-            //sử dụng proc update
-            string sqlCommand = $"Proc_Update{entityName}";
-            //truyền tham số cho Procedure
-            var dynamicParam = new DynamicParameters();
+            //sử dụng func update
+            string commandText = $"func_update_{BindingEntity.ToSnakeCase(entityName)}";
+            //tạo tham số
+            var param = new List<NpgsqlParameter>();
             //lấy danh sách property của entity
             var listProperties = typeof(T).GetProperties();
             foreach (var prop in listProperties)
             {
+                //chuyển qua snake case
+                var tableColunm = BindingEntity.ToSnakeCase(prop.Name);
                 //xem prop có cho phép map vào database không
                 var isNotMap = prop.IsDefined(typeof(NotMap), false);
                 if (!isNotMap)
                 {
                     //giá trị mới được truyền vào
-                    var newVal = entity.GetType().GetProperty(prop.Name).GetValue(entity);
-                    dynamicParam.Add($"@m_{prop.Name}", newVal);
+                    var value = entity.GetType().GetProperty(prop.Name).GetValue(entity);
+                    param.Add(new NpgsqlParameter($"@m_{tableColunm}", value == null ? DBNull.Value : value.ToString()));
                 }
             }
-            //update dữ liệu
-            var res = sqlConnection.Execute(sql: sqlCommand, param: dynamicParam, commandType: System.Data.CommandType.StoredProcedure);
+
+            //update
+            var res = BindingEntity.Execute(commandText,_sqlPostgreslqString,CommandType.StoredProcedure,param);
             //trả về kết quả
-            return res;
+            return res.Result;
         }
 
         /// <summary>
@@ -160,18 +168,17 @@ namespace MISA.Infrastructure.Respository
         /// Author: Nguyễn Đức Toán-MF1095 (13/04/2022)
         public virtual T GetById(Guid id)
         {
-            var entityName = typeof(T).Name;
-            //khởi tạo kết nối
-            var sqlConnection = new MySqlConnection(_sqlConnectionString);
+            var tableName = BindingEntity.ToSnakeCase(typeof(T).Name);
             //lấy dữ liệu
-            string sqlCommand = $"SELECT * FROM {entityName} as e WHERE {entityName}Id = @{entityName}Id";
+            string commandText = $"SELECT * FROM {tableName} as e WHERE {tableName}_id = @m_{tableName}_id";
             //khởi tạo tham số
-            var dynamicParam = new DynamicParameters();
-            dynamicParam.Add($"@{entityName}Id", id);
+            var param = new List<NpgsqlParameter>();
+            param.Add(new NpgsqlParameter($"@m_{tableName}_id", id.ToString()));
             //dữ liệu trả về gồm các propperty của T
-            var data = sqlConnection.Query<T>(sql: sqlCommand, param: dynamicParam).FirstOrDefault();
+            var data = BindingEntity.Query<T>(commandText, _sqlPostgreslqString, CommandType.Text, param);
+            var result = data.Result.FirstOrDefault();
             //trả về kết quả
-            return data;
+            return result;
         }
 
         /// <summary>
@@ -184,18 +191,18 @@ namespace MISA.Infrastructure.Respository
         /// Author: Nguyễn Đức Toán-MF1095 (13/04/2022)
         public virtual int Delete(Guid id)
         {
-            var entityName = typeof(T).Name;
-            //khởi tạo kết nối
-            var sqlConnection = new MySqlConnection(_sqlConnectionString);
+            //table name snake
+            var tableName = BindingEntity.ToSnakeCase(typeof(T).Name);
             //lấy dữ liệu
-            string sqlCommand = $"DELETE FROM {entityName} WHERE {entityName}Id = @{entityName}Id";
+            string commandText = $"WITH deleted AS (DELETE FROM {tableName} WHERE {tableName}_id = @m_{tableName}_id IS TRUE RETURNING *) SELECT count(*) FROM deleted;";
             //khởi tạo tham số
-            var dynamicParam = new DynamicParameters();
-            dynamicParam.Add($"@{entityName}Id", id);
-            //dữ liệu trả về gồm các propperty của Employee
-            var data = sqlConnection.Execute(sql: sqlCommand, param: dynamicParam);
+            var param = new List<NpgsqlParameter>();
+            param.Add(new NpgsqlParameter($"@m_{tableName}_id", id.ToString()));
+            //dữ liệu trả về số hàng được xóa
+            var data = BindingEntity.Execute(commandText, _sqlPostgreslqString,CommandType.Text,param);
+            var result = data.Result;
             //trả về kết quả
-            return data;
+            return result;
         }
 
         /// <summary>
@@ -206,29 +213,29 @@ namespace MISA.Infrastructure.Respository
         /// Author: Nguyễn Đức Toán-MF1095 (13/04/2022)
         public virtual int MultiDelete(List<Guid> listId)
         {
-            var entityName = typeof(T).Name;
+            //table name dang snake
+            var tableName = BindingEntity.ToSnakeCase(typeof(T).Name);
             //khởi tạo kết nối
-            var sqlConnection = new MySqlConnection(_sqlConnectionString);
+            var sqlConnection = new NpgsqlConnection(_sqlPostgreslqString);
+            //comamnd text delete nhiều
+            string commandText = "";
             //ds nhân viên cần xóa
             var listParam = "";
             //khởi tạo tham số, sinh chuỗi tham số
-            var dynamicParam = new DynamicParameters();
-            //index
-            var i = 0;
-            foreach(var id in listId)
+            var param = new List<NpgsqlParameter>();
+            //thêm param và tạo tham số commandtext
+            for (int i = 0; i < listId.Count; i++)
             {
-                dynamicParam.Add($"@id{i}", id);
-                listParam += $"@Id{i}" + ",";
-                i++;
+                param.Add(new NpgsqlParameter($"@id{i}", listId.ElementAt(i).ToString()));
+                listParam += $"@id{i}" + ",";
             }
             listParam = listParam.Substring(0, listParam.Length - 1).Trim();
-            //lấy dữ liệu
-            string sqlCommand = $"DELETE FROM {entityName} WHERE {entityName}Id IN ({listParam})";
-
+            commandText = $"WITH deleted AS (DELETE FROM {tableName} WHERE {tableName}_id IN ({listParam}) IS TRUE RETURNING *) SELECT count(*) FROM deleted;";
             //dữ liệu trả về gồm các propperty của Employee
-            var data = sqlConnection.Execute(sql: sqlCommand, param: dynamicParam);
+            var data = BindingEntity.Execute(commandText, _sqlPostgreslqString, CommandType.Text, param);
+            var res = data.Result;
             //trả về kết quả
-            return data;
+            return res;
         }
 
         /// <summary>
@@ -238,18 +245,51 @@ namespace MISA.Infrastructure.Respository
         /// <returns></returns>
         public virtual T FindByCode(string code)
         {
-            var entityName = typeof(T).Name;
-            //khởi tạo kết nối
-            var sqlConnection = new MySqlConnection(_sqlConnectionString);
+            //tableNAme dạng snake case
+            var tableName = typeof(T).Name;
             //lấy dữ liệu
-            string sqlCommand = $"SELECT * FROM {entityName} WHERE {entityName}Code = @{entityName}Code";
+            string commandText = $"SELECT * FROM {tableName} WHERE {tableName}_code = @m_{tableName}_code";
             //khởi tạo tham số
-            var dynamicParam = new DynamicParameters();
-            dynamicParam.Add($"@{entityName}Code", code);
+            var param = new List<NpgsqlParameter>();
+            param.Add(new NpgsqlParameter($"@m_{tableName}_code", code.ToString()));
             //dữ liệu trả về thông tin của đối tượng
-            var data = sqlConnection.Query<T>(sql: sqlCommand, param: dynamicParam).FirstOrDefault();
+            var data = BindingEntity.Query<T>(commandText, _sqlPostgreslqString, CommandType.Text, param);
+            var res = data.Result.FirstOrDefault();
             //trả về kết quả
-            return data;
+            return res;
+        }
+
+        /// <summary>
+        /// trả về chuỗi json gồm số bản ghi và danh sách kết quả
+        /// </summary>
+        /// <param name="currentPage"></param>
+        /// <param name="pageSize"></param>
+        /// <param name="filterText"></param>
+        /// <returns></returns>
+        public string Filter(int currentPage, int pageSize, string? filterText)
+        {
+            var tableName = BindingEntity.ToSnakeCase(typeof(T).Name);
+            //khởi tạo kết nối
+            var sqlConnection = new NpgsqlConnection(_sqlPostgreslqString);
+            //set option cho filter
+            //vị trí bắt đầu lấy
+            var offset = (currentPage - 1) * pageSize;
+            //số bản ghi lấy
+            var limit = pageSize;
+            //lấy dữ liệu
+            string commandText = $"func_filter_{tableName}";
+            //truyền param
+            var param = new List<NpgsqlParameter>();
+            param.Add(new NpgsqlParameter("@m_filter_text", filterText == null ? "" : filterText));
+            param.Add(new NpgsqlParameter("@m_limit", limit.ToString()));
+            param.Add(new NpgsqlParameter("@m_offset", offset.ToString()));
+            sqlConnection.Open();
+            //dữ liệu trả về gồm các propperty của Employee
+            //truy vấn trả về kq cho 2 câu lệnh sql
+            var data = BindingEntity.Query<string>(commandText, _sqlPostgreslqString, CommandType.StoredProcedure,param);
+
+            //trả về kết quả
+            return data.Result.FirstOrDefault();
         }
         #endregion
     }

@@ -37,11 +37,11 @@ namespace MISA.Web02.Core.Entities
         /// <summary>
         /// ngày hạch toán
         /// </summary>
-        public DateTime AccountingDate { get; set; }
+        public DateTime? AccountingDate { get; set; }
         /// <summary>
         /// Ngày Thanh toán
         /// </summary>
-        public DateTime PaytmentDate { get; set; }
+        public DateTime? PaytmentDate { get; set; }
         /// <summary>
         /// diễn giải cho phiếu chi(lí do chi)
         /// </summary>
@@ -49,7 +49,7 @@ namespace MISA.Web02.Core.Entities
         /// <summary>
         /// Khóa ngoại bảng nhân viên
         /// </summary>
-        public Guid EmployeeId { get; set; }
+        public Guid? EmployeeId { get; set; }
         /// <summary>
         /// tệp đính kèm chứng từ gốc kèm theo
         /// </summary>
@@ -57,11 +57,7 @@ namespace MISA.Web02.Core.Entities
         /// <summary>
         /// loại Tiền tệ
         /// </summary>
-        public string? Currency { get; set; }
-        /// <summary>
-        /// Tỉ giá
-        /// </summary>
-        public float ExchangeRate { get; set; }
+        public int? CurrencyId { get; set; }
 
     }
 }

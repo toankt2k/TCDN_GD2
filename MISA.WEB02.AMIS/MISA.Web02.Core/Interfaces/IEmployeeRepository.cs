@@ -78,8 +78,8 @@ namespace MISA.Web02.Core.Interfaces
         /// list danh sách nhân viên đã được filter
         /// </returns>
         /// Author: Nguyễn Đức Toán-MF1095(15/04/2022)
-        public object Filter(int currentPage, int pageSize, string? filterText);
-        public Task<object> testPostgre();
+        public string Filter(int currentPage, int pageSize, string? filterText);
+        public object testPostgre();
 
     }
 }

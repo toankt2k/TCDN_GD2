@@ -290,6 +290,7 @@
           "Dapper": "2.0.123",
           "MISA.Web02.Core": "1.0.0",
           "MySqlConnector": "2.1.8",
+          "Newtonsoft.Json": "13.0.1",
           "Npgsql": "6.0.4"
         },
         "runtime": {

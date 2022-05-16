@@ -79,7 +79,7 @@ namespace MISA.Web02.Core.Services
         /// <param name="id"></param>
         /// <returns></returns>
         /// Author: Nguyễn Đức Toán - MF1095 (14/04/2022)
-        public override int UpdateService(Employee employee, Guid id)
+        public int UpdateServicea(Employee employee, Guid id)
         {
             Dictionary<string, string> errorMsg = new Dictionary<string, string>();
             //validate dữ liệu trống
