@@ -29,7 +29,7 @@
       </div>
       <div class="container">
         <div class="table-area">
-          <MTableEditable />
+          <MTableEditable ref="tableOption" :columns="columns" :defaultData="tableData" />
         </div>
         <div class="view-other-area"></div>
       </div></div>
@@ -47,6 +47,7 @@
             <MButton
               :buttonType="'primary'"
               :text="'Cất'"
+              @click="getData"
               @keydown="lastTabIndex"
             />
           </div>
@@ -67,18 +68,95 @@ export default {
     MTableEditable,
     MButton,
   },
+  props:{
+    data:{
+      type:Array,
+      default:()=>[]
+    },
+  },
   data() {
-    return {};
+    return {
+      columns:[
+        {
+          id: "name",
+          name: "Tên cột dữ liệu",
+          displayName: "Tên cột dữ liệu",
+          descriptionName:"Tên cột dữ liệu",
+          width: "unset",
+          minWidth: "120px",
+          classList: [],
+          align: "left",
+          edit: false,
+          count: false,
+          type: "text",
+        },
+        {
+          id: "displayName",
+          name: "Tên cột trên giao diện",
+          displayName: "Tên cột trên giao diện",
+          descriptionName:"Tên cột trên giao diện",
+          width: "auto",
+          minWidth: "120px",
+          classList: [],
+          align: "left",
+          edit: true,
+          count: false,
+          type: "text",
+        },
+        {
+          id: "width",
+          name: "Độ rộng",
+          displayName: "Độ rộng",
+          descriptionName:"Độ rộng",
+          width: "100px",
+          minWidth: "120px",
+          classList: [],
+          align: "left",
+          edit: true,
+          count: false,
+          type: "text",
+        }],
+      tableData:this.data,
+
+    };
+    
   },
   methods: {
+    /**
+    * Mô tả : đóng form setting
+    * Created by: Nguyễn Đức Toán - MF1095 (20/05/2022)
+    */
     exitSetting() {
       try {
-        this.$emit("exitSetting", true);
+        this.$emit("exitSetting", false);
       } catch (error) {
         console.log(error);
       }
     },
+    /**
+    * Mô tả : láy dữ liệu từ bảng edit
+    * Created by: Nguyễn Đức Toán - MF1095 (20/05/2022)
+    */
+    getData(){
+      try {
+        let data = this.$refs['tableOption'].getData();
+        this.$emit('submit',data);
+      } catch (error) {
+        console.log(error);
+      }
+    }
   },
+  watch:{
+    data(newVal){
+      try {
+        if(newVal){
+          this.tableData = newVal;
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  }
 };
 </script>
 
@@ -90,9 +168,10 @@ export default {
   width: 100vw;
   height: 100vh;
   background-color: #11111121;
+  z-index: 20;
 }
 .custom-setting .dialog-content {
-  width: 50%;
+  width: 60%;
   float: right;
   height: 100%;
   background-color: #fff;
@@ -102,6 +181,7 @@ export default {
 }
 .custom-setting .dialog-content .container {
   overflow: auto;
+  max-height: calc(100% - 140px);
 }
 .custom-setting .dialog-content .title-area {
   display: flex;
@@ -137,6 +217,7 @@ export default {
   padding: 8px 20px;
   position: sticky;
   left: 0;
+  bottom: 0;
   display: flex;
   justify-content: space-between;
 }

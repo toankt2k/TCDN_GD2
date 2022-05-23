@@ -7,46 +7,31 @@ using System.Threading.Tasks;
 namespace MISA.Web02.Core.Entities
 {
     /// <summary>
-    /// Thông tin cá nhân của teacher
+    /// Thông tin cá nhân của nhà cung cấp
     /// Created by: Thai(13/1/2022)
     public class Vendor : BaseEntity
     {
         /// <summary>
         /// Id Bảng nhà cung cấp
         /// </summary>
-        [MISARequired]
-        public Guid VendorId { get; set; }
+        public Guid? VendorId { get; set; }
 
         /// <summary>
         /// Mã Nhà cung cấp
         /// </summary>
         [MISARequired]
+        [MISADisplay(Name = "Mã nhà cung cấp")]
         public string? VendorCode { get; set; }
-
+        
         /// <summary>
-        /// Tên đầy đủ Nhà cung cấp = tên prefix + tên nhà cung cấp
+        /// địa chỉ nhà cung cấp
         /// </summary>
-        [NotMap]
-        public string? VendorFullName
-        {
-            get
-            {
-                return $"{PrefixName} {VendorName}";
-            }
-        }
+        public string? Address { get; set; }
 
         /// <summary>
         /// Tên Nhà cung cấp
         /// </summary>
-        [MISARequired]
-        [MISADisplay(Name = "Tên nhà cung cấp")]
         public string? VendorName { get; set; }
-
-        /// <summary>
-        /// Tên tiền tố(xưng hô)
-        /// </summary>
-        public string? PrefixName { get; set; }
-
 
         /// <summary>
         /// mã số thuế
@@ -62,34 +47,34 @@ namespace MISA.Web02.Core.Entities
         /// số điện thoại bàn
         /// </summary>
         public string? LandLineNumber { get; set; }
-
+        /// <summary>
+        /// link trang web
+        /// </summary>
         public string? Website { get; set; }
 
         /// <summary>
+        /// nhân viên mua hàng khóa ngoại
+        /// </summary>
+        public Guid? EmployeeId { get; set; }
+        /// <summary>
         /// Loại nhà cung cấp: 0 - tổ chức; 1 - cá nhân
         /// </summary>
-        public int VendorType { get; set; }
+        public int? VendorType { get; set; }
+        
+        /// <summary>
+        /// chuỗi json lưu danh sách cá id nhóm nhà cc
+        /// </summary>
+        public string? VendorGroup { get; set; }
 
         /// <summary>
         /// là khách hàng hay không hay không
         /// </summary>
-        public bool IsCustomer { get; set; }
+        public int? IsCustomer { get; set; }
 
         /// <summary>
         /// Xưng hô ( người liên hệ)
         /// </summary>
-        public string? ContactPrefixId { get; set; }
-       
-        /// <summary>
-        /// tên xưng hô
-        /// </summary>
-        public string? ContactPrefixName
-        {
-            get
-            {
-                return "";
-            }
-        }
+        public int? PrefixNameId { get; set; }
 
         /// <summary>
         /// tên người liên hệ
@@ -116,7 +101,7 @@ namespace MISA.Web02.Core.Entities
         /// <summary>
         /// điều khoản được định nghĩa trong enum
         /// </summary>
-        public int ContractId { get; set; }
+        public int? ContractId { get; set; }
         
         /// <summary>
         /// tên điều khoản
@@ -134,15 +119,15 @@ namespace MISA.Web02.Core.Entities
         /// </summary>
         public double? MaxDebitAmount { get; set; }
 
-        ///// <summary>
-        ///// Tài khoản công nợ nhận
-        ///// </summary>
-        //public Guid? DebitReceiptAccountId { get; set; }
+        /// <summary>
+        /// Tài khoản công nợ nhận
+        /// </summary>
+        public int? DebitReceiptAccountId { get; set; }
 
-        ///// <summary>
-        ///// Tài khoản công nợ trả
-        ///// </summary>
-        //public Guid? DebitPaymentAccountId { get; set; }
+        /// <summary>
+        /// Tài khoản công nợ trả
+        /// </summary>
+        public int? DebitPaymentAccountId { get; set; }
 
         #endregion
 
@@ -155,27 +140,27 @@ namespace MISA.Web02.Core.Entities
         /// <summary>
         /// tên quốc gia
         /// </summary>
-        public string? CountryId { get; set; }
+        public int? CountryId { get; set; }
 
         /// <summary>
         /// tên tỉnh
         /// </summary>
-        public string? ProvinceId { get; set; }
+        public int? ProvinceId { get; set; }
 
         /// <summary>
         /// tên huyện
         /// </summary>
-        public string? DistrictId { get; set; }
+        public int? DistrictId { get; set; }
 
         /// <summary>
         /// tên xã
         /// </summary>
-        public string? WardId { get; set; }
+        public int? WardId { get; set; }
 
         /// <summary>
         /// danh sách các địac hỉ giao hàng là chuỗi json
         /// </summary>
-        public string? DeliveryAddresses { get; set; }
+        public string? DeliveryAddress { get; set; }
         #endregion
 
         #region Ghi chú

@@ -34,35 +34,45 @@
                 <div class="left m-col-6">
                   <div class="lable"><label for="">Đối tượng</label></div>
                   <MCombobox
-                    :displayProps="tesst"
-                    :apiData="'http://localhost:5093/api/v1/Departments'"
+                    :displayProps="objectProp"
+                    :apiData="'http://localhost:5093/api/v1/Vendors'"
                     :isObject="true"
-                    :idProp="'DepartmentId'"
-                    :nameProp="'DepartmentName'"
-                    v-model="test"
+                    :idProp="'VendorId'"
+                    :nameProp="'VendorName'"
+                    v-model="payment.VendorId"
                   />
                 </div>
                 <div class="right m-col-6">
                   <div class="lable"><label for="">Người nhận</label></div>
-                  <MInput />
+                  <MInput v-model="payment.ReceiverName" />
                 </div>
               </div>
               <div class="m-row m-col-12">
                 <div class="right m-col-12">
                   <div class="lable"><label for="">Địa chỉ</label></div>
-                  <MInput />
+                  <MInput v-model="payment.Address" />
                 </div>
               </div>
               <div class="m-row m-col-12">
                 <div class="right m-col-12">
                   <div class="lable"><label for="">Lý do chi</label></div>
-                  <MInput :placeholder="'Chi tiền cho'" />
+                  <MInput
+                    :placeholder="'Chi tiền cho'"
+                    v-model="payment.DescriptionPayment"
+                  />
                 </div>
               </div>
               <div class="m-row m-col-12">
                 <div class="left m-col-6">
                   <div class="lable"><label for="">Nhân viên</label></div>
-                  <MInput />
+                  <MCombobox
+                    :displayProps="employeeProp"
+                    :apiData="'http://localhost:5093/api/v1/Employees'"
+                    :isObject="true"
+                    :idProp="'EmployeeId'"
+                    :nameProp="'EmployeeName'"
+                    v-model="payment.EmployeeId"
+                  />
                 </div>
                 <div class="right m-col-6">
                   <div class="lable"><label for="">Kèm theo</label></div>
@@ -83,7 +93,7 @@
                   <div class="lable"><label for="">Ngày hạch toán</label></div>
                   <!-- eslint-disable -->
                   <DatePicker
-                    v-model:value="dateOfbirth"
+                    v-model:value="accountingDate"
                     :format="'DD/MM/YYYY'"
                     :placeholder="'DD/MM/YYYY'"
                     :lang="'vi'"
@@ -99,7 +109,7 @@
                   <div class="lable"><label for="">Ngày phiếu chi</label></div>
                   <!-- eslint-disable -->
                   <DatePicker
-                    v-model:value="dateOfbirth"
+                    v-model:value="paymentDate"
                     :format="'DD/MM/YYYY'"
                     :placeholder="'DD/MM/YYYY'"
                     :lang="'vi'"
@@ -117,7 +127,7 @@
                       >Số phiếu chi (<span class="required">*</span>)</label
                     >
                   </div>
-                  <MInput />
+                  <MInput v-model="payment.PaymentCode" />
                 </div>
               </div>
             </div>
@@ -134,13 +144,29 @@
             <a class="link">Hạch toán</a>
             <div class="type-currency">
               <div style="padding: 0px 10px 0px 20px">Loại tiền</div>
-              <div class="m-col-6"><MCombobox /></div>
+              <div class="m-col-6">
+                <MCombobox
+                  :placeholder="'Loại tiền'"
+                  :defaultList="this.dataStorage.paymentDetail.currencyCombobox"
+                  :idProp="'currencyId'"
+                  :nameProp="'CurrencyName'"
+                  v-model="payment.CurrencyId"
+                  :readonly="readonly"
+                />
+              </div>
             </div>
           </div>
         </div>
         <div class="table-area">
           <div class="table">
-            <MTableEditable :deleteFunc="true"/>
+            <MTableEditable
+              :deleteFunc="true"
+              :columns="columnOfPaymentDetail"
+              :checkBox="false"
+              :defaultData="paymentDetail"
+              @getData="getPaymentDetail"
+              :readonly="readonly"
+            />
           </div>
         </div>
         <div class="file-attach">
@@ -183,6 +209,7 @@
               :buttonType="'default'"
               :text="'Cất'"
               :textColor="'#fff'"
+              @click="savePayment"
             />
           </div>
           <div class="save-and-print-btn">
@@ -203,8 +230,8 @@ import MCombobox from "@/components/base/BaseComboBox.vue";
 import MButton from "@/components/base/button/BaseButton.vue";
 import MInput from "@/components/base/input/BaseInput.vue";
 import DatePicker from "vue-datepicker-next";
-import MTableEditable from "@/components/base/table/BaseTableEditable.vue";
 import "vue-datepicker-next/index.css";
+import MTableEditable from "@/components/base/table/BaseTableEditable.vue";
 export default {
   name: "ThePaymentDialog",
   components: {
@@ -214,21 +241,116 @@ export default {
     DatePicker,
     MTableEditable,
   },
+  computed: {
+    accountingDate:{
+      get(){
+        try {
+          if(!this.payment.AccountingDate)return new Date();
+          return new Date(this.payment.AccountingDate);
+        } catch (error) {
+          return new Date();
+        }
+      },
+      set(val){
+        try {
+          this.payment.AccountingDate = new Date(val);
+        } catch (error) {
+          return new Date();
+        }
+      },
+    },
+    paymentDate:{
+      get(){
+        try {
+          if(!this.payment.PaymentDate)return new Date();
+          return new Date(this.payment.PaymentDate);
+        } catch (error) {
+          return new Date();
+        }
+      },
+      set(val){
+        try {
+          this.payment.PaymentDate = new Date(val);
+        } catch (error) {
+          return new Date();
+        }
+      },
+    },
+
+
+    paymentDetail: {
+      get() {
+        try {
+          let rs = JSON.parse(
+            this.payment.PaymentDetail ? this.payment.PaymentDetail : "[{}]"
+          );
+          return rs;
+        } catch (error) {
+          console.log(error);
+          return [
+            {
+              DescriptionPaymentDetail: "",
+              DebitAccountId: "",
+              CreditAccountId: "",
+              CashAmount: "",
+              VendorId: "",
+              VendorName: "",
+            },
+          ];
+        }
+      },
+      set(val) {
+        try {
+          this.payment.PaymentDetail = JSON.stringify(val);
+        } catch (error) {
+          console.log(error);
+          this.payment.PaymentDetail = JSON.stringify([
+            {
+              DescriptionPaymentDetail: "",
+              DebitAccountId: "",
+              CreditAccountId: "",
+              CashAmount: "",
+              VendorId: "",
+              VendorName: "",
+            },
+          ]);
+        }
+      },
+    },
+  },
   data() {
     return {
       test: "1",
-      tesst: [
+      objectProp: [
         {
-          id: "DepartmentName",
-          name: "Phòng ban",
+          id: "VendorName",
+          name: "Đối tượng",
         },
         {
-          id: "DepartmentCode",
-          name: "Mã phòng ban",
+          id: "VendorCode",
+          name: "Mã đối tượng",
         },
         {
           id: "CreateBy",
           name: "Người tạo",
+        },
+      ],
+      employeeProp: [
+        {
+          id: "EmployeeCode",
+          name: "Mã nhân viên",
+        },
+        {
+          id: "EmployeeName",
+          name: "Tên nhân viên",
+        },
+        {
+          id: "DepartmentName",
+          name: "Đơn vị",
+        },
+        {
+          id: "PhoneNumber",
+          name: "Đt di động",
         },
       ],
       comboboxData: {
@@ -245,15 +367,152 @@ export default {
           },
         ],
       },
+      columnOfPaymentDetail: [
+        {
+          id: "DescriptionPaymentDetail",
+          name: "Diễn giải",
+          displayName: "Diễn giải",
+          descriptionName: "Diễn giải",
+          width: "150px",
+          minWidth: "120px",
+          classList: [],
+          align: "left",
+          edit: true,
+          count: false,
+          type: "text",
+          component: false,
+        },
+        {
+          id: "DebitAccountId",
+          name: "Tài khoản nợ",
+          displayName: "Tài khoản nợ",
+          descriptionName: "Tài khoản nợ",
+          width: "200",
+          minWidth: "120px",
+          classList: [],
+          align: "left",
+          edit: true,
+          count: false,
+          type: "text",
+          component: true,
+          componentData: {
+            name: "MCombobox",
+            prop: {
+              displayProps: this.dataStorage.paymentDetail.accountDebitProp,
+              defaultList: this.dataStorage.paymentDetail.accountDebit,
+              isObject: "true",
+              idProp: "DebitAccountId",
+              nameProp: "DebitAccountNumber",
+              ref: "DebitAccountId",
+            },
+          },
+        },
+        {
+          id: "CreditAccountId",
+          name: "Tài khoản có",
+          displayName: "Tài khoản có",
+          descriptionName: "Tài khoản có",
+          width: "200px",
+          minWidth: "120px",
+          classList: [],
+          align: "left",
+          edit: true,
+          count: false,
+          type: "text",
+          component: true,
+          componentData: {
+            name: "MCombobox",
+            prop: {
+              displayProps: this.dataStorage.paymentDetail.accountCreditProp,
+              defaultList: this.dataStorage.paymentDetail.accountCreadit,
+              isObject: "true",
+              idProp: "CreditAccountId",
+              nameProp: "CreditAccountNumber",
+              ref: "DebitReceiptAccountId",
+            },
+          },
+        },
+        {
+          id: "CashAmount",
+          name: "Số tiền",
+          displayName: "Số tiền",
+          descriptionName: "Số tiền",
+          width: "100px",
+          minWidth: "120px",
+          classList: [],
+          align: "right",
+          edit: true,
+          count: false,
+          type: "number",
+        },
+        {
+          id: "VendorId",
+          name: "Đối tượng",
+          displayName: "Đối tượng",
+          descriptionName: "Đối tượng",
+          width: "auto",
+          minWidth: "120px",
+          classList: [],
+          align: "left",
+          edit: true,
+          count: false,
+          type: "text",
+          component: true,
+          componentData: {
+            name: "MCombobox",
+            prop: {
+              displayProps: this.dataStorage.vendorDetail.vendorProp,
+              apiData: "http://localhost:5093/api/v1/Vendors",
+              isObject: "true",
+              idProp: "VendorId",
+              nameProp: "VendorName",
+            },
+          },
+        },
+        {
+          id: "VendorName",
+          name: "Tên Đối tượng",
+          displayName: "Tên Đối tượng",
+          descriptionName: "Tên Đối tượng",
+          width: "auto",
+          minWidth: "120px",
+          classList: [],
+          align: "left",
+          edit: false,
+          count: false,
+          type: "text",
+        },
+      ],
+      //không cho phép sửa
+      readonly: false,
+      payment: {},
     };
   },
   methods: {
+    /**
+     * Mô tả : lưu payment
+     * Created by: Nguyễn Đức Toán - MF1095 (23/05/2022)
+     */
+    savePayment() {
+      console.log(this.payment);
+    },
     /**
      * Mô tả : disable ngày lớn hơn hiện tại trả về true nếu ngày lớn hơn hiện tại
      * Created by: Nguyễn Đức Toán - MF1095 (06/05/2022)
      */
     afterToday(date) {
       return date > new Date();
+    },
+    /**
+     * Mô tả : lấy dữ liêu jtuwf bảng payment detail
+     * Created by: Nguyễn Đức Toán - MF1095 (23/05/2022)
+     */
+    getPaymentDetail(data) {
+      try {
+        this.payment.PaymentDetail = JSON.stringify(data);
+      } catch (error) {
+        console.log(error);
+      }
     },
   },
 };
@@ -364,10 +623,10 @@ export default {
   color: #111;
   float: right;
 }
-.m-popup .popup-content .form .total-payment .header{
+.m-popup .popup-content .form .total-payment .header {
   float: right;
 }
-.m-popup .popup-content .form .total-payment .total{
+.m-popup .popup-content .form .total-payment .total {
   font-size: 36px;
   font-weight: 700;
 }
@@ -463,11 +722,10 @@ export default {
   display: flex;
   align-items: center;
   padding-bottom: 8px;
-   margin-top: 8px;
+  margin-top: 8px;
 }
 .m-popup .popup-content .file-attach .attach .ic-attach {
   margin-right: 8px;
- 
 }
 .m-popup .popup-content .file-attach .attach .drag-target {
   min-height: 50px;

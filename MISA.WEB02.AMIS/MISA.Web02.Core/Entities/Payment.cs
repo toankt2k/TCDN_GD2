@@ -11,7 +11,7 @@ namespace MISA.Web02.Core.Entities
         /// <summary>
         /// id payment
         /// </summary>
-        public Guid PaymentId { get; set; }
+        public Guid? PaymentId { get; set; }
         /// <summary>
         /// code payment
         /// </summary>
@@ -19,13 +19,8 @@ namespace MISA.Web02.Core.Entities
         /// <summary>
         /// khóa ngoại bảng AccountObject
         /// </summary>
-        // TODO: Payment.cs chưa biết đối tưởng ở đây dùng employee , vendor hay chỉ vendor
-        public Guid AccountObjectId { get; set; }
-        /// <summary>
-        /// tên của AccountObject
-        /// </summary>
-        // TODO: Payment.cs chưa biết đối tưởng ở đây dùng employee , vendor hay chỉ vendor
-        public string? AccountObjectName { get; set; }
+        public Guid? VendorId { get; set; }
+        
         /// <summary>
         /// tên Người nhận
         /// </summary>
@@ -41,7 +36,7 @@ namespace MISA.Web02.Core.Entities
         /// <summary>
         /// Ngày Thanh toán
         /// </summary>
-        public DateTime? PaytmentDate { get; set; }
+        public DateTime? PaymentDate { get; set; }
         /// <summary>
         /// diễn giải cho phiếu chi(lí do chi)
         /// </summary>
@@ -53,11 +48,17 @@ namespace MISA.Web02.Core.Entities
         /// <summary>
         /// tệp đính kèm chứng từ gốc kèm theo
         /// </summary>
-        public int AttachDocumentAmount { get; set; }
+        public int? AttachDocumentAmount { get; set; }
         /// <summary>
         /// loại Tiền tệ
         /// </summary>
         public int? CurrencyId { get; set; }
+
+        /// <summary>
+        /// danh sách payment detail
+        /// </summary>
+        [NotMap]
+        public List<PaymentDetail>? PaymentDetail { get; set; }
 
     }
 }

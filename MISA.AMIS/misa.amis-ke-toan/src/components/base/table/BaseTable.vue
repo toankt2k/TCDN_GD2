@@ -1,35 +1,13 @@
 <template>
   <div class="m-table">
-    <!-- <div class="table-tool">
-      <div class="m-left">
-        <DropdownButton
-          ref="multiAction"
-          :typeClass="'default'"
-          :text="'Thực hiện hàng loạt'"
-          @click="multiFunction($event)"
-        />
-      </div>
-      <div class="m-right">
-        <div class="tool-search">
-          <MInput
-            :classIcon="'search'"
-            :placeholder="'Tìm theo mã, tên nhân viên'"
-            v-model="this.pagingOption.filterText"
-            @input="delaySearch($event)"
-          />
-        </div>
-        <div class="ultility-button">
-          <div class="refresh" @click="loadTable"></div>
-          <div class="export" @click="exportEmployee"></div>
-          
-        </div>
-      </div>
-    </div> -->
     <div class="table-content">
       <table>
         <thead>
           <tr>
-            <th class="hidden-left" style="min-width: 16px; width: 16px"></th>
+            <th
+              class="hidden-left"
+              style="min-width: 16px; width: 16px; background-color: #fff"
+            ></th>
             <th class="table-checkbox" style="min-width: 40px; width: 40px">
               <MCheckBox v-model="checkAll" :rowId="'All'" />
             </th>
@@ -37,27 +15,40 @@
               v-for="(item, index) in displayColunms"
               :key="`th${index}`"
               :style="{
-                width: item.width,
-                minWidth: item.minWidth,
-                textAlign:item.align
+                width: `${item.width.replace(/\D/g, '')}px`,
+                minWidth: `${
+                  item.width.replace(/\D/g, '') != 0
+                    ? item.width.replace(/\D/g, '')
+                    : item.minWidth.replace(/\D/g, '')
+                }px`,
+                textAlign: item.align,
               }"
               :class="item.classList"
             >
               {{ item.name }}
             </th>
             <th class="table-function" style="min-width: 100px">Chức năng</th>
-            <th class="hidden-right" style="right: 20px;width: 20px"></th>
-            <td class="hidden-right" style="background-color: #f4f5f8;width: 20px"></td>
+            <th
+              class="hidden-right"
+              style="right: 20px; width: 20px; background-color: #fff"
+            ></th>
+            <td
+              class="hidden-right"
+              style="background-color: #f4f5f8; width: 20px"
+            ></td>
           </tr>
         </thead>
-        <tbody>
+        <tbody v-show="!isLoading" id="mainTable">
           <tr
             :class="{ checked: val.checked }"
-            v-for="(val, index) in listEmployee"
+            v-for="(val, index) in tableData"
             :key="index"
             @dblclick="openForm(false, val)"
           >
-            <td class="hidden-left" style="background-color: #fff !important"></td>
+            <td
+              class="hidden-left"
+              style="background-color: #fff !important"
+            ></td>
             <td class="table-checkbox">
               <MCheckBox v-model="val.checked" :rowId="`r${index}`" />
             </td>
@@ -66,14 +57,32 @@
               :key="`td${ind}`"
               :title="val[item.id]"
               :style="{
-                textAlign:item.align
+                width: `${item.width.replace(/\D/g, '')}px`,
+                minWidth: `${
+                  item.width.replace(/\D/g, '') != 0
+                    ? item.width.replace(/\D/g, '')
+                    : item.minWidth.replace(/\D/g, '')
+                }px`,
+                textAlign: item.align,
               }"
             >
-              {{ dataFormat(val[item.id], item.type) }}
+              <div
+                :style="{
+                  width: `${item.width.replace(/\D/g, '')}px`,
+                  minWidth: `${
+                    item.width.replace(/\D/g, '') != 0
+                      ? item.width.replace(/\D/g, '')
+                      : item.minWidth.replace(/\D/g, '')
+                  }px`,
+                  overflowWrap: 'break-word',
+                }"
+              >
+                {{ dataFormat(val[item.id], item.type) }}
+              </div>
             </td>
             <td class="table-function">
               <div class="table-function-button">
-                <div class="button-edit" @click="openForm(false, val)">
+                <div class="button-edit" @click="openForm(val,tableFunc.key)">
                   {{ tableFunc.name }}
                 </div>
                 <div class="arrow-down-button">
@@ -84,32 +93,35 @@
                 </div>
               </div>
             </td>
-            <td class="hidden-right" style="right: 20px;background-color: #fff !important"></td>
+            <td
+              class="hidden-right"
+              style="right: 20px; background-color: #fff !important"
+            ></td>
             <td
               class="hidden-right"
               style="background-color: #f4f5f8 !important"
             ></td>
           </tr>
         </tbody>
-        <!-- <tbody v-show="!listEmployee.length > 0 && isLoading">
-          <tr
-            v-for="index in listEmployee.length > 0 ? listEmployee.length : 12"
-            :key="index"
-          >
-            <td class="hidden-left"></td>
+        <tbody v-show="isLoading">
+          <tr v-for="(val, index) in tableData" :key="index">
+            <td
+              class="hidden-left"
+              style="background-color: #fff !important"
+            ></td>
             <td class="table-checkbox">
               <div class="loading-1" style="width: 18px"></div>
             </td>
-            <td><div class="loading-1"></div></td>
-            <td><div class="loading-1"></div></td>
-            <td><div class="loading-1"></div></td>
-            <td><div class="loading-1"></div></td>
-            <td><div class="loading-1"></div></td>
-            <td><div class="loading-1"></div></td>
-            <td><div class="loading-1"></div></td>
-            <td><div class="loading-1"></div></td>
-            <td><div class="loading-1"></div></td>
-            <td><div class="loading-1"></div></td>
+            <td
+              v-for="(item, ind) in displayColunms"
+              :key="`td${ind}`"
+              :title="val[item.id]"
+              :style="{
+                textAlign: item.align,
+              }"
+            >
+              <div class="loading-1"></div>
+            </td>
             <td class="table-function" style="display: table-cell">
               <div
                 class="table-function-button"
@@ -118,101 +130,30 @@
                 <div class="loading-1"></div>
               </div>
             </td>
-            <td class="hidden-right"></td>
+            <td
+              class="hidden-right"
+              style="right: 20px; background-color: #fff !important"
+            ></td>
+            <td
+              class="hidden-right"
+              style="background-color: #f4f5f8 !important"
+            ></td>
           </tr>
         </tbody>
-        <tbody v-show="!listEmployee.length > 0 && !isLoading">
-          <div class="no-content">
-            <img src="@/assets/no-employee.svg" />
-            <div class="no-content-text">Không có dữ liệu</div>
-          </div>
-        </tbody>
-        <tbody ref="tbody" id="mainTable" v-show="listEmployee.length > 0">
-          <tr
-            :class="{ checked: val.checked }"
-            v-for="(val, index) in listEmployee"
-            :key="index"
-            @dblclick="openForm(false, val)"
-          >
-            <td class="hidden-left"></td>
-            <td class="table-checkbox">
-              <MCheckBox v-model="val.checked" :rowId="`r${index}`" />
-            </td>
-            <td :title="val.EmployeeCode">
-              <div class="overflow-content">
-                {{ val.EmployeeCode }}
-              </div>
-            </td>
-            <td :title="val.EmployeeName">
-              <div class="overflow-content">
-                {{ val.EmployeeName }}
-              </div>
-            </td>
-            <td :title="val.GenderName">
-              <div class="overflow-content">{{ val.GenderName }}</div>
-            </td>
-            <td :title="dateFormat(val.DateOfBirth)" class="m-text-center">
-              <div class="overflow-content">
-                {{ dateFormat(val.DateOfBirth) }}
-              </div>
-            </td>
-            <td :title="val.IdentityNumber">
-              <div class="overflow-content">
-                {{ val.IdentityNumber }}
-              </div>
-            </td>
-            <td :title="val.PositionName">
-              <div class="overflow-content">
-                {{ val.PositionName }}
-              </div>
-            </td>
-            <td :title="val.DepartmentName">
-              <div class="overflow-content">{{ val.DepartmentName }}</div>
-            </td>
-            <td :title="val.BankAccount">
-              <div class="overflow-content">{{ val.BankAccount }}</div>
-            </td>
-            <td :title="val.BankName">
-              <div class="overflow-content">{{ val.BankName }}</div>
-            </td>
-            <td :title="val.BankBranch">
-              <div class="overflow-content">
-                {{ val.BankBranch }}
-              </div>
-            </td>
-            <td class="table-function">
-              <div class="table-function-button">
-                <div class="button-edit" @click="openForm(false, val)">Sửa</div>
-                <div class="arrow-down-button">
-                  <div
-                    class="icon"
-                    @click="tableOption($event, val, index)"
-                  ></div>
-                </div>
-              </div>
-            </td>
-            <td class="hidden-right"></td>
-          </tr>
-        </tbody> -->
       </table>
+      <div v-show="!isLoading && tableData.length <= 0">
+        <div class="no-content">
+          <img src="@/assets/no-employee.svg" />
+          <div class="no-content-text">Không có dữ liệu</div>
+        </div>
+      </div>
     </div>
-    <!-- dropdown chức năng -->
-    <DropdownList
-      :listItem="functionDropdown"
-      :offsetX="this.X"
-      :offsetY="this.Y"
-      :maxHeight="maxHeight"
-      v-if="isShow"
-      @outSide="clickOutSide"
-      @selected="selectDropdown"
-    />
   </div>
 </template>
 
 <script>
 //import component
 import MCheckBox from "@/components/base/BaseCheckBox.vue";
-import DropdownList from "@/components/base/dialog/BaseDropdownList.vue";
 
 //import lib
 import axios from "axios";
@@ -222,213 +163,37 @@ export default {
   name: "MTable",
   components: {
     MCheckBox,
-    DropdownList,
-    // MPaging,
-    // ConfirmDialog,
   },
   props: {
+    //các cột hiển thị
     columns: {
       type: Array,
-      default: () => [
-        {
-          id: "EmployeeCode",
-          name: "Mã nhân viên",
-          displayName: "Mã nhân viên",
-          descriptionName:"Mã nhân viên",
-          width: "auto",
-          minWidth: "120px",
-          classList: [],
-          align: "left",
-          edit: true,
-          count: true,
-          type: "text",
-        },
-        {
-          id: "EmployeeName",
-          name: "Mã nhân viên",
-          displayName: "Mã nhân viên",
-          descriptionName:"Mã nhân viên",
-          width: "auto",
-          minWidth: "120px",
-          classList: [],
-          align: "left",
-          edit: true,
-          count: false,
-          type: "text",
-        },
-        {
-          id: "Gender",
-          name: "Giới tính",
-          displayName: "Giới tính",
-          descriptionName:"Giới tính",
-          width: "150px",
-          minWidth: "120px",
-          classList: [],
-          align: "right",
-          edit: true,
-          count: true,
-          type: "number",
-        },
-        {
-          id: "GenderName",
-          name: "Giới tính",
-          displayName: "Giới tính",
-          descriptionName:"Giới tính",
-          width: "150px",
-          minWidth: "120px",
-          classList: [],
-          align: "left",
-          edit: true,
-          count: true,
-          type: "text",
-        },
-        {
-          id: "DateOfBirth",
-          name: "Ngày sinh",
-          displayName: "Ngày sinh",
-          descriptionName:"Ngày sinh",
-          width: "auto",
-          minWidth: "120px",
-          classList: [],
-          align: "center",
-          edit: true,
-          count: false,
-          type: "date",
-        },
-        {
-          id: "IdentityNumber",
-          name: "Số CMND",
-          displayName: "Số CMND",
-          descriptionName:"Số chứng minh nhân dân",
-          width: "150px",
-          minWidth: "120px",
-          classList: [],
-          align: "left",
-          edit: true,
-          count: true,
-          type: "text",
-        },
-        {
-          id: "IdentityDate",
-          name: "Ngày cấp",
-          displayName: "Ngày cấp",
-          descriptionName:"Ngày cấp",
-          width: "auto",
-          minWidth: "120px",
-          classList: [],
-          align: "center",
-          edit: true,
-          count: false,
-          type: "date",
-        },
-        {
-          id: "IdentityPlace",
-          name: "Nơi cấp",
-          displayName: "Nơi cấp",
-          descriptionName:"Nơi cấp",
-          width: "150px",
-          minWidth: "120px",
-          classList: [],
-          align: "left",
-          edit: true,
-          count: true,
-          type: "text",
-        },
-        {
-          id: "PositionName",
-          name: "Chức danh",
-          displayName: "Chức danh",
-          descriptionName:"Chức danh",
-          width: "auto",
-          minWidth: "120px",
-          classList: [],
-          align: "left",
-          edit: true,
-          count: false,
-          type: "text",
-        },
-        {
-          id: "DepartmentId",
-          name: "Mã đơn vị",
-          displayName: "Mã đơn vị",
-          descriptionName:"Mã đơn vị",
-          width: "auto",
-          minWidth: "120px",
-          classList: [],
-          align: "left",
-          edit: true,
-          count: false,
-          type: "text",
-        },
-        {
-          id: "DepartmentName",
-          name: "Tên đơn vị",
-          displayName: "Tên đơn vị",
-          descriptionName:"Tên đơn vị",
-          width: "auto",
-          minWidth: "120px",
-          classList: [],
-          align: "left",
-          edit: true,
-          count: false,
-          type: "text",
-        },
-        {
-          id: "BankAccount",
-          name: "Số tài khoản",
-          displayName: "Số tài khoản",
-          descriptionName:"Số tài khoản",
-          width: "auto",
-          minWidth: "120px",
-          classList: [],
-          align: "left",
-          edit: true,
-          count: false,
-          type: "text",
-        },
-        {
-          id: "BankName",
-          name: "Tên ngân hàng",
-          displayName: "Tên ngân hàng",
-          descriptionName:"Tên ngân hàng",
-          width: "auto",
-          minWidth: "120px",
-          classList: [],
-          align: "left",
-          edit: true,
-          count: false,
-          type: "text",
-        },
-        {
-          id: "BankBranch",
-          name: "Chi nhánh tk ngân hàng",
-          displayName: "Chi nhánh tk ngân hàng",
-          descriptionName:"Chi nhánh tài khoản ngân hàng",
-          width: "auto",
-          minWidth: "120px",
-          classList: [],
-          align: "left",
-          edit: true,
-          count: false,
-          type: "text",
-        },
-
-      ],
+      default: () => [],
     },
+    //các chức năng trong bảng
     tableFunction: {
       type: Object,
       default: () => {
-        return {
-          id: 1,
-          name: "Sửa",
-        };
+        return {};
       },
+    },
+    //dữ liêu mặc đinh trong bảng
+    defaultData: {
+      type: Array,
+      default: () => [],
     },
   },
   data() {
     return {
+      //các cột hiển thị trong table
       displayColunms: this.columns,
+      //các chức nawg có trogn table
       tableFunc: this.tableFunction,
+      /**
+       * Mô tả : tableData làdanh sách nhân viên hiện lên bảng
+       * Created by: Nguyễn Đức Toán - MF1095 (09/04/2022)
+       */
+      tableData: this.defaultData,
       //show detailDialog
       infoDialog: false,
       //xác định là dialog them hay sửa
@@ -439,11 +204,7 @@ export default {
       maxHeight: 0,
       isShow: false,
       functionDropdown: [],
-      /**
-       * Mô tả : listEmployee làdanh sách nhân viên hiện lên bảng
-       * Created by: Nguyễn Đức Toán - MF1095 (09/04/2022)
-       */
-      listEmployee: [],
+
       //Mô tả : mã id nhân viên đang được chọn
       selectedId: "",
       //mã nhân viên được chọn
@@ -477,35 +238,6 @@ export default {
    * Created by: Nguyễn Đức Toán - MF1095 (07/04/2022)
    */
   methods: {
-    /**
-     * Mô tả : sau khi nhập searchtext thì delay1s
-     * Created by: Nguyễn Đức Toán - MF1095 (21/04/2022)
-     */
-    delaySearch() {
-      let me = this;
-      clearTimeout(this.delayTimer);
-      this.delayTimer = setTimeout(function () {
-        me.pagingOption.currentPage = 1;
-        me.loadTable();
-      }, 500);
-    },
-    /**
-     * Mô tả : nhận thông tin phân trang từ component paging
-     * @param {*} data - currentPage thông tin để phân trang và filter
-     * @param {*} pageSize - số bản ghi/trang
-     * Created by: Nguyễn Đức Toán - MF1095
-     * Created date: 09:42 18/04/2022
-     */
-    selectedPaging(data, pageSize) {
-      try {
-        this.pagingOption.currentPage = data;
-        this.pagingOption.pageSize = pageSize;
-        this.loadTable();
-      } catch (error) {
-        console.log(error);
-      }
-    },
-
     /**
      * Mô tả : bắt emit từ confirm dialog
      * Created by: Nguyễn Đức Toán - MF1095 (15/04/2022)
@@ -546,169 +278,6 @@ export default {
       this.selectedCode = "";
       this.exitConfirm();
     },
-
-    /**
-     * Mô tả : đóng form thông tin nhân viên
-     * Created by: Nguyễn Đức Toán - MF1095 (09/04/2022)
-     */
-    exitForm() {
-      try {
-        this.infoDialog = false;
-        this.selectedId = "";
-        this.selectedCode = "";
-      } catch (error) {
-        console.log(error);
-      }
-    },
-    /**
-     * Mô tả : bắt emit từ dropdown
-     * Created by: Nguyễn Đức Toán - MF1095 (15/04/2022)
-     */
-    selectDropdown(key) {
-      console.log(key);
-      switch (key) {
-        case "multiDelete":
-          this.confirmDialogData = {
-            name: "xóa",
-            button: this.resource.confirmDialogData.deleteMultiple,
-            type: "warning",
-            text: this.resource.confirmDialogData.getMultiDeleteConfirm(),
-            key: "multiDelete",
-          }; //global property
-          this.isConfirm = true;
-          break;
-        case "delete": //chọn xóa 1 nhân
-          this.confirmDialogData = {
-            name: "xóa",
-            button: this.resource.confirmDialogData.delete,
-            type: "warning",
-            text: this.resource.confirmDialogData.getDeleteConfirm(
-              this.selectedCode
-            ),
-            key: "delete",
-          };
-          this.isConfirm = true;
-          break;
-        case "duplicate":
-          this.openForm(true, { EmployeeId: this.selectedId });
-          break;
-        default:
-          break;
-      }
-    },
-    /**
-     * Mô tả : exit confirm
-     * Created by: Nguyễn Đức Toán - MF1095 (15/04/2022)
-     */
-    exitConfirm() {
-      try {
-        this.isConfirm = false;
-      } catch (error) {
-        console.log(error);
-      }
-    },
-    /**
-     * Mô tả : gọi api xóa 1 ban ghi
-     * Created by: Nguyễn Đức Toán - MF1095 (14/04/2022)
-     */
-    deleteEmployee() {
-      let me = this;
-      try {
-        axios({
-          url: `${this.dataStorage.api.deleteEmployee}/${me.selectedId}`,
-          method: "DELETE",
-        })
-          .then((res) => {
-            console.log(res);
-            if (res.status == 200) {
-              me.addToast(this.resource.toastMessage.deleteSuccess);
-              //chọn trang đầu tiên
-              me.pagingOption.currentPage = 1;
-              //load lại table
-              me.loadTable();
-            }
-          })
-          .catch((res) => {
-            console.log(res.response);
-          });
-      } catch (error) {
-        console.log(error);
-      } finally {
-        this.selectedId = "";
-        this.selectedCode = "";
-      }
-    },
-    /**
-     * Mô tả : gọi api xóa nhiều bản ghi
-     * Created by: Nguyễn Đức Toán - MF1095 (14/04/2022)
-     */
-    deleteMultiEmployee() {
-      let me = this;
-      try {
-        let dataDelete = [];
-        me.listEmployee.forEach((ele) => {
-          if (ele.checked) {
-            dataDelete.push(ele.EmployeeId);
-          }
-        });
-        axios({
-          url: this.dataStorage.api.deleteMultiEmployee,
-          method: "DELETE",
-          data: dataDelete,
-        })
-          .then((res) => {
-            console.log(res);
-            if (res.status == 200) {
-              me.addToast(this.resource.toastMessage.deleteSuccess);
-              //chọn trang đầu tiên
-              me.pagingOption.currentPage = 1;
-              //load lại table
-              me.loadTable();
-            }
-          })
-          .catch((res) => {
-            console.log(res.response);
-          });
-      } catch (error) {
-        console.log(error);
-      } finally {
-        this.selectedId = "";
-        this.selectedCode = "";
-      }
-    },
-
-    /**
-     * Mô tả : mở form thông tin nhân viên
-     * @param {*} type true/false xác định form thêm(true) hay sửa(false);
-     * @param {*} val đối tượng employee đã chọn;
-     * Created by: Nguyễn Đức Toán - MF1095 (16/04/2022)
-     */
-    openForm(type, val) {
-      this.isAdd = type;
-      if (val) {
-        this.selectedId = val.EmployeeId;
-      } else {
-        this.selectedId = "";
-      }
-      this.infoDialog = true;
-    },
-    exportEmployee() {
-      try {
-        axios({
-          url: this.dataStorage.api.export,
-          method: "GET",
-          responseType: "blob",
-        })
-          .then((res) => {
-            console.log(res);
-          })
-          .catch((res) => {
-            console.log(res.response);
-          });
-      } catch (error) {
-        console.log();
-      }
-    },
     /**
      * Mô tả : lấy dữ liệu table từ api
      * Created by: Nguyễn Đức Toán - MF1095 (15/04/2022)
@@ -717,7 +286,7 @@ export default {
       this.isLoading = true;
       this.checkAll = false;
       let me = this;
-      me.listEmployee = [];
+      me.tableData = [];
       try {
         axios({
           method: "GET",
@@ -726,7 +295,7 @@ export default {
           .then((res) => {
             console.log(res);
             if (res.status == 200) {
-              me.listEmployee = res.data.list;
+              me.tableData = res.data.list;
               me.pagingOption.totalRecord = res.data.totalRecord;
               me.pagingOption.totalPage = res.data.totalPage;
               me.isLoading = false;
@@ -735,17 +304,6 @@ export default {
           .catch((res) => {
             console.error(res);
           });
-      } catch (error) {
-        console.log(error);
-      }
-    },
-    /**
-     * Mô tả : emit gọi hàm thêm toastmessage
-     * Created by: Nguyễn Đức Toán - MF1095 (15/04/2022)
-     */
-    addToast(toast) {
-      try {
-        this.$emit("addToast", toast);
       } catch (error) {
         console.log(error);
       }
@@ -762,12 +320,10 @@ export default {
         this.functionDropdown = this.resource.dropdownData.tableFunction;
         //ngăn sự kiện click khác
         // e.preventDefault();
-        //hiện dropdown
-        this.isShow = true;
         //lấy độ cao màn hình
         this.maxHeight = e.view.innerHeight;
-        this.X = tagetElement.left;
-        this.Y = tagetElement.top + 10;
+        this.X = tagetElement.left - 50;
+        this.Y = tagetElement.top;
         //set selected row
         this.$el.querySelectorAll(`tbody#mainTable tr`).forEach((element) => {
           element.classList.remove("selected");
@@ -779,70 +335,61 @@ export default {
         this.selectedId = val.EmployeeId;
         //mã nhân viên được chọn
         this.selectedCode = val.EmployeeCode;
+        let event = {
+          left : this.X,
+          top : this.Y,
+          height : tagetElement.height,
+        };
+        this.tableEvent("tableOption", val, event);
       } catch (error) {
         console.log(error);
       }
     },
+
     /**
-     * Mô tả : set lại cho form detail thành form thêm
-     * Created by: Nguyễn Đức Toán - MF1095 (23/04/2022)
+     * Mô tả : gán lai jdanh sách cho bảng
+     * Created by: Nguyễn Đức Toán - MF1095 (20/05/2022)
      */
-    setAddForm(isAdd) {
+    setData(data) {
       try {
-        this.isAdd = isAdd;
-      } catch (error) {
-        console.log(error);
-      }
-    },
-    /**
-     * Mô tả : bắt sự kiện click chuột vào nút sửa để hiện ra dropdown lựa chọn thực hiện hàng loạt
-     * Created by: Nguyễn Đức Toán - MF1095 (09/04/2022)
-     */
-    multiFunction(e) {
-      if (!this.multiFlag) return;
-      try {
-        //dừng sự kiện click khác
-        e.stopPropagation();
-        //ngăn sự kiện click khác
-        // kiểm tra sô dòng được chọn
-        let count = 0;
-        this.listEmployee.forEach((element) => {
-          if (element.checked == true) {
-            count++;
-          }
-        });
-        //lất element đc click
-        let elementTarget = this.$refs.multiAction.$el.getBoundingClientRect();
-        // e.preventDefault();
-        //nếu sso dòng được chọn lớn hơn 0
-        if (count > 0) {
-          this.functionDropdown = this.resource.dropdownData.multipleFunction;
-        } else {
-          this.functionDropdown = [];
+        if (data) {
+          this.tableData = data;
         }
-        //lấy độ cao màn hình
-        this.maxHeight = e.view.innerHeight;
-        this.X = elementTarget.left + 130;
-        this.Y = elementTarget.top + elementTarget.height + 4;
-        //hiện dropdown
-        this.isShow = true;
       } catch (error) {
         console.log(error);
       }
     },
     /**
-     * Mô tả : bắt sự kiện phím tắt nhập vào
-     * *******1. ctrl + S submit form thông tin
-     * @param
-     * @return
-     * Created by: Nguyễn Đức Toán - MF1095
-     * Created date: 12:08 02/04/2022
+     * Mô tả : gán lai jdanh sách cho bảng
+     * Created by: Nguyễn Đức Toán - MF1095 (20/05/2022)
      */
-    handleKeyUp() {
-      // console.log(e);
+    setColumns(columns) {
+      try {
+        if (columns) {
+          this.displayColunms = columns;
+        }
+      } catch (error) {
+        console.log(error);
+      }
     },
-    handleKeyDown() {
-      // console.log(e);
+
+    openForm(val,key) {
+      try {
+        this.tableEvent(key, val);
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    /**
+     * Mô tả : emit even của table ra comp cha
+     * Created by: Nguyễn Đức Toán - MF1095 (21/05/2022)
+     */
+    tableEvent(key, val, event) {
+      try {
+        this.$emit("tableEvent", key, val, event);
+      } catch (error) {
+        console.log(error);
+      }
     },
     /**
      * Mô tả : click ra ngoài dropdown list
@@ -893,26 +440,32 @@ export default {
      * Mô tả : kiểm tra nếu chọn nhiều hơn 1 em ployee thì cho phép dùng chức năng xóa nhiều
      * Created by: Nguyễn Đức Toán - MF1095 (27/04/2022)
      */
-    listEmployee: {
+    tableData: {
       deep: true,
       handler(newVal) {
-        let count = 0;
-        newVal.forEach((val) => {
-          if (val.checked) {
-            count++;
+        try {
+          if (newVal) {
+            let count = 0;
+            newVal.forEach((val) => {
+              if (val.checked) {
+                count++;
+              }
+            });
+            let target = this.$refs.multiAction;
+            if (target) {
+              if (count < 1) {
+                target.$el.classList.add("disable-click");
+                //k cho phép click
+                this.multiFlag = false;
+              } else {
+                target.$el.classList.remove("disable-click");
+                //cho phep click
+                this.multiFlag = true;
+              }
+            }
           }
-        });
-        let target = this.$refs.multiAction;
-        if (target) {
-          if (count < 1) {
-            target.$el.classList.add("disable-click");
-            //k cho phép click
-            this.multiFlag = false;
-          } else {
-            target.$el.classList.remove("disable-click");
-            //cho phep click
-            this.multiFlag = true;
-          }
+        } catch (error) {
+          console.log(error);
         }
       },
     },
@@ -925,22 +478,19 @@ export default {
     checkAll(newVal) {
       try {
         //nếu check all được check thì check tất cả check box và ngược lại
-        this.listEmployee.forEach((ele) => {
+        this.tableData.forEach((ele) => {
           ele.checked = newVal;
         });
       } catch (error) {
         console.log(error);
       }
     },
-    
   },
   /**
    * Mô tả : sau khi tạo compnent thì lấy dữu liệu nhân viên từ api
    * Created by: Nguyễn Đức Toán - MF1095 (15/04/2022)
    */
-  created() {
-    this.loadTable();
-  },
+  created() {},
 };
 </script>
 
@@ -967,11 +517,13 @@ export default {
 .no-content {
   width: 100%;
   /* height: 132px; */
-  position: absolute;
+  position: fixed;
+  transform: translate(-100px, 0);
   display: flex;
   justify-content: center;
   align-items: center;
   flex-direction: column;
+  z-index: 25;
 }
 .no-content .no-content-text {
   padding: 10px;

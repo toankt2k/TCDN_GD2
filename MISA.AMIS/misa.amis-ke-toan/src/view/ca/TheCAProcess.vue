@@ -8,9 +8,9 @@
             <div class="btn-recive"  @click="funcImprovConfirm">
               <div class="title">Thu tiền</div>
             </div>
-            <div class="btn-payment">
-              <div class="title">Chi tiền</div>
-            </div>
+            <a class="btn-payment" href="/ThePaymentDetail" >
+              <div class="title" style="color:#111">Chi tiền</div>
+            </a>
             <div class="btn-audit"  @click="funcImprovConfirm">
               <div class="title">Kiểm kê quỹ</div>
             </div>

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using MISA.Web02.Core.Entities;
 using MISA.Web02.Core.Exceptions;
 using MISA.Web02.Core.Interfaces;
+using MISA.Web02.Core.Interfaces.Service;
 using MISA.Web02.Core.Resourses;
 
 namespace MISA.Web02.Api.Controllers

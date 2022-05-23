@@ -66,25 +66,25 @@ namespace MISA.Web02.Core.Services
             {
                 throw new MISAExceptions(MISAMessageResource.VN_DataInvalid, errorMsg);
             }
-            //lấy code của entity truyền vào
-            var code = typeof(T).GetProperty($"{entityName}Code").GetValue(entity).ToString();
-            //code đúng format
-            var rx = new Regex(@"[a-zA-Z]{2}-[0-9]+$");
-            if (!rx.IsMatch(code.ToUpper()))
-            {
-                errorMsg.Add($"{entityName}Code", MISAMessageResource.VN_CodeInvalid);
-            }
-            //kiểm tra mã code trùng
-            var data = _baseRepository.FindByCode(code);
-            //nếu có bản ghi trùng với mã hiện tại
-            if (data != null)
-            {
-                errorMsg.Add($"{entityName}Code", MISAMessageResource.VN_CodeDuplicate);
-            }
-            if (errorMsg.Count() > 0)//nếu danh sách lỗi có lỗi thì throw exception
-            {
-                throw new MISAExceptions(MISAMessageResource.VN_DataInvalid, errorMsg);
-            }
+            ////lấy code của entity truyền vào
+            //var code = typeof(T).GetProperty($"{entityName}Code").GetValue(entity).ToString();
+            ////code đúng format
+            //var rx = new Regex(@"[a-zA-Z]{2}-[0-9]+$");
+            //if (!rx.IsMatch(code.ToUpper()))
+            //{
+            //    errorMsg.Add($"{entityName}Code", MISAMessageResource.VN_CodeInvalid);
+            //}
+            ////kiểm tra mã code trùng
+            //var data = _baseRepository.FindByCode(code);
+            ////nếu có bản ghi trùng với mã hiện tại
+            //if (data != null)
+            //{
+            //    errorMsg.Add($"{entityName}Code", MISAMessageResource.VN_CodeDuplicate);
+            //}
+            //if (errorMsg.Count() > 0)//nếu danh sách lỗi có lỗi thì throw exception
+            //{
+            //    throw new MISAExceptions(MISAMessageResource.VN_DataInvalid, errorMsg);
+            //}
             //thêm mới database
             var result = _baseRepository.Insert(entity);
             return result;
@@ -98,7 +98,10 @@ namespace MISA.Web02.Core.Services
         /// Author: Nguyễn Đức Toán - MF1095 (14/04/2022)
         public virtual int UpdateService(T entity, Guid id)
         {
+            
             var entityName = typeof(T).Name;
+            //gán lại id cho entity mới
+            typeof(T).GetProperty($"{entityName}Id").SetValue(entity,id);
             Dictionary<string, string> errorMsg = new Dictionary<string, string>();
             //validate dữ liệu trống
             var validateEmptyResult = ValidateEmpty(entity);
@@ -151,7 +154,7 @@ namespace MISA.Web02.Core.Services
                 //lấy giá trị của entity đó
                 var entityValue = prop.GetValue(entity);
                 //lấy giá trị của data
-                var dataValue = prop.GetValue(entity);
+                var dataValue = prop.GetValue(oldEntity);
                 //nếu các trường không được nhập vào thì người dùng không muốn thay đổi
                 //nên giữ nguyên giá trị cũ trong database
                 if (entityValue == null)
@@ -235,5 +238,10 @@ namespace MISA.Web02.Core.Services
             return result;
         }
 
+        public string FilterService(int currentPage, int pageSize, string? filterText)
+        {
+            var result = _baseRepository.Filter(currentPage, pageSize,filterText);
+            return result;
+        }
     }
 }

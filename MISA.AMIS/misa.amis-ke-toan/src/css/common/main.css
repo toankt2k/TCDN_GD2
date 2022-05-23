@@ -35,6 +35,156 @@ body {
     src: url('@/assets/fonts/notosans-semibold.df3e6dc4.woff2');
 }
 
+.disabled {
+    display: none;
+}
+
+.mi-48 {
+    width: 48px;
+    height: 48px;
+    min-width: 48px;
+    min-height: 48px;
+}
+
+.mi-32 {
+    width: 32px;
+    height: 32px;
+    min-width: 32px;
+    min-height: 32px;
+}
+
+.mi-24 {
+    width: 24px;
+    height: 24px;
+    min-width: 24px;
+    min-height: 24px;
+}
+
+.mi-14 {
+    width: 14px;
+    height: 14px;
+    min-width: 14px;
+    min-height: 14px;
+}
+
+.mi-16 {
+    width: 16px;
+    height: 16px;
+    min-width: 16px;
+    min-height: 16px;
+}
+
+.mi {
+    background-image: url("@/assets/img/Sprites.64af8f61.svg");
+}
+
+.pointer {
+    cursor: pointer;
+}
+
+.text-center {
+    text-align: center!important;
+}
+
+.text-nowrap {
+    white-space: nowrap;
+}
+
+.sticky-left-30 {
+    position: sticky;
+    left: 16px;
+    z-index: 4;
+}
+
+.sticky-right-30 {
+    position: sticky;
+    right: 19px;
+}
+
+.sticky-top--87 {
+    position: sticky;
+    top: -87px;
+    z-index: 20;
+}
+
+.bg-while {
+    background-color: #fff;
+}
+
+
+/* width */
+
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+
+/* Track */
+
+ ::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+
+/* Handle */
+
+ ::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 0;
+}
+
+
+/* Handle on hover */
+
+ ::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+ ::-webkit-input-placeholder {
+    /* Edge */
+    font-size: 12px;
+    font-style: italic;
+    font-family: MISA notosans;
+}
+
+ :-ms-input-placeholder {
+    /* Internet Explorer */
+    font-size: 12px;
+    font-style: italic;
+    font-family: MISA notosans;
+}
+
+ ::placeholder {
+    font-size: 12px;
+    font-style: italic;
+    font-family: MISA notosans;
+}
+
+.d-flex {
+    display: flex;
+}
+
+.d-flex.justify-space-between {
+    justify-content: space-between;
+}
+
+.d-flex.alignt-center {
+    align-items: center;
+}
+
+.d-flex.justify-space-center {
+    justify-content: center;
+}
+
+.relative {
+    position: relative;
+}
+
+.absolute {
+    position: absolute;
+}
+
 .m-row {
     display: flex;
 }
@@ -328,6 +478,15 @@ div {
 
 .ic-delete {
     background: url('@/assets/img/Sprites.64af8f61.svg') no-repeat -464px -312px;
+    width: 16px;
+    height: 16px;
+    min-width: 16px;
+    min-height: 16px;
+    cursor: pointer;
+}
+
+.ic-check {
+    background: url('@/assets/img/Sprites.64af8f61.svg') no-repeat -896px -312px;
     width: 16px;
     height: 16px;
     min-width: 16px;

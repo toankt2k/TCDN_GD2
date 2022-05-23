@@ -13,6 +13,7 @@
               ref="multiAction"
               :typeClass="'default'"
               :text="'Tiện ích'"
+              
             />
           </div>
           <div class="button">
@@ -52,13 +53,14 @@
       </div>
       <div class="table-tool">
         <div class="m-left m-d-flex m-align-item-center">
-            <div class="check-all"  style="padding:0 10px;">
-                <div class="ic-check-all"></div>
-            </div>
+          <div class="check-all" style="padding: 0 10px">
+            <div class="ic-check-all"></div>
+          </div>
           <DropdownButton
             ref="multiAction"
             :typeClass="'default'"
             :text="'Thực hiện hàng loạt'"
+            @click="multiFunction"
           />
         </div>
         <div class="m-right">
@@ -76,7 +78,7 @@
         </div>
       </div>
       <div class="table-area">
-        <MTable />
+        <MTable ref="PaymentTable" :columns="tableOption" :defaultData="tableData"/>
       </div>
 
       <div class="paging-area">
@@ -87,15 +89,20 @@
                 Tổng số: <strong>{{ 10 }}</strong> bản ghi
               </div>
             </div>
-            <MPaging
-              :totalRecord="10"
-              :totalPage="2"
-              v-model="test"
-            />
+            <MPaging :totalRecord="10" :totalPage="2" v-model="test" />
           </div>
         </div>
       </div>
     </div>
+    <!-- dropdown chức năng -->
+    <DropdownList
+      ref="funcionDropdown"
+      :maxheight="maxHeight"
+      :listItem="functionDropdown"
+      v-show="isShow"
+      @outSide="clickOutSide"
+      @selected="selectDropdown"
+    />
   </div>
 </template>
 
@@ -105,6 +112,9 @@ import DropdownButton from "@/components/base/button/BaseDropdownButton.vue";
 import MTable from "@/components/base/table/BaseTable.vue";
 import MPaging from "@/components/base/BasePaging.vue";
 import MInput from "@/components/base/input/BaseInput.vue";
+import DropdownList from "@/components/base/dialog/BaseDropdownList.vue";
+
+import axios from "axios";
 export default {
   components: {
     MButton,
@@ -112,11 +122,116 @@ export default {
     MTable,
     MPaging,
     MInput,
+    DropdownList,
   },
   data() {
-      return {
-          test:10,
+    return {
+      test: 10,
+      //các côt jhieenr thị trong bảng
+      tableOption: [],
+      //dât cho bảng
+      tableData: [],
+      //các chức năng cho dropdown
+      functionDropdown:[],
+      isShow:false,
+      //độ cao tối đa của màn hình
+      maxHeight:window.screen.availHeight,
+    };
+  },
+  methods: {
+    /**
+    * Mô tả : lấy danh sách nhân dữ liệu về table
+    * Created by: Nguyễn Đức Toán - MF1095 (20/05/2022)
+    */
+    getTableData() {
+      try {
+        let me = this;
+        axios
+          .get(`http://localhost:5093/api/v1/Employees`)
+          .then((res) => {
+            me.$refs.PaymentTable.setData(res.data);
+          })
+          .catch((res) => {
+            console.log(res);
+          });
+      } catch (error) {
+        console.log(error);
       }
+    },
+    /**
+    * Mô tả : lấy danh sách nhân dữ liệu về table
+    * Created by: Nguyễn Đức Toán - MF1095 (20/05/2022)
+    */
+    getTableOption() {
+      try {
+        let me = this;
+        axios
+          .get(`http://localhost:5093/api/v1/TableOptions/ByCode?code=Employee`)
+          .then((res) => {
+            console.log(res);
+            me.tableOption = JSON.parse(res.data.ListColumns);
+            me.$refs.PaymentTable.setColumns(JSON.parse(res.data.ListColumns));
+          })
+          .catch((res) => {
+            console.log(res);
+          });
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    /**
+     * Mô tả : bắt sự kiện click chuột vào nút sửa để hiện ra dropdown lựa chọn thực hiện hàng loạt
+     * Created by: Nguyễn Đức Toán - MF1095 (09/04/2022)
+     */
+    multiFunction(e) {
+      // if (!this.multiFlag) return;
+      try {
+        //dừng sự kiện click khác
+        e.stopPropagation();
+        console.log(e);
+        //ngăn sự kiện click khác
+        // kiểm tra sô dòng được chọn
+        let count = 3;
+        this.tableData.forEach((element) => {
+          if (element.checked == true) {
+            count++;
+          }
+        });
+        //lất element đc click
+        let elementTarget = this.$refs['multiAction'].$el.getBoundingClientRect();
+        // e.preventDefault();
+        //nếu sso dòng được chọn lớn hơn 0
+        if (count > 0) {
+          this.functionDropdown = this.resource.dropdownData.multipleFunction;
+        } else {
+          this.functionDropdown = [];
+        }
+        //lấy độ cao màn hình
+        this.maxHeight = e.view.innerHeight;
+        this.$refs['funcionDropdown'].setX(elementTarget.left + 40);
+        this.$refs['funcionDropdown'].setY(elementTarget.top + elementTarget.height-4);
+        //hiện dropdown
+        this.isShow = true;
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    clickOutSide(value){
+      try{
+        this.isShow = value;
+      }
+      catch(error){
+        console.log(error);
+      }
+    }
+  },
+  created() {
+    try {
+      this.getTableOption();
+      // this.getTableData()
+    } catch (error) {
+      console.log(error);
+    }
   },
 };
 </script>

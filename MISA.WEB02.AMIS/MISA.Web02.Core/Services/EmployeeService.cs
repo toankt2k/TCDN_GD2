@@ -1,8 +1,8 @@
 ﻿using MISA.Web02.Core.Entities;
 using MISA.Web02.Core.Exceptions;
 using MISA.Web02.Core.Helpers.ExportExcel;
-using MISA.Web02.Core.Interfaces;
-using MISA.Web02.Core.Interfaces.Base;
+using MISA.Web02.Core.Interfaces.Repository;
+using MISA.Web02.Core.Interfaces.Service;
 using MISA.Web02.Core.Resourses;
 using System;
 using System.Collections.Generic;

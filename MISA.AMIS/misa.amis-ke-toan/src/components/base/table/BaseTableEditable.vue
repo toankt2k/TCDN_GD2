@@ -9,9 +9,13 @@
               <MCheckBox />
             </th>
             <th
-              v-for="(col, index) in displayColunms"
+              v-for="(col, index) in displayColumns"
               :key="'col' + index"
-              :style="{ minWidth: col.minWidth, width: col.width,textAlign:col.align }"
+              :style="{
+                minWidth: col.minWidth,
+                width: `${col.width.replace(/\D/g, '') + 'px'}`,
+                textAlign: col.align,
+              }"
               :title="col.descriptionName"
               :class="col.classList"
             >
@@ -143,24 +147,39 @@
               <MCheckBox />
             </td>
             <td
-              v-for="(col, index) in displayColunms"
+              v-for="(col, index) in displayColumns"
               :key="'rcol' + index"
-              @click="setEdit($event, `ip${ind+col.id}`, ind)"
+              @click="setEdit($event, `ip${ind + col.id}`, ind,col)"
               :title="item[col.id]"
             >
-              <MInput
-                v-show="editRow == ind && col.edit"
-                :ref="`ip${ind+col.id}`"
-                v-model="item[col.id]"
-                :align="col.align"
-                :type="col.type"
-              />
-              <div v-show="editRow != ind || !col.edit" :style="{textAlign:col.align}">
+              <div v-show="editRow == ind && col.edit">
+                <MInput
+                  v-if="!col.component"
+                  :ref="`ip${ind + col.id}`"
+                  v-model="item[col.id]"
+                  :align="col.align"
+                  :type="col.type"
+                  @input="getDataTable"
+                />
+                <component
+                  v-if="col.component"
+                  :is="col.componentData.name"
+                  v-bind="col.componentData.prop"
+                  v-model="item[col.id]"
+                ></component>
+              </div>
+              <div
+                v-show="editRow != ind || !col.edit"
+                :style="{ textAlign: col.align }"
+              >
                 {{ dataFormat(item[col.id], col.type) }}
               </div>
             </td>
             <td class="table-function" v-if="deleteFunc">
-              <div class="table-function-button ic-delete"></div>
+              <div
+                class="table-function-button ic-delete"
+                @click="deleteRow(ind)"
+              ></div>
             </td>
             <td
               class="hidden-right"
@@ -173,7 +192,7 @@
             <td class="hidden-left"></td>
             <td class="table-checkbox" v-if="checkBox"></td>
             <td
-              v-for="(col, index) in displayColunms"
+              v-for="(col, index) in displayColumns"
               class="m-text-right count"
               :key="'rcol' + index"
             >
@@ -194,6 +213,7 @@
 //import component
 import MCheckBox from "@/components/base/BaseCheckBox.vue";
 import MInput from "@/components/base/input/BaseInput.vue";
+import MCombobox from "@/components/base/BaseComboBox.vue";
 //import lib
 import format from "@/js/lib/formatContent.js";
 
@@ -202,56 +222,17 @@ export default {
   components: {
     MCheckBox,
     MInput,
+    MCombobox,
   },
   props: {
     defaultData: {
       type: Array,
-      default: () => [{ EmployeeCode: "45" }],
+      default: () => [],
     },
     //các côt jđược hiển thị trên bảng
-    colunms: {
+    columns: {
       type: Array,
-      default: () => [
-        {
-          id: "EmployeeCode",
-          name: "Mã nhân viên",
-          displayName: "Mã nhân viên",
-          descriptionName:"Mã nhân viên",
-          width: "150px",
-          minWidth: "120px",
-          classList: [],
-          align: "right",
-          edit: true,
-          count: true,
-          type: "number",
-        },
-        {
-          id: "EmployeeCode1",
-          name: "Mã nhân viên",
-          displayName: "Mã nhân viên",
-          descriptionName:"Mã nhân viên",
-          width: "auto",
-          minWidth: "120px",
-          classList: [],
-          align: "left",
-          edit: true,
-          count: false,
-          type: "text",
-        },
-        {
-          id: "EmployeeCode2",
-          name: "Mã nhân viên",
-          displayName: "Mã nhân viên",
-          descriptionName:"Mã nhân viên",
-          width: "100px",
-          minWidth: "120px",
-          classList: [],
-          align: "left",
-          edit: true,
-          count: false,
-          type: "text",
-        },
-      ],
+      default: () => [],
     },
     //có chwucs năng xóa hay không
     deleteFunc: {
@@ -269,7 +250,7 @@ export default {
       //xác định hàng nào trong bảng đang được sửa
       editRow: -1,
       //danh sách các cột được hiển thị
-      displayColunms: this.colunms,
+      displayColumns: this.columns,
       tableData: this.defaultData,
       test: false,
       //show detailDialog
@@ -308,10 +289,19 @@ export default {
    * Created by: Nguyễn Đức Toán - MF1095 (07/04/2022)
    */
   methods: {
-    setEdit(e, refOfTagetInput, indexOfColunm) {
+    getDataTable() {
+      try {
+        this.$emit("getData", this.tableData);
+      } catch (error) {
+        console.log(error);
+      }
+    },
+
+    setEdit(e, refOfTagetInput, indexOfColunm, col) {
       try {
         e.preventDefault();
         this.editRow = indexOfColunm;
+        if(col.component)return;
         this.$nextTick(() => {
           this.$refs[refOfTagetInput][0].setFocus(true);
         });
@@ -330,22 +320,6 @@ export default {
         me.pagingOption.currentPage = 1;
         me.loadTable();
       }, 500);
-    },
-    /**
-     * Mô tả : nhận thông tin phân trang từ component paging
-     * @param {*} data - currentPage thông tin để phân trang và filter
-     * @param {*} pageSize - số bản ghi/trang
-     * Created by: Nguyễn Đức Toán - MF1095
-     * Created date: 09:42 18/04/2022
-     */
-    selectedPaging(data, pageSize) {
-      try {
-        this.pagingOption.currentPage = data;
-        this.pagingOption.pageSize = pageSize;
-        this.loadTable();
-      } catch (error) {
-        console.log(error);
-      }
     },
 
     /**
@@ -449,49 +423,6 @@ export default {
         console.log(error);
       }
     },
-    /**
-     * Mô tả : gọi api xóa 1 ban ghi
-     * Created by: Nguyễn Đức Toán - MF1095 (14/04/2022)
-     */
-
-    /**
-     * Mô tả : gọi api xóa nhiều bản ghi
-     * Created by: Nguyễn Đức Toán - MF1095 (14/04/2022)
-     */
-    // deleteMultiEmployee() {
-    //   let me = this;
-    //   try {
-    //     let dataDelete = [];
-    //     me.listEmployee.forEach((ele) => {
-    //       if (ele.checked) {
-    //         dataDelete.push(ele.EmployeeId);
-    //       }
-    //     });
-    //     axios({
-    //       url: this.dataStorage.api.deleteMultiEmployee,
-    //       method: "DELETE",
-    //       data: dataDelete,
-    //     })
-    //       .then((res) => {
-    //         console.log(res);
-    //         if (res.status == 200) {
-    //           me.addToast(this.resource.toastMessage.deleteSuccess);
-    //           //chọn trang đầu tiên
-    //           me.pagingOption.currentPage = 1;
-    //           //load lại table
-    //           me.loadTable();
-    //         }
-    //       })
-    //       .catch((res) => {
-    //         console.log(res.response);
-    //       });
-    //   } catch (error) {
-    //     console.log(error);
-    //   } finally {
-    //     this.selectedId = "";
-    //     this.selectedCode = "";
-    //   }
-    // },
 
     /**
      * Mô tả : mở form thông tin nhân viên
@@ -508,53 +439,7 @@ export default {
       }
       this.infoDialog = true;
     },
-    // exportEmployee() {
-    //   try {
-    //     axios({
-    //       url: this.dataStorage.api.export,
-    //       method: "GET",
-    //       responseType: "blob",
-    //     })
-    //       .then((res) => {
-    //         FileDownload(res.data, "Danh_sach_nhan_vien.xlsx");
-    //       })
-    //       .catch((res) => {
-    //         console.log(res.response);
-    //       });
-    //   } catch (error) {
-    //     console.log();
-    //   }
-    // },
-    /**
-     * Mô tả : lấy dữ liệu table từ api
-     * Created by: Nguyễn Đức Toán - MF1095 (15/04/2022)
-     */
-    // loadTable() {
-    //   this.isLoading = true;
-    //   this.checkAll = false;
-    //   let me = this;
-    //   me.listEmployee = [];
-    //   try {
-    //     axios({
-    //       method: "GET",
-    //       url: `${this.dataStorage.api.filter}?currentPage=${me.pagingOption.currentPage}&pageSize=${me.pagingOption.pageSize}&filterText=${me.pagingOption.filterText}`,
-    //     })
-    //       .then((res) => {
-    //         console.log(res);
-    //         if (res.status == 200) {
-    //           me.listEmployee = res.data.list;
-    //           me.pagingOption.totalRecord = res.data.totalRecord;
-    //           me.pagingOption.totalPage = res.data.totalPage;
-    //           me.isLoading = false;
-    //         }
-    //       })
-    //       .catch((res) => {
-    //         console.error(res);
-    //       });
-    //   } catch (error) {
-    //     console.log(error);
-    //   }
-    // },
+
     /**
      * Mô tả : emit gọi hàm thêm toastmessage
      * Created by: Nguyễn Đức Toán - MF1095 (15/04/2022)
@@ -600,12 +485,20 @@ export default {
       }
     },
     /**
-     * Mô tả : set lại cho form detail thành form thêm
+     * Mô tả : get dữ liệu khi cất
      * Created by: Nguyễn Đức Toán - MF1095 (23/04/2022)
      */
-    setAddForm(isAdd) {
+    getData() {
       try {
-        this.isAdd = isAdd;
+        return this.tableData;
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    deleteRow(ind) {
+      try {
+        this.tableData.splice(ind, 1);
+        this.getDataTable();
       } catch (error) {
         console.log(error);
       }
@@ -691,15 +584,42 @@ export default {
         console.log(error);
       }
     },
-    // dateFormat(date) {
-    //   return format.dateFormat(date);
-    // },
-    // // fomat string sang number
-    // salaryFormat(salary) {
-    //   return format.salaryFormat(salary);
-    // },
+    /**
+     * Mô tả : gán lai jdanh sách cho bảng
+     * Created by: Nguyễn Đức Toán - MF1095 (20/05/2022)
+     */
+    setData(data) {
+      try {
+        if (data) {
+          this.tableData = data;
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    /**
+     * Mô tả : gán lai jdanh sách cho bảng
+     * Created by: Nguyễn Đức Toán - MF1095 (20/05/2022)
+     */
+    setColumns(columns) {
+      try {
+        if (columns) {
+          this.displayColumns = columns;
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    },
   },
   watch: {
+    defaultData(newVal, old) {
+      try {
+        if (newVal != old) this.tableData = newVal;
+      } catch (error) {
+        console.log(error);
+      }
+    },
+
     /**
      * Mô tả : kiểm tra nếu chọn nhiều hơn 1 em ployee thì cho phép dùng chức năng xóa nhiều
      * Created by: Nguyễn Đức Toán - MF1095 (27/04/2022)
@@ -765,7 +685,7 @@ export default {
   width: 100% !important;
   overflow: unset;
 }
-table{
+table {
   padding-bottom: 10px;
 }
 tfoot .count {
@@ -780,7 +700,7 @@ tfoot .count {
   min-width: 24px;
 }
 .table-function {
-    right: 0px !important;
+  right: 0px !important;
 }
 @-webkit-keyframes moving-gradient {
   0% {

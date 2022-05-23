@@ -54,5 +54,18 @@ namespace MISA.Web02.Core.Interfaces.Base
         /// <param name="listId"></param>
         /// <returns></returns>
         public int MultiDelete(List<Guid> listId);
+
+        /// <summary>
+        /// phân trang, tìm kiếm
+        /// </summary>
+        /// <param name="currentPage">page hiện tại</param>
+        /// <param name="pageSize">số bản ghi/1page</param>
+        /// <param name="filterText">tên/mã nhân viên cần tìm kiếm</param>
+        /// <returns>
+        /// count: tổng số bản ghi phù hợp với kq tìm kiếm
+        /// list danh sách nhân viên đã được filter
+        /// </returns>
+        /// Author: Nguyễn Đức Toán-MF1095(15/04/2022)
+        public string FilterService(int currentPage, int pageSize, string? filterText);
     }
 }

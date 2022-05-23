@@ -100,9 +100,7 @@ namespace MISA.Web02.Core.Entities
         /// <summary>
         /// mã id của bảng phòng ban
         /// </summary>
-        [MISADisplay(Name = "Id phòng ban")]
-        [MISARequired]
-        public Guid DepartmentId { get; set; }
+        public Guid? DepartmentId { get; set; }
         /// <summary>
         /// tên của bảng phòng ban
         /// </summary>

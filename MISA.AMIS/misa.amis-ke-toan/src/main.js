@@ -39,6 +39,12 @@ const routers = [
             import ("@/view/ca/ThePaymentDetail.vue")
     },
     {
+        path: '/VendorList',
+        name: 'VendorList',
+        component: () =>
+            import ("@/view/vendor/VendorList.vue")
+    },
+    {
         path: '/test',
         name: 'HelloWorld',
         component: () =>

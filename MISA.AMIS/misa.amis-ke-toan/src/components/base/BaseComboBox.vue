@@ -2,6 +2,7 @@
   <div ref="combobox" class="m-combobox">
     <div class="combobox">
       <input
+        :placeholder="placeholder"
         ref="input"
         class="m-input combobox-input"
         type="text"
@@ -15,7 +16,12 @@
         <div class="ic-add"></div>
       </div>
       <span class="combobox-icon" ref="icon" @click="openItem($event)"></span>
-      <div class="item-box" ref="itemBox" v-if="!isObject">
+      <div
+        class="item-box"
+        ref="itemBox"
+        v-if="!isObject"
+        style="min-width: 100%; max-height: 160px;z-index:11"
+      >
         <div
           :ref="`r${item[idProp]}`"
           class="item"
@@ -27,8 +33,15 @@
         >
           {{ item[nameProp] }}
         </div>
+        <div class="item empty" v-if="listItem.length <= 0">Không có dữ liệu hiển thị.</div>
       </div>
-      <div class="item-box" :class="{ object: isObject }" ref="itemBox" v-else>
+      <div
+        class="item-box"
+        :class="{ object: isObject }"
+        ref="itemBox"
+        style="min-width: 100%;z-index:11"
+        v-else
+      >
         <div class="table-combobox">
           <table>
             <thead>
@@ -48,7 +61,7 @@
                 @click="selectItem(item)"
               >
                 <td v-for="(head, ind) in displayProps" :key="`r${ind}`">
-                  {{item[head.id]}}
+                  {{ item[head.id] }}
                 </td>
               </tr>
             </tbody>
@@ -127,6 +140,10 @@ export default {
       type: Array,
       default: () => [],
     },
+    placeholder: {
+      type: String,
+      default: "",
+    },
   },
   /**
    * Mô tả : Khai báo và khởi tạo các data dùng cho component
@@ -138,7 +155,7 @@ export default {
        * Mô tả : listItem - danh sách các item của combobox, được gán mặc đinh giá trị từ component cha
        * Created by: Nguyễn Đức Toán - MF1095 (08/04/2022)
        */
-      listItem: this.defaultList,
+      listItem: JSON.parse(JSON.stringify(this.defaultList)),
       /**
        * Mô tả : giá trị hiển thị mặc định của combobox
        * Created by: Nguyễn Đức Toán - MF1095 (08/04/2022)
@@ -188,7 +205,13 @@ export default {
      */
     openItem(e) {
       try {
-        console.log(e);
+        if(this.readonly)return;
+        //nếu không được truyền api thì combo box load dữ liệu khi được gọi
+        if (this.apiData == "") {
+          //emit giá trị true nếu sự kiện mở combobox và ngược lại
+          if (this.$refs.itemBox.style.display != "block")
+            this.$emit("getData");
+        }
         if (this.$refs.itemBox.style.display != "block") {
           // hiện item box
           this.$refs.itemBox.style.display = "block";
@@ -208,6 +231,7 @@ export default {
         let maxHeight = e.view.innerHeight;
         //lấy vị trí của combobox
         let combobox = this.$refs.input.getBoundingClientRect();
+        this.$refs.itemBox.style.minWidth = combobox.width + "px";
         this.top = combobox.top + 35;
         // heigth của itembox
         let clientHeight = this.$refs.itemBox.clientHeight;
@@ -254,7 +278,6 @@ export default {
      */
     selectItem(item) {
       try {
-        console.log(item);
         //emit dữ liệu
         this.$emit("update:modelValue", item[this.idProp]);
         //set tên hiển thị
@@ -408,6 +431,29 @@ export default {
       }
     },
     /**
+     * Mô tả : gán listdata cho combobox
+     * Created by: Nguyễn Đức Toán - MF1095 (22/05/2022)
+     */
+    setData(data) {
+      try {
+        this.listItem = data;
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    /**
+     * Mô tả : gán listdata cho combobox
+     * Created by: Nguyễn Đức Toán - MF1095 (22/05/2022)
+     */
+    removeData() {
+      try {
+        this.listItem = [];
+        this.selectedName = "";
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    /**
      * Mô tả : setfocus cho input lỗi
      * Created by: Nguyễn Đức Toán - MF1095 (20/04/2022)
      */
@@ -436,6 +482,7 @@ export default {
           .then((res) => {
             //gán giá trị cho danh sách item của item box
             me.listItem = res.data;
+            console.log(res);
             //set mặc định chọn
             me.setDefaultSelected();
           })
@@ -467,10 +514,12 @@ export default {
    */
   mounted() {
     try {
-      let combobox = this.$refs.input.getBoundingClientRect();
-      this.top = combobox.top + 35;
-      this.$refs.itemBox.style.top = top + "px";
-      this.$refs.itemBox.style.minWidth = combobox.width + "px";
+      this.$nextTick(() => {
+        let combobox = this.$refs.combobox.getBoundingClientRect();
+        this.top = combobox.top + 35;
+        this.$refs.itemBox.style.top = top + "px";
+        this.$refs.itemBox.style.minWidth = combobox.width + "px";
+      });
     } catch (error) {
       console.log(error);
     }
@@ -480,8 +529,17 @@ export default {
 
 <style scoped>
 @import url("@/css/components/combobox.css");
+
+
 .m-input {
   font-family: Notosans-regular !important;
+}
+input::placeholder {
+  font-family: Notosans-regular !important;
+  font-style: italic !important;
+}
+.item.empty{
+  pointer-events: none;
 }
 table {
   border-collapse: separate;

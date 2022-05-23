@@ -6,6 +6,9 @@ using MISA.Web02.Core.Interfaces.Base;
 using MISA.Web02.Core.Services;
 using MISA.Web02.Core.Resourses;
 using System.Net;
+using Newtonsoft.Json.Linq;
+using MISA.Web02.Api.Helpers;
+using Newtonsoft.Json;
 
 namespace MISA.Web02.Api.Controllers
 {
@@ -253,6 +256,45 @@ namespace MISA.Web02.Api.Controllers
                 return StatusCode(500, result);
             }
      
+        }
+        /// <summary>
+        /// Filter, phân trang
+        /// </summary>
+        /// <returns>
+        /// danh sách cá bản ghhi và tổng số trang, tổng số bản ghi
+        /// </returns>
+        /// Author: Nguyễn Đức Toán-MF1095 (18/04/2022)
+        [HttpGet("filter")]
+        public virtual IActionResult Filter(int currentPage, int pageSize, string? filterText)
+        {
+            try
+            {
+                //trả về danh sách đã được filter và tổng số bản ghi
+                var result = _baseService.FilterService(currentPage, pageSize, filterText);
+                var jObj = JObject.Parse(result);
+                jObj.Capitalize();
+                return Ok(JObject.Parse(jObj.ToString()));
+            }
+            catch (MISAExceptions ex)
+            {
+                var result = new MISAServiceResult()
+                {
+                    devMsg = ex.Message,
+                    userMsg = MISAMessageResource.VN_MisaExceptionMsg,
+                    data = ex.Data,
+                };
+                return BadRequest(result);
+            }
+            catch (Exception ex)
+            {
+                var result = new
+                {
+                    devMsg = ex.Message,
+                    userMsg = MISAMessageResource.VN_MisaExceptionMsg,
+                    data = ex.Data,
+                };
+                return StatusCode(500, result);
+            }
         }
         #endregion
     }

@@ -16,25 +16,20 @@ export default {
   name: "DropdownList",
   components: {},
   props: {
-    //giá trị css top của phần tử
-    offsetX: {
-      type: Number,
-      default: 0,
-    },
-    //giá trị css left của phần tử
-    offsetY: {
-      type: Number,
-      default: 0,
-    },
-    //độ cao của màn hình
-    maxHeight: {
-      type: Number,
-      default: 0,
-    },
     listItem: {
       type: Array,
       default: () => [],
     },
+  },
+  data() {
+    return {
+      //giá trị css top của phần tử
+      offsetX: 0,
+      //giá trị css left của phần tử
+      offsetY: 0,
+      //độ cao màn hình
+      maxHeight: 0,
+    };
   },
   methods: {
     /**
@@ -52,28 +47,38 @@ export default {
     clickOutSide() {
       this.$emit("outSide", false);
     },
+    /**
+     * Mô tả : set position left cho component
+     * Created by: Nguyễn Đức Toán - MF1095 (20/05/2022)
+     */
+    setX(value) {
+      try {
+        this.offsetX = value;
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    /**
+     * Mô tả : set position top cho component
+     * Created by: Nguyễn Đức Toán - MF1095 (20/05/2022)
+     */
+    setY(value) {
+      try {
+        this.offsetY = value;
+      } catch (error) {
+        console.log(error);
+      }
+    },
   },
   /**
-  * Mô tả : khi component được render thì sẽ xuất hiện theo vị trí chỉ định
-  * Created by: Nguyễn Đức Toán - MF1095 (25/04/2022)
-  */
+   * Mô tả : khi component được render thì sẽ xuất hiện theo vị trí chỉ định
+   * Created by: Nguyễn Đức Toán - MF1095 (25/04/2022)
+   */
   mounted() {
-    //độ cao của item box
-    let clientHeight = this.$refs.dropdown.clientHeight;
-    //độ rộng của item box
-    let clientWidth = this.$refs.dropdown.clientWidth;
-    //position top của item box
-    let top = this.offsetY;
-    //nếu vị trí xuất hiện của itembox bị che bởi màn hình thì giảm top để ittembox xuất hiện trong màn hình
-    if (top + clientHeight >= this.maxHeight) {
-      top = top - clientHeight;
-    }
-    //set vị trí cho itembox
-    this.$refs.dropdown.style.top = top + "px";
-    //set vị trí cho item bõ hiện trong màn hình
-    this.$refs.dropdown.style.left = this.offsetX - clientWidth + 30 + "px";
     //sự kiện click outside
     window.addEventListener("click", this.clickOutSide);
+    this.maxHeight = document.body.clientHeight;
+    this.maxWidth = document.body.clientWidth;
   },
   /**
    * Mô tả : trước khi tắt dropdown thì hủy sự kiện click outside
@@ -83,22 +88,29 @@ export default {
     //sự kiện click outside
     window.removeEventListener("click", this.clickOutSide);
   },
+
+  created() {},
   watch: {
     offsetY(val) {
-      //độ cao của itembox
-      let clientHeight = this.$refs.dropdown.clientHeight;
-      //set vị trí cho item box
-      let top = val;
-      if (top + clientHeight >= this.maxHeight) {
-        top = top - clientHeight;
-      }
-      this.$refs.dropdown.style.top = `${top + 10}px`;
+      this.$nextTick(() => {
+        let client = this.$refs['dropdown'].getBoundingClientRect();
+        let top = val;
+        if(client.height + top > this.maxHeight){
+          top -= client.height;
+        }
+        this.$refs.dropdown.style.top = `${top + 10}px`;
+      });
     },
     offsetX(val) {
-      //độ rộng của itembox
-      let clientWidth = this.$refs.dropdown.clientWidth;
-      // set lại vị trí
-      this.$refs.dropdown.style.left = `${val - clientWidth + 30}px`;
+      this.$nextTick(() => {
+        let client = this.$refs['dropdown'].getBoundingClientRect();
+        let left = val;
+        if(client.width + left > this.maxWidth){
+          left -= client.width;
+        }
+        this.$refs.dropdown.style.left = `${left}px`;
+      });
+      
     },
   },
 };

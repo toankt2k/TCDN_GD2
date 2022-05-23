@@ -1,5 +1,6 @@
 ﻿using MISA.Web02.Core.Entities;
 using MISA.Web02.Core.Interfaces;
+using MISA.Web02.Core.Interfaces.Repository;
 using System;
 using System.Collections.Generic;
 using System.Linq;

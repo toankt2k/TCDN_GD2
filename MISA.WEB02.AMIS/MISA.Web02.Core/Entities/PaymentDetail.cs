@@ -14,49 +14,49 @@ namespace MISA.Web02.Core.Entities
         /// <summary>
         /// id accounting
         /// </summary>
-        public Guid PaymentDetailId { get; set; }
+        public Guid? PaymentDetailId { get; set; }
 
         /// <summary>
         /// diễn giải cho phiếu chi
         /// </summary>
-        public string? DescriptionPayment { get; set; }
+        public string? DescriptionPaymentDetail { get; set; }
 
         /// <summary>
         /// khóa ngoại bảng Payment
         /// </summary>
-        public Guid PaymentId { get; set; }
+        public Guid? PaymentId { get; set; }
 
         /// <summary>
         /// Tài khoản nợ
         /// </summary>
-        public Guid? DebitAccountId { get; set; }
+        public int? DebitAccountId { get; set; }
 
         /// <summary>
         /// số tk nợ
         /// </summary>
         [NotMap]
-        public Guid? DebitAccountNUmber { get; set; }
+        public string? DebitAccountNumber { get; set; }
 
         /// <summary>
         /// Tài khoản credit
         /// </summary>
-        public Guid? CreditAccountId { get; set; }
+        public int? CreditAccountId { get; set; }
 
         /// <summary>
         /// số tk có
         /// </summary>
         [NotMap]
-        public Guid? CreditAccountNumber { get; set; }
+        public string? CreditAccountNumber { get; set; }
 
         /// <summary>
         /// số tiền chi
         /// </summary>
-        public float CashAmount { get; set; }
+        public float? CashAmount { get; set; }
 
         /// <summary>
         /// khóa ngoại cho đối tượng(Vendor, employee,khách hàng ...)
         /// </summary>
-        public Guid AccountObjectId { get; set; }
+        public Guid? AccountObjectId { get; set; }
 
         /// <summary>
         /// tên đối tượng(Vendor, employee,khách hàng ...)

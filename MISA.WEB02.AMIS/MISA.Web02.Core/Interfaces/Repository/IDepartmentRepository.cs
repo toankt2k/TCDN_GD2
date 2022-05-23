@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MISA.Web02.Core.Interfaces
+namespace MISA.Web02.Core.Interfaces.Repository
 {
     public interface IDepartmentRepository:IBaseRepository<Department>
     {

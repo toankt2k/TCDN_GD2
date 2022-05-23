@@ -1,5 +1,6 @@
 ﻿using MISA.Infrastructure.Respository;
-using MISA.Web02.Core.Interfaces;
+using MISA.Web02.Core.Interfaces.Service;
+using MISA.Web02.Core.Interfaces.Repository;
 using MISA.Web02.Core.Interfaces.Base;
 using MISA.Web02.Core.Services;
 using Newtonsoft.Json.Serialization;
@@ -20,6 +21,21 @@ builder.Services.AddScoped<IEmployeeService, EmployeeService>();
 //department
 builder.Services.AddScoped<IDepartmentRepository, DepartmentRespository>();
 builder.Services.AddScoped<IDepartmentService, DepartmentService>();
+//vendor
+builder.Services.AddScoped<IVendorRepository, VendorRepository>();
+builder.Services.AddScoped<IVendorService, VendorService>();
+//payment
+builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
+builder.Services.AddScoped<IPaymentService, PaymentService>();
+//payment
+builder.Services.AddScoped<IPaymentDetailRepository, PaymentDetailRepository>();
+builder.Services.AddScoped<IPaymentDetailService, PaymentDetailService>();
+//payment
+builder.Services.AddScoped<ITableOptionRepository, TableOptionRepository>();
+builder.Services.AddScoped<ITableOptionService, TableOptionService>();
+//payment
+builder.Services.AddScoped<IVendorGroupRepository, VendorGroupRepository>();
+builder.Services.AddScoped<IVendorGroupService, VendorGroupService>();
 
 builder.Services.AddCors(options =>
 {

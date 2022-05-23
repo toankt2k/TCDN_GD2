@@ -6,9 +6,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MISA.Web02.Core.Interfaces
+namespace MISA.Web02.Core.Interfaces.Service
 {
-    public interface IDepartmentService:IBaseService<Department>
+    public interface IVendorService:IBaseService<Vendor>
     {
     }
 }

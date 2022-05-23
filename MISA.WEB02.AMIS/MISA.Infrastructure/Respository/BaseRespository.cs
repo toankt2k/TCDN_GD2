@@ -21,7 +21,7 @@ namespace MISA.Infrastructure.Respository
     public class BaseRespository<T> : IBaseRepository<T>
     {
         #region Fields
-        public string _sqlPostgreslqString;
+        protected string _sqlPostgreslqString;
 
         #endregion
         #region Constructor
@@ -71,7 +71,8 @@ namespace MISA.Infrastructure.Respository
             for (int i = 0; i < listEntityCode.Count(); i++)
             {
                 var code = listEntityCode.ElementAt(i);
-                listCode.Add(int.Parse(Regex.Replace(code.ToString(), pattern, "")));
+                var intCode = Regex.Replace(code.ToString(), pattern, "");
+                listCode.Add(!string.IsNullOrEmpty(intCode)?int.Parse(intCode):0);
             }
             var newCode = $"1";
             if (listCode.Count > 0)
@@ -246,7 +247,7 @@ namespace MISA.Infrastructure.Respository
         public virtual T FindByCode(string code)
         {
             //tableNAme dạng snake case
-            var tableName = typeof(T).Name;
+            var tableName = BindingEntity.ToSnakeCase(typeof(T).Name);
             //lấy dữ liệu
             string commandText = $"SELECT * FROM {tableName} WHERE {tableName}_code = @m_{tableName}_code";
             //khởi tạo tham số
@@ -280,14 +281,11 @@ namespace MISA.Infrastructure.Respository
             string commandText = $"func_filter_{tableName}";
             //truyền param
             var param = new List<NpgsqlParameter>();
-            param.Add(new NpgsqlParameter("@m_filter_text", filterText == null ? "" : filterText));
             param.Add(new NpgsqlParameter("@m_limit", limit.ToString()));
+            param.Add(new NpgsqlParameter("@m_filter_text", filterText == null ? "" : filterText));
             param.Add(new NpgsqlParameter("@m_offset", offset.ToString()));
-            sqlConnection.Open();
-            //dữ liệu trả về gồm các propperty của Employee
             //truy vấn trả về kq cho 2 câu lệnh sql
             var data = BindingEntity.Query<string>(commandText, _sqlPostgreslqString, CommandType.StoredProcedure,param);
-
             //trả về kết quả
             return data.Result.FirstOrDefault();
         }

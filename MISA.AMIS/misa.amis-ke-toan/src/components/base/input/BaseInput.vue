@@ -10,6 +10,7 @@
         :style="{'text-align': align}"
         :maxlength="maxlength"
         @mousemove="stopDraggable"
+        :readonly="readonly"
       />
       <div class="input-icon" :class="classIcon" v-if="classIcon"></div>
     </div>
@@ -43,6 +44,11 @@ export default {
     modelValue: {
       type: String,
       default: "",
+    },
+    //trường dữ liệu chỉ  đc đọc
+    readonly: {
+      type: Boolean,
+      default: false,
     },
     /**
     * Mô tả : kiểu nhập mặc định cho input

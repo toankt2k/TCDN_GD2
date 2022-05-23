@@ -50,7 +50,6 @@ namespace MISA.Infrastructure.Helpers
                                 }
                                 ((IDictionary<string, object>)entity).Add(propName, propValue);
                             }
-
                             var entityData = JsonConvert.DeserializeObject<T>(JsonConvert.SerializeObject(entity));
                             result.Add(entityData);
                         }
@@ -144,6 +143,7 @@ namespace MISA.Infrastructure.Helpers
             }
 
         }
+
 
         /// <summary>
         /// dùng khi goị function k trả về query 

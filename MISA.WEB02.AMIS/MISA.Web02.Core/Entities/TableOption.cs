@@ -11,11 +11,11 @@ namespace MISA.Web02.Core.Entities
         /// <summary>
         /// id của bảng
         /// </summary>
-        public Guid TableOptionId { get; set; }
+        public Guid? TableOptionId { get; set; }
         /// <summary>
         /// mã code của bảng xác định option của bảng nào
         /// </summary>
-        public string? TableCode { get; set; }
+        public string? TableOptionCode { get; set; }
         /// <summary>
         /// danh sách các cột hiển thị trong bảng
         /// </summary>

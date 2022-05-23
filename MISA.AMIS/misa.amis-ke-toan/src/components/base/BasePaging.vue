@@ -147,6 +147,7 @@ export default {
      */
     selectPage(page) {
       try {
+        console.log("23");
         if (page > 0 && page <= this.totalPage) {
           //emit data
           this.$emit("selectPage", page, this.pageSize);

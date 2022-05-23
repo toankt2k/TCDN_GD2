@@ -130,11 +130,17 @@ const resources = {
         multipleFunction: [
             { name: "Xóa hàng loạt", key: "multiDelete" },
         ],
-        //các item cho chức năng của bảng
-        tableFunction: [
-            { name: "Nhân bản", key: "duplicate" },
+        //các item cho chức năng của bảng vendor
+        tableVendorFunction: [
+            { name: "Sửa", key: "edit" },
+            { name: "Xem", key: "view" },
             { name: "Xóa", key: "delete" },
-            { name: "Ngừng sử dụng", key: "stop" },
+        ],
+        //các item cho chức năng của bảng payment
+        tablePaymentFunction: [
+            { name: "Xem", key: "view" },
+            { name: "Xóa", key: "delete" },
+            { name: "Nhân bản", key: "duplicate" },
         ],
     },
     /**

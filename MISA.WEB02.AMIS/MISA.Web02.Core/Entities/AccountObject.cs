@@ -11,16 +11,18 @@ namespace MISA.Web02.Core.Entities
         /// <summary>
         /// id đói tượng
         /// </summary>
-        public Guid AccountObjectId { get; set; }
+        public Guid? AccountObjectId { get; set; }
 
         /// <summary>
         /// mã đối tượng
         /// </summary>
+        [NotMap]
         public string? AccountObjectCode { get; set; }
 
         /// <summary>
         /// tên đối tượng
         /// </summary>
+        [NotMap]
         public string? AccountObjectName { get; set; }
 
         /// <summary>
@@ -32,16 +34,16 @@ namespace MISA.Web02.Core.Entities
         /// <summary>
         /// khóa ngoại bảng vendor
         /// </summary>
-        public Guid VendorId { get; set; }
+        public Guid? VendorId { get; set; }
 
         /// <summary>
         /// khóa ngoại bảng nhân viên
         /// </summary>
-        public Guid EmployeeId { get; set; }
+        public Guid? EmployeeId { get; set; }
 
         /// <summary>
         /// khóa ngoại bảng customer
         /// </summary>
-        public Guid CustomerId { get; set; }
+        public Guid? CustomerId { get; set; }
     }
 }

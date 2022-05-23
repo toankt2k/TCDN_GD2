@@ -11,6 +11,7 @@
         @mousemove="stopDraggable"
         type="text-area"
         :rows="rows"
+        :readonly="readonly"
       ></textarea>
       <div class="input-icon" :class="classIcon" v-if="classIcon"></div>
     </div>
@@ -56,6 +57,14 @@ export default {
     type: {
       type: String,
       default: "text",
+    },
+    /**
+     * Mô tả : readonly cho input input
+     * Created by: Nguyễn Đức Toán - MF1095 (11/04/2022)
+     */
+    readonly: {
+      type: Boolean,
+      default: false,
     },
     /**
      * Mô tả : căn lề cho chữ trong input
@@ -171,6 +180,9 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 @import url("@/css/components/input.css");
+textarea{
+  font-family: NotoSans-regular;
+}
 </style>

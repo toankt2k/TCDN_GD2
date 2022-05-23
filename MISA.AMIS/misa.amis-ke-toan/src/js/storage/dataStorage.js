@@ -168,19 +168,268 @@
      ],
      CAProcessUtilityBtn: [],
      vendorDetail: {
+         vendorProp: [{
+                 id: "VendorName",
+                 name: "Đối tượng",
+             },
+             {
+                 id: "VendorCode",
+                 name: "Mã đối tượng",
+             },
+             {
+                 id: "CreateBy",
+                 name: "Người tạo",
+             },
+         ],
          radioButtonTypeVendor: {
              button: [{
-                     id: "1",
+                     id: "0",
                      name: "Tổ chức",
                  },
                  {
-                     id: "0",
+                     id: "1",
                      name: "Cá nhân",
                  }
              ],
              id: 'id',
              name: 'name'
-         }
-     }
+         },
+         prefixNameCombobox: {
+             button: [{
+                     id: "0",
+                     name: "Anh",
+                 },
+                 {
+                     id: "1",
+                     name: "Bà",
+                 },
+                 {
+                     id: "3",
+                     name: "Bạn",
+                 },
+                 {
+                     id: "4",
+                     name: "Chị",
+                 },
+                 {
+                     id: "5",
+                     name: "Mr",
+                 },
+                 {
+                     id: "6",
+                     name: "Mrs",
+                 },
+                 {
+                     id: "7",
+                     name: "Miss",
+                 },
+                 {
+                     id: "8",
+                     name: "Ông",
+                 },
+             ],
+             id: 'id',
+             name: 'name'
+         },
+         contractCombobox: [{
+                 ContractId: 1,
+                 ContractName: "Điều khoản 1",
+                 ContractCode: "DK1"
+             },
+             {
+                 ContractId: 2,
+                 ContractName: "Điều khoản 2",
+                 ContractCode: "DK2"
+             },
+             {
+                 ContractId: 3,
+                 ContractName: "Điều khoản 3",
+                 ContractCode: "DK3"
+             },
+         ],
+         debitAccount: [{
+                 DebitPaymentAccountId: 1,
+                 DebitPaymentAccountCode: "12323",
+                 DebitPaymentAccountName: "Tài khoản của người bán"
+             },
+             {
+                 DebitPaymentAccountId: 2,
+                 DebitPaymentAccountCode: "1111",
+                 DebitPaymentAccountName: "Tài khoản của người mua"
+             },
+             {
+                 DebitPaymentAccountId: 3,
+                 DebitPaymentAccountCode: "456546",
+                 DebitPaymentAccountName: "Tài khoản của người lao động"
+             },
+
+         ],
+         accountDebit: [{
+                 DebitAccountId: 1,
+                 DebitAccountNumber: "123",
+                 DebitAccountName: "Tài khoản của người bán"
+             },
+             {
+                 DebitAccountId: 2,
+                 DebitAccountNumber: "1233",
+                 DebitAccountName: "Tài khoản của người bán"
+             },
+             {
+                 DebitAccountId: 3,
+                 DebitAccountNumber: "11111",
+                 DebitAccountName: "Tài khoản của người bán"
+             },
+             {
+                 DebitAccountId: 4,
+                 DebitAccountNumber: "111",
+                 DebitAccountName: "Tài khoản của người bán"
+             },
+             {
+                 DebitAccountId: 5,
+                 DebitAccountNumber: "1111",
+                 DebitAccountName: "Tài khoản của người bán"
+             },
+             {
+                 DebitAccountId: 6,
+                 DebitAccountNumber: "12213",
+                 DebitAccountName: "Tài khoản của người bán"
+             },
+
+         ],
+         accountDebitProp: [{
+                 id: "DebitAccountNumber",
+                 name: "Số tài khoản",
+             },
+             {
+                 id: "DebitAccountName",
+                 name: "Tên Tài khoản",
+             },
+         ],
+         accountCreadit: [{
+                 CreditAccountId: 1,
+                 CreditAccountNumber: "1213",
+                 CreditAccountName: "Tài khoản của người bán"
+             },
+             {
+                 CreditAccountId: 2,
+                 CreditAccountNumber: "1113",
+                 CreditAccountName: "Tài khoản của người bán"
+             },
+             {
+                 CreditAccountId: 3,
+                 CreditAccountNumber: "11231",
+                 CreditAccountName: "Tài khoản của người bán"
+             },
+             {
+                 CreditAccountId: 4,
+                 CreditAccountNumber: "11233",
+                 CreditAccountName: "Tài khoản của người bán"
+             },
+
+         ],
+         accountCreditProp: [{
+                 id: "CreditAccountNumber",
+                 name: "Số tài khoản",
+             },
+             {
+                 id: "CreditAccountName",
+                 name: "Tên Tài khoản",
+             },
+         ],
+
+     },
+     paymentDetail: {
+         currencyCombobox: [{
+                 id: "0",
+                 name: "VND",
+             },
+             {
+                 id: "1",
+                 name: "USD",
+             },
+             {
+                 id: "3",
+                 name: "YEN",
+             },
+             {
+                 id: "4",
+                 name: "WON",
+             }
+         ],
+         accountDebit: [{
+                 DebitAccountId: 1,
+                 DebitAccountNumber: "123",
+                 DebitAccountName: "Tài khoản của người bán"
+             },
+             {
+                 DebitAccountId: 2,
+                 DebitAccountNumber: "1233",
+                 DebitAccountName: "Tài khoản của người bán"
+             },
+             {
+                 DebitAccountId: 3,
+                 DebitAccountNumber: "11111",
+                 DebitAccountName: "Tài khoản của người bán"
+             },
+             {
+                 DebitAccountId: 4,
+                 DebitAccountNumber: "111",
+                 DebitAccountName: "Tài khoản của người bán"
+             },
+             {
+                 DebitAccountId: 5,
+                 DebitAccountNumber: "1111",
+                 DebitAccountName: "Tài khoản của người bán"
+             },
+             {
+                 DebitAccountId: 6,
+                 DebitAccountNumber: "12213",
+                 DebitAccountName: "Tài khoản của người bán"
+             },
+
+         ],
+         accountDebitProp: [{
+                 id: "DebitAccountNumber",
+                 name: "Số tài khoản",
+             },
+             {
+                 id: "DebitAccountName",
+                 name: "Tên Tài khoản",
+             },
+         ],
+         accountCreadit: [{
+                 CreditAccountId: 1,
+                 CreditAccountNumber: "1213",
+                 CreditAccountName: "Tài khoản của người bán"
+             },
+             {
+                 CreditAccountId: 2,
+                 CreditAccountNumber: "1113",
+                 CreditAccountName: "Tài khoản của người bán"
+             },
+             {
+                 CreditAccountId: 3,
+                 CreditAccountNumber: "11231",
+                 CreditAccountName: "Tài khoản của người bán"
+             },
+             {
+                 CreditAccountId: 4,
+                 CreditAccountNumber: "11233",
+                 CreditAccountName: "Tài khoản của người bán"
+             },
+
+         ],
+         accountCreditProp: [{
+                 id: "CreditAccountNumber",
+                 name: "Số tài khoản",
+             },
+             {
+                 id: "CreditAccountName",
+                 name: "Tên Tài khoản",
+             },
+         ],
+
+     },
+
  }
  export default dataStorage;
