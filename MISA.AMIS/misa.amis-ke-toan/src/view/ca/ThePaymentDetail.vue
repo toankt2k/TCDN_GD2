@@ -4,7 +4,9 @@
       <div class="popup-title">
         <div class="left">
           <div class="popup-icon ic-recent-log"></div>
-          <div class="popup-title-text">Phiếu chi rrrrr123</div>
+          <div class="popup-title-text">
+            Phiếu chi {{ payment.PaymentCode }}
+          </div>
           <div class="type-payment">
             <MCombobox />
           </div>
@@ -38,8 +40,9 @@
                     :apiData="'http://localhost:5093/api/v1/Vendors'"
                     :isObject="true"
                     :idProp="'VendorId'"
-                    :nameProp="'VendorName'"
+                    :nameProp="'VendorCode'"
                     v-model="payment.VendorId"
+                    @getSelected="getSelectedVendor"
                   />
                 </div>
                 <div class="right m-col-6">
@@ -70,7 +73,7 @@
                     :apiData="'http://localhost:5093/api/v1/Employees'"
                     :isObject="true"
                     :idProp="'EmployeeId'"
-                    :nameProp="'EmployeeName'"
+                    :nameProp="'EmployeeCode'"
                     v-model="payment.EmployeeId"
                   />
                 </div>
@@ -78,7 +81,11 @@
                   <div class="lable"><label for="">Kèm theo</label></div>
                   <div style="display: flex; align-items: center">
                     <div class="m-col-7">
-                      <MInput :placeholder="'Số lượng'" :align="'right'" />
+                      <MInput
+                        :placeholder="'Số lượng'"
+                        :align="'right'"
+                        v-model="payment.AttachDocumentAmount"
+                      />
                     </div>
                     <div class="description" style="margin-left: 4px">
                       chứng từ gốc
@@ -98,7 +105,6 @@
                     :placeholder="'DD/MM/YYYY'"
                     :lang="'vi'"
                     :clearable="false"
-                    :disabled-date="afterToday"
                     title-format="DD/MM/YYYY"
                   />
                   <!-- eslint-enable -->
@@ -114,7 +120,6 @@
                     :placeholder="'DD/MM/YYYY'"
                     :lang="'vi'"
                     :clearable="false"
-                    :disabled-date="afterToday"
                     title-format="DD/MM/YYYY"
                   />
                   <!-- eslint-enable -->
@@ -127,7 +132,7 @@
                       >Số phiếu chi (<span class="required">*</span>)</label
                     >
                   </div>
-                  <MInput v-model="payment.PaymentCode" />
+                  <MInput ref="PaymentCode" v-model="payment.PaymentCode" />
                 </div>
               </div>
             </div>
@@ -135,7 +140,7 @@
           <div class="m-right summary-info m-col-2">
             <div class="total-payment">
               <div class="header">Tổng tiền</div>
-              <div class="total">100,0</div>
+              <div class="total">{{totalAmount}}</div>
             </div>
           </div>
         </div>
@@ -172,10 +177,10 @@
         <div class="file-attach">
           <div class="button-area">
             <div class="add-row">
-              <button>Thêm dòng</button>
+              <button @click="addRow">Thêm dòng</button>
             </div>
             <div class="delete-all">
-              <button>Xóa hết dòng</button>
+              <button @click="removeRow">Xóa hết dòng</button>
             </div>
           </div>
           <div class="attach">
@@ -222,6 +227,15 @@
         </div>
       </div>
     </div>
+    <ConfirmDialog
+      :text="confirmDialogData.text"
+      :type="confirmDialogData.type"
+      :listButton="confirmDialogData.button"
+      :align="confirmDialogData.align"
+      @confirm="confirm"
+      :keyConfirm="confirmDialogData.key"
+      v-if="isConfirm"
+    />
   </div>
 </template>
 
@@ -232,6 +246,8 @@ import MInput from "@/components/base/input/BaseInput.vue";
 import DatePicker from "vue-datepicker-next";
 import "vue-datepicker-next/index.css";
 import MTableEditable from "@/components/base/table/BaseTableEditable.vue";
+import ConfirmDialog from "@/components/base/dialog/BaseConfirmDialog.vue";
+import axios from "axios";
 export default {
   name: "ThePaymentDialog",
   components: {
@@ -240,43 +256,45 @@ export default {
     MInput,
     DatePicker,
     MTableEditable,
+    ConfirmDialog,
   },
   computed: {
-    accountingDate:{
-      get(){
+    accountingDate: {
+      get() {
         try {
-          if(!this.payment.AccountingDate)return new Date();
+          if (!this.payment.AccountingDate) return new Date();
           return new Date(this.payment.AccountingDate);
         } catch (error) {
           return new Date();
         }
       },
-      set(val){
+      set(val) {
         try {
+          if(this.payment.AccountingDate==this.payment.PaymentDate)this.payment.PaymentDate = new Date(val);
           this.payment.AccountingDate = new Date(val);
         } catch (error) {
           return new Date();
         }
       },
     },
-    paymentDate:{
-      get(){
+    paymentDate: {
+      get() {
         try {
-          if(!this.payment.PaymentDate)return new Date();
+          if (!this.payment.PaymentDate) return new Date();
           return new Date(this.payment.PaymentDate);
         } catch (error) {
           return new Date();
         }
       },
-      set(val){
+      set(val) {
         try {
-          this.payment.PaymentDate = new Date(val);
+          if (new Date(val) <= new Date(this.payment.AccountingDate))
+            this.payment.PaymentDate = new Date(val);
         } catch (error) {
           return new Date();
         }
       },
     },
-
 
     paymentDetail: {
       get() {
@@ -331,8 +349,16 @@ export default {
           name: "Mã đối tượng",
         },
         {
-          id: "CreateBy",
-          name: "Người tạo",
+          id: "Address",
+          name: "Địa chỉ",
+        },
+        {
+          id: "TaxCode",
+          name: "Mã số thuế",
+        },
+        {
+          id: "PhoneNumber",
+          name: "Số điện thoại",
         },
       ],
       employeeProp: [
@@ -353,20 +379,7 @@ export default {
           name: "Đt di động",
         },
       ],
-      comboboxData: {
-        name: "GenderName",
-        id: "Gender",
-        data: [
-          {
-            Gender: "0",
-            GenderName: "Nam",
-          },
-          {
-            Gender: "1",
-            GenderName: "Nữ",
-          },
-        ],
-      },
+      confirmDialogData: {},
       columnOfPaymentDetail: [
         {
           id: "DescriptionPaymentDetail",
@@ -397,10 +410,12 @@ export default {
           component: true,
           componentData: {
             name: "MCombobox",
+            objectName:'DebitAccount',
             prop: {
               displayProps: this.dataStorage.paymentDetail.accountDebitProp,
               defaultList: this.dataStorage.paymentDetail.accountDebit,
-              isObject: "true",
+              isObject: true,
+              nameObject:"DebitAccountNumber",
               idProp: "DebitAccountId",
               nameProp: "DebitAccountNumber",
               ref: "DebitAccountId",
@@ -422,13 +437,15 @@ export default {
           component: true,
           componentData: {
             name: "MCombobox",
+            objectName:'CreditAccount',
             prop: {
               displayProps: this.dataStorage.paymentDetail.accountCreditProp,
               defaultList: this.dataStorage.paymentDetail.accountCreadit,
-              isObject: "true",
+              isObject: true,
+              nameObject:"CreditAccountNumber",
               idProp: "CreditAccountId",
               nameProp: "CreditAccountNumber",
-              ref: "DebitReceiptAccountId",
+              ref: "CreditAccountId",
             },
           },
         },
@@ -442,7 +459,7 @@ export default {
           classList: [],
           align: "right",
           edit: true,
-          count: false,
+          count: true,
           type: "number",
         },
         {
@@ -460,12 +477,15 @@ export default {
           component: true,
           componentData: {
             name: "MCombobox",
+            objectName:'Vendor',
             prop: {
               displayProps: this.dataStorage.vendorDetail.vendorProp,
               apiData: "http://localhost:5093/api/v1/Vendors",
-              isObject: "true",
+              isObject: true,
               idProp: "VendorId",
-              nameProp: "VendorName",
+              nameObject:"VendorName",
+              nameProp: "VendorCode",
+              ref:"VendorId"
             },
           },
         },
@@ -481,11 +501,18 @@ export default {
           edit: false,
           count: false,
           type: "text",
+          comboboxName:true,
+          refReferent:"VendorId"
         },
       ],
       //không cho phép sửa
       readonly: false,
       payment: {},
+      //show confirm dialog
+      isConfirm: false,
+      //danh sách cac input lỗi
+      listErrorInput: [],
+      totalAmount:0,
     };
   },
   methods: {
@@ -495,25 +522,236 @@ export default {
      */
     savePayment() {
       console.log(this.payment);
+      // if(!this.validate())return;
+      this.addPayment();
     },
     /**
-     * Mô tả : disable ngày lớn hơn hiện tại trả về true nếu ngày lớn hơn hiện tại
-     * Created by: Nguyễn Đức Toán - MF1095 (06/05/2022)
+     * Mô tả : gọi api insert payment
+     * Created by: Nguyễn Đức Toán - MF1095 (24/05/2022)
      */
-    afterToday(date) {
-      return date > new Date();
+    addPayment() {
+      try {
+        let me = this;
+        let data = JSON.parse(JSON.stringify(me.payment));
+        if (data.PaymentDetail)
+          data.PaymentDetail = JSON.parse(data.PaymentDetail);
+        axios({
+          method: "POST",
+          url: "http://localhost:5093/api/v1/Payments",
+          data: data,
+        })
+          .then((res) => {
+            console.log(res);
+          })
+          .catch((res) => {
+            console.log(res);
+            if (res.response.status == 400) {
+              let confirm = {
+                name: "dataError",
+                button: this.resource.confirmDialogData.errorResponse,
+                // align: "",
+                type: "warning",
+                text: `${res.response.data.data["PaymentCode"]}`,
+                key: "dataError",
+              };
+              this.openConfirm(confirm);
+            }
+          });
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    /**
+     * Mô tả : lấy số phiếu chi mới nhất
+     * Created by: Nguyễn Đức Toán - MF1095 (24/05/2022)
+     */
+    async getNewPaymentCode() {
+      try {
+        let me = this;
+        await axios({
+          method: "GET",
+          url: "http://localhost:5093/api/v1/Payments/NewPaymentCode",
+          async: true,
+        })
+          .then((res) => {
+            console.log(res);
+            me.payment.PaymentCode = res.data;
+          })
+          .catch((res) => {
+            console.log(res);
+          });
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    /**
+     * Mô tả : validate dữ lieuj trên form
+     * Created by: Nguyễn Đức Toán - MF1095 (24/05/2022)
+     */
+    validate() {
+      try {
+        // let inputs = this.$refs;
+        if (!this.payment.PaymentCode) {
+          let confirm = {
+            name: "emptyError",
+            button: this.resource.confirmDialogData.errorInputConfirm,
+            align: "center",
+            type: "error",
+            text: `Số phiếu chi không được trống`,
+            key: "emptyError",
+          };
+          this.openConfirm(confirm);
+          this.listErrorInput.push({
+            id: "PaymentCode",
+            title: "Số phiếu chi không được trống",
+          });
+        }
+        return true;
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    openConfirm(confirm) {
+      this.confirmDialogData = confirm;
+      this.isConfirm = true;
+    },
+    /**
+     * Mô tả : forcus vào ô đầu tiên lỗi
+     * Created by: Nguyễn Đức Toán - MF1095 (24/05/2022)
+     */
+    focusErrorInput() {
+      try {
+        if (this.listErrorInput.length > 0) {
+          let input = this.listErrorInput[0];
+          this.$refs[input.id].setErrorFocus(input.title);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    confirm(key, val) {
+      console.log(key, val);
+      let me = this;
+      switch (key) {
+        case "emptyError": //input nhập trống
+          switch (val) {
+            case 1: //đóng
+              this.isConfirm = false;
+              this.focusErrorInput();
+              break;
+            default:
+              break;
+          }
+          break;
+        case "dataError": //input nhập trống
+          switch (val) {
+            case 1: //không
+              this.isConfirm = false;
+              this.focusErrorInput();
+              break;
+            case 2: //có
+              this.isConfirm = false;
+
+              this.getNewPaymentCode().then(() => {
+                console.log(me.payment);
+                me.savePayment();
+              });
+              break;
+            default:
+              break;
+          }
+          break;
+
+        default:
+          break;
+      }
+    },
+    // /**
+    //  * Mô tả : disable ngày lớn hơn hiện tại trả về true nếu ngày lớn hơn hiện tại
+    //  * Created by: Nguyễn Đức Toán - MF1095 (06/05/2022)
+    //  */
+    // afterToday(date) {
+    //   return date > new Date();
+    // },
+    getSelectedVendor(data){
+      try {
+        if(data.VendorType==1)this.payment.ReceiverName = data.ReceiverName;
+        if(data.VendorType==0)this.payment.ReceiverName = data.ContactLegalRep;
+        this.payment.Address = data.Address;
+      } catch (error) {
+        console.log(error);
+      }
     },
     /**
      * Mô tả : lấy dữ liêu jtuwf bảng payment detail
      * Created by: Nguyễn Đức Toán - MF1095 (23/05/2022)
      */
-    getPaymentDetail(data) {
+    getPaymentDetail(data,count) {
       try {
+        console.log(data, count);
         this.payment.PaymentDetail = JSON.stringify(data);
+        this.totalAmount = count['CashAmount'];
       } catch (error) {
         console.log(error);
       }
     },
+    /**
+     * Mô tả : thêm dòng cho bảng payment detail
+     * Created by: Nguyễn Đức Toán - MF1095 (24/05/2022)
+     */
+    addRow() {
+      try {
+        console.log(this.payment.PaymentDetail);
+        if (this.payment.PaymentDetail) {
+          let temp = JSON.parse(this.payment.PaymentDetail);
+          temp.push({});
+          this.payment.PaymentDetail = JSON.stringify(temp);
+        } else {
+          let temp = JSON.parse(JSON.stringify([{}]));
+          temp.push({});
+          this.payment.PaymentDetail = JSON.stringify(temp);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    /**
+     * Mô tả : xóa hàng cho bảng paymentdetail
+     * Created by: Nguyễn Đức Toán - MF1095 (24/05/2022)
+     */
+    removeRow() {
+      try {
+        let temp = JSON.parse(this.payment.PaymentDetail);
+        temp = [];
+        temp.push({});
+        this.payment.PaymentDetail = JSON.stringify(temp);
+      } catch (error) {
+        console.log(error);
+      }
+    },
+  },
+  mounted() {
+    try {
+      if (!this.payment.AccountingDate)
+        this.payment.AccountingDate = new Date();
+      if (!this.payment.PaymentDate) this.payment.PaymentDate = new Date();
+      this.payment.DescriptionPayment = 'Chi tiền cho '
+      this.getNewPaymentCode();
+    } catch (error) {
+      console.log(error);
+    }
+  },
+  watch: {
+    // payment: {
+    //   handler: function(val, oldVal) {
+    //     if(oldVal == val)return;
+    //     let tempPaymentDetail = JSON.parse(this.payment.PaymentDetail);
+    //     tempPaymentDetail.forEach(element => {
+    //       element.
+    //     });
+    //   },
+    //   deep: true
+    // }
   },
 };
 </script>

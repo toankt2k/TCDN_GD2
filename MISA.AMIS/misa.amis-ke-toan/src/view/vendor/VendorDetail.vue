@@ -129,7 +129,7 @@
                       :apiData="'http://localhost:5093/api/v1/Employees'"
                       :isObject="true"
                       :idProp="'EmployeeId'"
-                      :nameProp="'EmployeeName'"
+                      :nameProp="'EmployeeCode'"
                       v-model="vendor.EmployeeId"
                       :readonly="readonly"
                     />
@@ -335,7 +335,7 @@
                             "
                             :isObject="true"
                             :idProp="'ContractId'"
-                            :nameProp="'ContractName'"
+                            :nameProp="'ContractCode'"
                             v-model="vendor.ContractId"
                             :readonly="readonly"
                           />
@@ -853,7 +853,7 @@
                             "
                             :isObject="true"
                             :idProp="'ContractId'"
-                            :nameProp="'ContractName'"
+                            :nameProp="'ContractCode'"
                             v-model="vendor.EmployeeId"
                             :readonly="readonly"
                           />

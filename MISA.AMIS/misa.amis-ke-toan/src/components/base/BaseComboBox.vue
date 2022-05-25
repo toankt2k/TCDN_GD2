@@ -17,10 +17,11 @@
       </div>
       <span class="combobox-icon" ref="icon" @click="openItem($event)"></span>
       <div
+
         class="item-box"
         ref="itemBox"
         v-if="!isObject"
-        style="min-width: 100%; max-height: 160px;z-index:11"
+        style="min-width: 100%; max-height: 160px; z-index: 11"
       >
         <div
           :ref="`r${item[idProp]}`"
@@ -33,16 +34,23 @@
         >
           {{ item[nameProp] }}
         </div>
-        <div class="item empty" v-if="listItem.length <= 0">Không có dữ liệu hiển thị.</div>
+        <div class="item empty" v-if="listItem.length <= 0">
+          Không có dữ liệu hiển thị.
+        </div>
       </div>
       <div
         class="item-box"
         :class="{ object: isObject }"
         ref="itemBox"
-        style="min-width: 100%;z-index:11"
+        style="min-width: 100%; z-index: 11"
         v-else
+        v-on:clickout="close"
       >
-        <div class="table-combobox">
+        <div
+          class="table-combobox"
+          @scroll="lazyLoading($event)"
+          ref="itemBoxTable"
+        >
           <table>
             <thead>
               <tr>
@@ -74,6 +82,7 @@
 
 <script>
 import axios from "axios";
+import 'clickout-event';
 export default {
   name: "ComboBox",
   components: {},
@@ -125,6 +134,10 @@ export default {
       type: String,
       default: "",
     },
+    nameObject: {
+      type: String,
+      default: "",
+    },
     //xác định input chỉ đọc
     readonly: {
       type: Boolean,
@@ -166,13 +179,17 @@ export default {
        * Mô tả : vị trí bắt đầu của itembox cách top mặc đinh là 35px
        * Created by: Nguyễn Đức Toán - MF1095 (10/04/2022)
        */
-      top: {
-        type: Number,
-        default: 0,
-      },
+      top: 0,
+      //lazy loading cho combobox
+      currentPage: 1,
+      pageSize: 10,
+      searchText: "",
     };
   },
   methods: {
+    getName() {
+      return this.selectedName;
+    },
     /**
      * Mô tả : gọi hàm setSelectedItem để set item được chọn
      * @param {*} id - id của item được chọn
@@ -187,12 +204,25 @@ export default {
           if (id == element[me.idProp]) {
             element.selected = true;
             this.$emit("update:modelValue", id);
+            if (this.isObject) {
+              let data = element;
+              this.$emit("getSelected", data);
+            }
             this.selectedName = element[me.nameProp];
             this.indexOfSelectedItem = index;
           } else {
             element.selected = false;
           }
         });
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    close(){
+      try {
+        if (this.$refs.itemBox.style.display == "block"){
+          this.openItem();
+        }
       } catch (error) {
         console.log(error);
       }
@@ -205,7 +235,7 @@ export default {
      */
     openItem(e) {
       try {
-        if(this.readonly)return;
+        if (this.readonly) return;
         //nếu không được truyền api thì combo box load dữ liệu khi được gọi
         if (this.apiData == "") {
           //emit giá trị true nếu sự kiện mở combobox và ngược lại
@@ -227,6 +257,7 @@ export default {
           // trở vwf trạng thái đầu
           this.$refs.icon.style.transform = "unset";
         }
+        if (!e) return;
         //lấy độ cao max của màn hình
         let maxHeight = e.view.innerHeight;
         //lấy vị trí của combobox
@@ -280,6 +311,10 @@ export default {
       try {
         //emit dữ liệu
         this.$emit("update:modelValue", item[this.idProp]);
+        if (this.isObject) {
+          let data = item;
+          this.$emit("getSelected", data);
+        }
         //set tên hiển thị
         this.selectedName = item[this.nameProp];
         //bỏ selected cho các item không chọn
@@ -307,6 +342,10 @@ export default {
         console.log(item);
         //emit dữ liệu
         this.$emit("update:modelValue", item[this.idProp]);
+        if (this.isObject) {
+          let data = item;
+          this.$emit("getSelected", data);
+        }
         //set tên hiển thị
         this.selectedName = item[this.nameProp];
         //bỏ selected cho các item không chọn
@@ -352,9 +391,45 @@ export default {
             });
             element.selected = true;
             this.$emit("update:modelValue", element[this.idProp]);
+            if (this.isObject) {
+              let data = element;
+              this.$emit("getSelected", data);
+            }
             this.indexOfSelectedItem = index;
           }
         });
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    /**
+     * Mô tả : lazyLoading khi scroll xuống cuối bản ghi thì load thêm data
+     * Created by: Nguyễn Đức Toán - MF1095 (25/05/2022)
+     */
+    lazyLoading() {
+      try {
+        //nếu lazyLoading bằng true thì mới loading.
+        if (this.lazyLoading) {
+          //độ cao dropdown
+          let dropdownHeight = this.$refs.itemBoxTable.clientHeight;
+          //phần đã bị tràn khỏi top.
+          let scrollTop = this.$refs.itemBoxTable.scrollTop;
+          //toàn bộ độ cao có thể scroll
+          let scrollHeight = this.$refs.itemBoxTable.scrollHeight;
+          // console.log(dropdownHeight,scrollTop, scrollHeight);
+          //vị trí hiện tại của con lăn
+          var total = dropdownHeight + Math.floor(scrollTop);
+          //nếu bằng scrollHeight thì là đang ở bottom
+          if (total >= scrollHeight) {
+            // console.log("đang ở bottom");
+            total = 0;
+            //emit tới cha load tiếp thông tin, truyền vào dữ liệu filter nếu có để lazy load tiếp thông tin đó.
+            // this.$emit("eLoadNext", this.selectedText);
+            console.log("bottom");
+            this.pageSize += 10;
+            this.getDataCombo();
+          }
+        }
       } catch (error) {
         console.log(error);
       }
@@ -464,35 +539,48 @@ export default {
         console.log(error);
       }
     },
+    /**
+    * Mô tả : lấy data từ api
+    * Created by: Nguyễn Đức Toán - MF1095 (25/05/2022)
+    */
+    getDataCombo() {
+      try {
+        let me = this;
+        // nếu api lấy danh sách item có được truyền tức là combobox muốn lấy dữ liệu từ api
+        //thay thế cho danh sách mặc định
+        if (me.apiData != "") {
+          axios({
+            method: "GET",
+            url: `${me.apiData}/filter?currentPage=${me.currentPage}&pageSize=${me.pageSize}&filterText=${me.searchText}`,
+          })
+            .then((res) => {
+              //gán giá trị cho danh sách item của item box
+              if (res.data.List) {
+                [...me.listItem] = [...res.data.List];
+              }
+              console.log(res);
+              //set mặc định chọn
+              me.setDefaultSelected();
+            })
+            .catch((res) => {
+              console.log(res);
+            });
+        } else {
+          //nếu không có api lấy dữ liệu  thì dùng dữ liệu mặc định và set mặc định chọn
+          me.setDefaultSelected();
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    },
   },
   /**
    * Mô tả : hàm chạy khi component được tạo
    * Created by: Nguyễn Đức Toán - MF1095 (08/04/2022)
    */
   created() {
-    let me = this;
     try {
-      // nếu api lấy danh sách item có được truyền tức là combobox muốn lấy dữ liệu từ api
-      //thay thế cho danh sách mặc định
-      if (me.apiData != "") {
-        axios({
-          method: "GET",
-          url: me.apiData,
-        })
-          .then((res) => {
-            //gán giá trị cho danh sách item của item box
-            me.listItem = res.data;
-            console.log(res);
-            //set mặc định chọn
-            me.setDefaultSelected();
-          })
-          .catch((res) => {
-            console.log(res);
-          });
-      } else {
-        //nếu không có api lấy dữ liệu  thì dùng dữ liệu mặc định và set mặc định chọn
-        me.setDefaultSelected();
-      }
+      this.getDataCombo();
     } catch (error) {
       console.log(error);
     }
@@ -530,7 +618,6 @@ export default {
 <style scoped>
 @import url("@/css/components/combobox.css");
 
-
 .m-input {
   font-family: Notosans-regular !important;
 }
@@ -538,7 +625,7 @@ input::placeholder {
   font-family: Notosans-regular !important;
   font-style: italic !important;
 }
-.item.empty{
+.item.empty {
   pointer-events: none;
 }
 table {

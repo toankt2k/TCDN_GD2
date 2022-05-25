@@ -523,7 +523,7 @@ export default {
   justify-content: center;
   align-items: center;
   flex-direction: column;
-  z-index: 25;
+  z-index: 20;
 }
 .no-content .no-content-text {
   padding: 10px;

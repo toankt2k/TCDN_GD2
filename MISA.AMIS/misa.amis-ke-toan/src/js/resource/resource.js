@@ -73,11 +73,18 @@ const resources = {
          * Created by: Nguyễn Đức Toán - MF1095 (27/04/2022)
          */
         errorResponse: [{
-            id: 1,
-            name: "Đồng ý",
-            type: "primary",
-            align: "right",
-        }, ],
+                id: 1,
+                name: "Không",
+                type: "default",
+                align: "left",
+            },
+            {
+                id: 2,
+                name: "Có",
+                type: "primary",
+                align: "right",
+            },
+        ],
         /**
          * Mô tả : danh sách các thông tin diển thị lên confirm khi lỗi nhập liệu
          * Created by: Nguyễn Đức Toán - MF1095 (27/04/2022)

@@ -149,7 +149,7 @@
             <td
               v-for="(col, index) in displayColumns"
               :key="'rcol' + index"
-              @click="setEdit($event, `ip${ind + col.id}`, ind,col)"
+              @click="setEdit($event, `ip${ind + col.id}`, ind, col)"
               :title="item[col.id]"
             >
               <div v-show="editRow == ind && col.edit">
@@ -159,20 +159,29 @@
                   v-model="item[col.id]"
                   :align="col.align"
                   :type="col.type"
-                  @input="getDataTable"
+                  @input="getDataTable(col.type)"
                 />
                 <component
                   v-if="col.component"
                   :is="col.componentData.name"
                   v-bind="col.componentData.prop"
                   v-model="item[col.id]"
+                  @getSelected="
+                    getName(
+                      $event,
+                      `${col.componentData.prop.ref}${ind}/${index + 1}`,
+                      `${col.componentData.prop.ref}${ind}/${index}`,
+                      col.componentData.objectName
+                    )
+                  "
                 ></component>
               </div>
               <div
                 v-show="editRow != ind || !col.edit"
                 :style="{ textAlign: col.align }"
+                :ref="`${col.refReferent ?? col.id}${ind}/${index}`"
               >
-                {{ dataFormat(item[col.id], col.type) }}
+                {{ !col.component ? dataFormat(item[col.id], col.type) : "" }}
               </div>
             </td>
             <td class="table-function" v-if="deleteFunc">
@@ -195,9 +204,8 @@
               v-for="(col, index) in displayColumns"
               class="m-text-right count"
               :key="'rcol' + index"
-            >
-              {{ col.count ? dataFormat(0, "number") : "" }}
-            </td>
+              :ref="`count${col.id}${index}`"
+            ></td>
             <td class="table-function" v-if="deleteFunc">
               <div class="table-function-button"></div>
             </td>
@@ -282,6 +290,7 @@ export default {
       isLoading: false,
       //cho phep thực hiện xóa nhiều
       multiFlag: false,
+      timeOutInput: null,
     };
   },
   /**
@@ -289,9 +298,42 @@ export default {
    * Created by: Nguyễn Đức Toán - MF1095 (07/04/2022)
    */
   methods: {
-    getDataTable() {
+    getName(data, refName, refCode, idProp) {
+      if (!data) return "";
+      this.$nextTick(() => {
+        let targetCode = this.$refs[refCode];
+        if (!targetCode) return "";
+        targetCode[0].innerHTML = data[`${idProp}Code`];
+        let targetName = this.$refs[refName];
+        if (!targetName) return "";
+        targetName[0].innerHTML = data[`${idProp}Name`];
+      });
+    },
+    getDataTable(type) {
       try {
-        this.$emit("getData", this.tableData);
+        clearTimeout(this.timeOutInput);
+        let me = this;
+        this.timeOutInput = setTimeout(function () {
+          let count = [];
+          if (type == "number") {
+            me.displayColumns.forEach((ele, ind) => {
+              if (ele.count) {
+                let target = me.$refs[`count${ele.id}${ind}`];
+                let total = 0;
+                me.tableData.forEach((el) => {
+                  if (el[ele.id]) {
+                    total += parseInt(el[ele.id]);
+                  }
+                });
+                if (target) {
+                  target[0].innerHTML = total;
+                }
+                count[ele.id] = total;
+              }
+            });
+          }
+          me.$emit("getData", me.tableData, count);
+        }, 500);
       } catch (error) {
         console.log(error);
       }
@@ -299,9 +341,10 @@ export default {
 
     setEdit(e, refOfTagetInput, indexOfColunm, col) {
       try {
+        console.log("log");
         e.preventDefault();
         this.editRow = indexOfColunm;
-        if(col.component)return;
+        if (col.component) return;
         this.$nextTick(() => {
           this.$refs[refOfTagetInput][0].setFocus(true);
         });
@@ -498,7 +541,7 @@ export default {
     deleteRow(ind) {
       try {
         this.tableData.splice(ind, 1);
-        this.getDataTable();
+        this.getDataTable("number");
       } catch (error) {
         console.log(error);
       }

@@ -266,38 +266,38 @@
          ],
          accountDebit: [{
                  DebitAccountId: 1,
-                 DebitAccountNumber: "123",
+                 DebitAccountCode: "123",
                  DebitAccountName: "Tài khoản của người bán"
              },
              {
                  DebitAccountId: 2,
-                 DebitAccountNumber: "1233",
+                 DebitAccountCode: "1233",
                  DebitAccountName: "Tài khoản của người bán"
              },
              {
                  DebitAccountId: 3,
-                 DebitAccountNumber: "11111",
+                 DebitAccountCode: "11111",
                  DebitAccountName: "Tài khoản của người bán"
              },
              {
                  DebitAccountId: 4,
-                 DebitAccountNumber: "111",
+                 DebitAccountCode: "111",
                  DebitAccountName: "Tài khoản của người bán"
              },
              {
                  DebitAccountId: 5,
-                 DebitAccountNumber: "1111",
+                 DebitAccountCode: "1111",
                  DebitAccountName: "Tài khoản của người bán"
              },
              {
                  DebitAccountId: 6,
-                 DebitAccountNumber: "12213",
+                 DebitAccountCode: "12213",
                  DebitAccountName: "Tài khoản của người bán"
              },
 
          ],
          accountDebitProp: [{
-                 id: "DebitAccountNumber",
+                 id: "DebitAccountCode",
                  name: "Số tài khoản",
              },
              {
@@ -307,28 +307,28 @@
          ],
          accountCreadit: [{
                  CreditAccountId: 1,
-                 CreditAccountNumber: "1213",
+                 CreditAccountCode: "1213",
                  CreditAccountName: "Tài khoản của người bán"
              },
              {
                  CreditAccountId: 2,
-                 CreditAccountNumber: "1113",
+                 CreditAccountCode: "1113",
                  CreditAccountName: "Tài khoản của người bán"
              },
              {
                  CreditAccountId: 3,
-                 CreditAccountNumber: "11231",
+                 CreditAccountCode: "11231",
                  CreditAccountName: "Tài khoản của người bán"
              },
              {
                  CreditAccountId: 4,
-                 CreditAccountNumber: "11233",
+                 CreditAccountCode: "11233",
                  CreditAccountName: "Tài khoản của người bán"
              },
 
          ],
          accountCreditProp: [{
-                 id: "CreditAccountNumber",
+                 id: "CreditAccountCode",
                  name: "Số tài khoản",
              },
              {
@@ -358,38 +358,38 @@
          ],
          accountDebit: [{
                  DebitAccountId: 1,
-                 DebitAccountNumber: "123",
+                 DebitAccountCode: "123",
                  DebitAccountName: "Tài khoản của người bán"
              },
              {
                  DebitAccountId: 2,
-                 DebitAccountNumber: "1233",
+                 DebitAccountCode: "1233",
                  DebitAccountName: "Tài khoản của người bán"
              },
              {
                  DebitAccountId: 3,
-                 DebitAccountNumber: "11111",
+                 DebitAccountCode: "11111",
                  DebitAccountName: "Tài khoản của người bán"
              },
              {
                  DebitAccountId: 4,
-                 DebitAccountNumber: "111",
+                 DebitAccountCode: "111",
                  DebitAccountName: "Tài khoản của người bán"
              },
              {
                  DebitAccountId: 5,
-                 DebitAccountNumber: "1111",
+                 DebitAccountCode: "1111",
                  DebitAccountName: "Tài khoản của người bán"
              },
              {
                  DebitAccountId: 6,
-                 DebitAccountNumber: "12213",
+                 DebitAccountCode: "12213",
                  DebitAccountName: "Tài khoản của người bán"
              },
 
          ],
          accountDebitProp: [{
-                 id: "DebitAccountNumber",
+                 id: "DebitAccountCode",
                  name: "Số tài khoản",
              },
              {
@@ -399,28 +399,28 @@
          ],
          accountCreadit: [{
                  CreditAccountId: 1,
-                 CreditAccountNumber: "1213",
+                 CreditAccountCode: "1213",
                  CreditAccountName: "Tài khoản của người bán"
              },
              {
                  CreditAccountId: 2,
-                 CreditAccountNumber: "1113",
+                 CreditAccountCode: "1113",
                  CreditAccountName: "Tài khoản của người bán"
              },
              {
                  CreditAccountId: 3,
-                 CreditAccountNumber: "11231",
+                 CreditAccountCode: "11231",
                  CreditAccountName: "Tài khoản của người bán"
              },
              {
                  CreditAccountId: 4,
-                 CreditAccountNumber: "11233",
+                 CreditAccountCode: "11233",
                  CreditAccountName: "Tài khoản của người bán"
              },
 
          ],
          accountCreditProp: [{
-                 id: "CreditAccountNumber",
+                 id: "CreditAccountCode",
                  name: "Số tài khoản",
              },
              {
