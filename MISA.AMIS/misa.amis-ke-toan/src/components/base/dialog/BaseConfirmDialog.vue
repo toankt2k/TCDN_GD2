@@ -121,7 +121,7 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 12;
+  z-index: 22;
 }
 .m-dialog-confirm.warning .m-popup {
   background-color: #fff;
@@ -174,7 +174,7 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 12;
+  z-index: 22;
 }
 .m-dialog-confirm.info .m-popup {
   background-color: #fff;
@@ -227,7 +227,7 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 12;
+  z-index: 22;
 }
 .m-dialog-confirm.error .m-popup {
   background-color: #fff;

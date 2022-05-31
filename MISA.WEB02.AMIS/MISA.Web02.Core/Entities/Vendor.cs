@@ -31,6 +31,8 @@ namespace MISA.Web02.Core.Entities
         /// <summary>
         /// Tên Nhà cung cấp
         /// </summary>
+        [MISARequired]
+        [MISADisplay(Name = "Tên nhà cung cấp")]
         public string? VendorName { get; set; }
 
         /// <summary>

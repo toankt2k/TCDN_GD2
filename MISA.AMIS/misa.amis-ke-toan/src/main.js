@@ -7,6 +7,8 @@ import processResource from '@/js/resource/caProcessResource.js';
 import confirmResource from '@/js/resource/confirmResource.js';
 import { createRouter, createWebHistory } from 'vue-router'
 
+
+
 //1.định nghĩa/import các router
 // import Employee from '@/view/employee/TheEmployee.vue'
 import CAProcess from '@/view/ca/TheCAProcess.vue'
@@ -59,9 +61,8 @@ const router = createRouter({
 });
 //4. sử dụng vuerouter
 
-
-
 let app = createApp(App);
+
 app.config.globalProperties.dataStorage = dataStorage;
 app.config.globalProperties.resource = resource;
 app.config.globalProperties.processResource = processResource;

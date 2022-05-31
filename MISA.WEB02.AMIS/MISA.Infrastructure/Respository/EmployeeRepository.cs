@@ -12,11 +12,16 @@ using System.Text.RegularExpressions;
 using MISA.Infrastructure.Helpers;
 using System.Data;
 using MISA.Web02.Core.Interfaces.Repository;
+using Microsoft.Extensions.Configuration;
 
 namespace MISA.Infrastructure.Respository
 {
     public class EmployeeRepository : BaseRespository<Employee>, IEmployeeRepository
     {
+        public EmployeeRepository(IConfiguration configuration) : base(configuration)
+        {
+        }
+
         public override IEnumerable<Employee> Get()
         {
             string commandText = $"SELECT e.*,d.department_name FROM employee as e join department as d on e.department_id = d.department_id";

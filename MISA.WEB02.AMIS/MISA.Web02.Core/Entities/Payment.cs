@@ -15,6 +15,8 @@ namespace MISA.Web02.Core.Entities
         /// <summary>
         /// code payment
         /// </summary>
+        [MISADisplay(Name="Số chứng từ")]
+        [MISARequired]
         public string? PaymentCode { get; set; }
         /// <summary>
         /// khóa ngoại bảng AccountObject
@@ -59,6 +61,15 @@ namespace MISA.Web02.Core.Entities
         /// </summary>
         [NotMap]
         public List<PaymentDetail>? PaymentDetail { get; set; }
+        
+        /// <summary>
+        /// tổng số tiền chi
+        /// </summary>
+        public float? TotalAmount { get; set; }
+        /// <summary>
+        /// tổng số tiền chi
+        /// </summary>
+        public string? VendorName { get; set; }
 
     }
 }

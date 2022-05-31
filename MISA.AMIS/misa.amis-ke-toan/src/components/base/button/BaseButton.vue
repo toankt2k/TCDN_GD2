@@ -46,9 +46,15 @@ export default {
       default: "",
     },
   },
+  methods: {
+    setFocus(focus){
+        if (focus) {
+          this.$refs.btnLeft.focus();
+        }
+    }
+  },
   mounted() {
     try {
-        console.log(this.isUtility,this.isDropdown);
       if (this.isDropdown && this.isUtility) {
         this.$refs.btnRight.style.borderTopRightRadius = 32 + "px";
         this.$refs.btnRight.style.borderBottomRightRadius = 32 + "px";

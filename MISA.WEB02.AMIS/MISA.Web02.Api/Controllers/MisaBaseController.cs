@@ -116,7 +116,7 @@ namespace MISA.Web02.Api.Controllers
             try
             {
                 var result = _baseService.InsertService(entity);
-                return StatusCode(201, result);
+                return StatusCode(201, entity);
             }
             catch (MISAExceptions ex)
             {
@@ -204,7 +204,7 @@ namespace MISA.Web02.Api.Controllers
                     userMsg = MISAMessageResource.VN_MisaExceptionMsg,
                     data = ex1.Data,
                 };
-                return StatusCode(500, result);
+                return BadRequest(result);
             }
             catch (Exception ex)
             {
@@ -296,6 +296,45 @@ namespace MISA.Web02.Api.Controllers
                 return StatusCode(500, result);
             }
         }
+        /// <summary>
+        /// export excel
+        /// </summary>
+        /// <returns>
+        /// danh sách cá bản ghhi và tổng số trang, tổng số bản ghi
+        /// </returns>
+        /// Author: Nguyễn Đức Toán-MF1095 (18/04/2022)
+        [HttpPost("export")]
+        public virtual IActionResult Export(int currentPage, int pageSize, string? filterText, [FromBody] List<TableInfo> columns)
+        {
+            try
+            {
+                //trả về danh sách đã được filter và tổng số bản ghi
+                var result = _baseService.ExportService(currentPage, pageSize, filterText, columns);;
+                return File(result, "xlsx/xls", "danh_sach.xlsx");
+            }
+            catch (MISAExceptions ex)
+            {
+                var result = new MISAServiceResult()
+                {
+                    devMsg = ex.Message,
+                    userMsg = MISAMessageResource.VN_MisaExceptionMsg,
+                    data = ex.Data,
+                };
+                return BadRequest(result);
+            }
+            catch (Exception ex)
+            {
+                var result = new
+                {
+                    devMsg = ex.Message,
+                    userMsg = MISAMessageResource.VN_MisaExceptionMsg,
+                    data = ex.Data,
+                };
+                return StatusCode(500, result);
+            }
+        }
+
+
         #endregion
     }
 }

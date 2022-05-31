@@ -142,14 +142,86 @@
          ],
      },
      api: {
-         addEmployee: "http://localhost:5093/api/v1/Employees",
-         updateEmployee: "http://localhost:5093/api/v1/Employees",
-         getById: "http://localhost:5093/api/v1/Employees",
-         getNewEmployeeCode: "http://localhost:5093/api/v1/Employees/NewEmployeeCode",
-         deleteEmployee: "http://localhost:5093/api/v1/Employees",
-         deleteMultiEmployee: "http://localhost:5093/api/v1/Employees/Multiple",
-         filter: "http://localhost:5093/api/v1/Employees/Filter",
-         export: "http://localhost:5093/api/v1/Employees/Export",
+         //  addEmployee: "http://localhost:5093/api/v1/Employees",
+         //  updateEmployee: "http://localhost:5093/api/v1/Employees",
+         //  getById: "http://localhost:5093/api/v1/Employees",
+         //  getNewEmployeeCode: "http://localhost:5093/api/v1/Employees/NewEmployeeCode",
+         //  deleteEmployee: "http://localhost:5093/api/v1/Employees",
+         //  deleteMultiEmployee: "http://localhost:5093/api/v1/Employees/Multiple",
+         //  filter: "http://localhost:5093/api/v1/Employees/Filter",
+         //  export: "http://localhost:5093/api/v1/Employees/Export",
+         employee: {
+             add: "http://localhost:5093/api/v1/Employees/",
+             update: "http://localhost:5093/api/v1/Employees/",
+             delete: "http://localhost:5093/api/v1/Employees/",
+             multi: "http://localhost:5093/api/v1/Employees/Multiple",
+             filter: "http://localhost:5093/api/v1/Employees/filter",
+             export: "http://localhost:5093/api/v1/Employees/export",
+             getAll: "http://localhost:5093/api/v1/Employees",
+             getById: "http://localhost:5093/api/v1/Employees",
+             getNewCode: "http://localhost:5093/api/v1/Employees/NewEmployeeCode",
+         },
+         payment: {
+             add: "http://localhost:5093/api/v1/Payments",
+             update: "http://localhost:5093/api/v1/Payments",
+             delete: "http://localhost:5093/api/v1/Payments",
+             multi: "http://localhost:5093/api/v1/Payments/Multiple",
+             filter: "http://localhost:5093/api/v1/Payments/filter",
+             export: "http://localhost:5093/api/v1/Payments/export",
+             getAll: "http://localhost:5093/api/v1/Payments",
+             getById: "http://localhost:5093/api/v1/Payments",
+             getNewCode: "http://localhost:5093/api/v1/Payments/NewPaymentCode",
+         },
+         paymentDetail: {
+             add: "http://localhost:5093/api/v1/PaymentDetails",
+             update: "http://localhost:5093/api/v1/PaymentDetails",
+             delete: "http://localhost:5093/api/v1/PaymentDetails",
+             multi: "http://localhost:5093/api/v1/PaymentDetails/Multiple",
+             filter: "http://localhost:5093/api/v1/PaymentDetails/filter",
+             export: "http://localhost:5093/api/v1/PaymentDetails/export",
+             getAll: "http://localhost:5093/api/v1/PaymentDetails",
+             getById: "http://localhost:5093/api/v1/PaymentDetails",
+             getNewCode: "http://localhost:5093/api/v1/PaymentDetails/NewPaymentCode",
+             getByPayment: "http://localhost:5093/api/v1/PaymentDetails/ByPayment"
+         },
+         vendor: {
+             add: "http://localhost:5093/api/v1/Vendors",
+             update: "http://localhost:5093/api/v1/Vendors",
+             delete: "http://localhost:5093/api/v1/Vendors",
+             multi: "http://localhost:5093/api/v1/Vendors/Multiple",
+             filter: "http://localhost:5093/api/v1/Vendors/filter",
+             export: "http://localhost:5093/api/v1/Vendors/export",
+             getAll: "http://localhost:5093/api/v1/Vendors",
+             getById: "http://localhost:5093/api/v1/Vendors",
+             getNewCode: "http://localhost:5093/api/v1/Vendors/NewVendorCode",
+         },
+         vendorGroup: {
+             add: "",
+             update: "",
+             delete: "",
+             multi: "http://localhost:5093/api/v1/vendorGroups/Multiple",
+             filter: "http://localhost:5093/api/v1/vendorGroups/filter",
+             export: "http://localhost:5093/api/v1/vendorGroups/export",
+             getAll: "http://localhost:5093/api/v1/VendorGroups",
+             getById: "",
+             getNewCode: "",
+         },
+         tableOption: {
+             updateByCode: "http://localhost:5093/api/v1/TableOptions/ByCode",
+             getByCode: "http://localhost:5093/api/v1/TableOptions/ByCode",
+         },
+         address: {
+             getAllCountries: "http://saugi.xyz:5000/api/v1/Countries",
+             getAllProvinces: "http://saugi.xyz:5000/api/v1/Provinces",
+             getProvince: "http://saugi.xyz:5000/api/v1/Provinces",
+             getByCountry: "http://saugi.xyz:5000/api/v1/Provinces/ByCountry",
+             getAllDistricts: "http://saugi.xyz:5000/api/v1/Districts",
+             getDistrict: "http://saugi.xyz:5000/api/v1/Districts",
+             getByProvince: "http://saugi.xyz:5000/api/v1/Districts/ByProvince",
+             getAllWards: "http://saugi.xyz:5000/api/v1/Wards",
+             getWard: "http://saugi.xyz:5000/api/v1/Wards",
+             getByDistrict: "http://saugi.xyz:5000/api/v1/Wards/ByDistrict",
+         },
      },
      /**
       * Mô tả : danh sách các item tab cho trang tiền mặt
@@ -169,16 +241,24 @@
      CAProcessUtilityBtn: [],
      vendorDetail: {
          vendorProp: [{
-                 id: "VendorName",
-                 name: "Đối tượng",
-             },
-             {
                  id: "VendorCode",
                  name: "Mã đối tượng",
              },
              {
-                 id: "CreateBy",
-                 name: "Người tạo",
+                 id: "VendorName",
+                 name: "Đối tượng",
+             },
+             {
+                 id: "Address",
+                 name: "Địa chỉ",
+             },
+             {
+                 id: "TaxCode",
+                 name: "Mã số thuế",
+             },
+             {
+                 id: "PhoneNumber",
+                 name: "Số điện thoại",
              },
          ],
          radioButtonTypeVendor: {
@@ -249,49 +329,49 @@
          ],
          debitAccount: [{
                  DebitPaymentAccountId: 1,
-                 DebitPaymentAccountCode: "12323",
+                 DebitPaymentAccountCode: "1111",
                  DebitPaymentAccountName: "Tài khoản của người bán"
              },
              {
                  DebitPaymentAccountId: 2,
-                 DebitPaymentAccountCode: "1111",
+                 DebitPaymentAccountCode: "11112",
                  DebitPaymentAccountName: "Tài khoản của người mua"
              },
              {
                  DebitPaymentAccountId: 3,
-                 DebitPaymentAccountCode: "456546",
+                 DebitPaymentAccountCode: "11113",
                  DebitPaymentAccountName: "Tài khoản của người lao động"
              },
 
          ],
          accountDebit: [{
                  DebitAccountId: 1,
-                 DebitAccountCode: "123",
-                 DebitAccountName: "Tài khoản của người bán"
-             },
-             {
-                 DebitAccountId: 2,
-                 DebitAccountCode: "1233",
-                 DebitAccountName: "Tài khoản của người bán"
-             },
-             {
-                 DebitAccountId: 3,
-                 DebitAccountCode: "11111",
-                 DebitAccountName: "Tài khoản của người bán"
-             },
-             {
-                 DebitAccountId: 4,
-                 DebitAccountCode: "111",
-                 DebitAccountName: "Tài khoản của người bán"
-             },
-             {
-                 DebitAccountId: 5,
                  DebitAccountCode: "1111",
                  DebitAccountName: "Tài khoản của người bán"
              },
              {
+                 DebitAccountId: 2,
+                 DebitAccountCode: "11112",
+                 DebitAccountName: "Tài khoản của người bán"
+             },
+             {
+                 DebitAccountId: 3,
+                 DebitAccountCode: "11113",
+                 DebitAccountName: "Tài khoản của người bán"
+             },
+             {
+                 DebitAccountId: 4,
+                 DebitAccountCode: "11114",
+                 DebitAccountName: "Tài khoản của người bán"
+             },
+             {
+                 DebitAccountId: 5,
+                 DebitAccountCode: "11115",
+                 DebitAccountName: "Tài khoản của người bán"
+             },
+             {
                  DebitAccountId: 6,
-                 DebitAccountCode: "12213",
+                 DebitAccountCode: "11116",
                  DebitAccountName: "Tài khoản của người bán"
              },
 
@@ -340,51 +420,85 @@
      },
      paymentDetail: {
          currencyCombobox: [{
-                 id: "0",
-                 name: "VND",
+                 id: "1",
+                 code: "VND",
+                 name: "Việt Nam đồng",
+                 exchange: 1
              },
              {
+                 id: "2",
+                 code: "USD",
+                 name: "Đô la Mỹ",
+                 exchange: 23150.00
+             }
+         ],
+         paymentTypeCombobox: [{
                  id: "1",
-                 name: "USD",
+                 name: "1. Trả tiền nhà cung cấp (không theo hóa đơn)",
+             },
+             {
+                 id: "2",
+                 name: "2. Tạm ứng cho nhân viên",
              },
              {
                  id: "3",
-                 name: "YEN",
+                 name: "3. Chi mua ngoài có hóa đơn",
              },
              {
                  id: "4",
-                 name: "WON",
+                 name: "4. Trả lương nhân viên",
+             },
+             {
+                 id: "5",
+                 name: "5. Chuyển tiền cho chi nhánh khác",
+             },
+             {
+                 id: "6",
+                 name: "6. Gửi tiền vào ngân hàng",
+             },
+             {
+                 id: "7",
+                 name: "7. Chi khác",
+             },
+         ],
+         currencyProp: [{
+                 id: "code",
+                 name: "Mã loại tiền",
+             },
+             {
+                 id: "name",
+                 name: "Tên loại tiền",
              }
          ],
          accountDebit: [{
                  DebitAccountId: 1,
-                 DebitAccountCode: "123",
-                 DebitAccountName: "Tài khoản của người bán"
+                 DebitAccountCode: "1111",
+                 DebitAccountName: "Nguyễn Đức Toán"
              },
              {
                  DebitAccountId: 2,
-                 DebitAccountCode: "1233",
-                 DebitAccountName: "Tài khoản của người bán"
+                 DebitAccountCode: "11112",
+                 DebitAccountName: "Tài khoản sao kê"
              },
              {
                  DebitAccountId: 3,
-                 DebitAccountCode: "11111",
-                 DebitAccountName: "Tài khoản của người bán"
+                 DebitAccountCode: "11113",
+                 DebitAccountName: "Tiền Việt Nam"
              },
              {
                  DebitAccountId: 4,
-                 DebitAccountCode: "111",
-                 DebitAccountName: "Tài khoản của người bán"
+                 DebitAccountCode: "11114",
+                 DebitAccountName: "Ngoại tệ"
              },
              {
                  DebitAccountId: 5,
-                 DebitAccountCode: "1111",
-                 DebitAccountName: "Tài khoản của người bán"
+                 DebitAccountCode: "11115",
+                 DebitAccountName: "Cổ phiếu"
              },
              {
                  DebitAccountId: 6,
-                 DebitAccountCode: "12213",
-                 DebitAccountName: "Tài khoản của người bán"
+                 DebitAccountCode: "11116",
+                 DebitAccountName: "Tiền gửi"
              },
 
          ],
@@ -399,23 +513,23 @@
          ],
          accountCreadit: [{
                  CreditAccountId: 1,
-                 CreditAccountCode: "1213",
-                 CreditAccountName: "Tài khoản của người bán"
+                 CreditAccountCode: "1111",
+                 CreditAccountName: "Công ty cổ phần MISA"
              },
              {
                  CreditAccountId: 2,
-                 CreditAccountCode: "1113",
-                 CreditAccountName: "Tài khoản của người bán"
+                 CreditAccountCode: "11111",
+                 CreditAccountName: "Tài khoản thu hồi"
              },
              {
                  CreditAccountId: 3,
-                 CreditAccountCode: "11231",
-                 CreditAccountName: "Tài khoản của người bán"
+                 CreditAccountCode: "11112",
+                 CreditAccountName: "Quỹ thu chi"
              },
              {
                  CreditAccountId: 4,
-                 CreditAccountCode: "11233",
-                 CreditAccountName: "Tài khoản của người bán"
+                 CreditAccountCode: "11113",
+                 CreditAccountName: "Tiền tài trợ"
              },
 
          ],

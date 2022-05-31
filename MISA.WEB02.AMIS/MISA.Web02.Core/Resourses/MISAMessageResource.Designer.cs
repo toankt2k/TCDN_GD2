@@ -70,7 +70,7 @@ namespace MISA.Web02.Core.Resourses {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Mã không đúng định dạng (mã gồm 2 chữ và các chữ số: NV-12345, DP-12342)..
+        ///   Looks up a localized string similar to Mã không đúng định dạng..
         /// </summary>
         public static string VN_CodeInvalid {
             get {
@@ -79,7 +79,7 @@ namespace MISA.Web02.Core.Resourses {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to đã tồn tại trong hệ thống, vui lòng kiểm tra lại..
+        ///   Looks up a localized string similar to {0} đã tồn tại trong hệ thống, vui lòng kiểm tra lại..
         /// </summary>
         public static string VN_DataDuplicate {
             get {
@@ -106,6 +106,33 @@ namespace MISA.Web02.Core.Resourses {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to thu_chi_tien_mat.
+        /// </summary>
+        public static string VN_FileNamePayment {
+            get {
+                return ResourceManager.GetString("VN_FileNamePayment", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to danh_sach_nhà_cung_cap.
+        /// </summary>
+        public static string VN_FileNameVendor {
+            get {
+                return ResourceManager.GetString("VN_FileNameVendor", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} không đúng đinh dạng.
+        /// </summary>
+        public static string VN_InvalidFormat {
+            get {
+                return ResourceManager.GetString("VN_InvalidFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Có lỗi xảy ra vui lòng liên hệ Misa để được hỗ trợ..
         /// </summary>
         public static string VN_MisaExceptionMsg {
@@ -120,6 +147,34 @@ namespace MISA.Web02.Core.Resourses {
         public static string VN_NotEmptyMsg {
             get {
                 return ResourceManager.GetString("VN_NotEmptyMsg", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Thu chi tiền mặt.
+        /// </summary>
+        public static string VN_TitlePayment {
+            get {
+                return ResourceManager.GetString("VN_TitlePayment", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to danh_sach_nha_cung_cap.
+        /// </summary>
+        public static string VN_TitleVendor {
+            get {
+                return ResourceManager.GetString("VN_TitleVendor", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Xóa không thành công.
+        ///Nhà cung cấp {0} đã có phát sinh. Bạn phải xóa các phát sinh liên quan trước khi xóa nhà cung cấp..
+        /// </summary>
+        public static string VN_VendorHasPayment {
+            get {
+                return ResourceManager.GetString("VN_VendorHasPayment", resourceCulture);
             }
         }
     }

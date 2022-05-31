@@ -8,24 +8,33 @@
         type="text"
         :value="selectedName"
         :readonly="readonly"
+        :disabled="disabled"
         @input="openItemByFocus"
         @mousemove="stopDraggable"
         @keydown="selectItemByButton"
+        :style="{
+          'padding-right':
+            isObject && quickAdd ? '62px !important' : '30px !important',
+        }"
       />
-      <div class="add-btn" v-if="isObject">
+      <div class="add-btn" @click="func" v-if="isObject && quickAdd">
         <div class="ic-add"></div>
       </div>
       <span class="combobox-icon" ref="icon" @click="openItem($event)"></span>
       <div
-
         class="item-box"
         ref="itemBox"
         v-if="!isObject"
-        style="min-width: 100%; max-height: 160px; z-index: 11"
+        :style="{
+          'min-width': '100px',
+          'max-height': '160px',
+          'max-width': '300px',
+          'z-index': '11',
+        }"
       >
         <div
           :ref="`r${item[idProp]}`"
-          class="item"
+          class="item data-content"
           :class="{ selected: item.selected }"
           v-for="(item, index) in listItem"
           :key="index"
@@ -82,7 +91,7 @@
 
 <script>
 import axios from "axios";
-import 'clickout-event';
+import "clickout-event";
 export default {
   name: "ComboBox",
   components: {},
@@ -97,8 +106,12 @@ export default {
      * Created by: Nguyễn Đức Toán - MF1095 (08/04/2022)
      */
     modelValue: {
-      type: String,
+      type: [String, Number],
       default: "",
+    },
+    func: {
+      type: Function,
+      default: () => {},
     },
     /**
      * Mô tả : defaultList danh sách mặc định của combobox nhận được từ component cha
@@ -143,10 +156,20 @@ export default {
       type: Boolean,
       default: false,
     },
+    //xác định input chỉ đọc
+    disabled: {
+      type: Boolean,
+      default: false,
+    },
     //xác định combobox có thể được thêm nhanh
     isObject: {
       type: Boolean,
       default: false,
+    },
+    //xác định combobox có thể được thêm nhanh
+    quickAdd: {
+      type: Boolean,
+      default: true,
     },
     //danh sách các prop cần hiển thị
     displayProps: {
@@ -184,6 +207,8 @@ export default {
       currentPage: 1,
       pageSize: 10,
       searchText: "",
+      //đã load lấy dữ liệu chưa
+      firstLoad: true,
     };
   },
   methods: {
@@ -218,9 +243,9 @@ export default {
         console.log(error);
       }
     },
-    close(){
+    close() {
       try {
-        if (this.$refs.itemBox.style.display == "block"){
+        if (this.$refs.itemBox.style.display == "block") {
           this.openItem();
         }
       } catch (error) {
@@ -235,7 +260,7 @@ export default {
      */
     openItem(e) {
       try {
-        if (this.readonly) return;
+        if (this.disabled || this.readonly) return;
         //nếu không được truyền api thì combo box load dữ liệu khi được gọi
         if (this.apiData == "") {
           //emit giá trị true nếu sự kiện mở combobox và ngược lại
@@ -258,24 +283,31 @@ export default {
           this.$refs.icon.style.transform = "unset";
         }
         if (!e) return;
-        //lấy độ cao max của màn hình
+        //lấy độ cao,rộng max của màn hình
         let maxHeight = e.view.innerHeight;
+        let maxWidth = e.view.innerWidth;
         //lấy vị trí của combobox
         let combobox = this.$refs.input.getBoundingClientRect();
         this.$refs.itemBox.style.minWidth = combobox.width + "px";
         this.top = combobox.top + 35;
-        // heigth của itembox
+        let left = combobox.left;
+        // heigth,width của itembox
         let clientHeight = this.$refs.itemBox.clientHeight;
+        let clientWidth = this.$refs.itemBox.clientWidth;
         //kiểm tra nếu quá màn hình hiển thị thì cho itembox mở lên phía trên
         if (this.top + clientHeight > maxHeight) {
           this.top += -43 - clientHeight;
         } else {
           this.top = combobox.top + 35;
         }
+        //kiểm tra có quá độ rộng màn hình hay k
+        if (left + clientWidth > maxWidth) {
+          left -= left + clientWidth - maxWidth + 10;
+        }
         //set vị trí của item box theo giá trị của top
         this.$refs.itemBox.style.top = this.top + "px";
         //set vị trí của item box theo giá trị của left
-        this.$refs.itemBox.style.left = combobox.left + "px";
+        this.$refs.itemBox.style.left = left + "px";
       } catch (error) {
         console.log(error);
       }
@@ -292,6 +324,31 @@ export default {
         this.$refs.itemBox.style.display = "block";
         //quay icon 180độ
         this.$refs.icon.style.transform = "rotate(180deg)";
+        //lấy độ cao,rộng max của màn hình
+        let maxHeight = window.innerHeight;
+        let maxWidth = window.innerWidth;
+        //lấy vị trí của combobox
+        let combobox = this.$refs.input.getBoundingClientRect();
+        this.$refs.itemBox.style.minWidth = combobox.width + "px";
+        this.top = combobox.top + 35;
+        let left = combobox.left;
+        // heigth,width của itembox
+        let clientHeight = this.$refs.itemBox.clientHeight;
+        let clientWidth = this.$refs.itemBox.clientWidth;
+        //kiểm tra nếu quá màn hình hiển thị thì cho itembox mở lên phía trên
+        if (this.top + clientHeight > maxHeight) {
+          this.top += -43 - clientHeight;
+        } else {
+          this.top = combobox.top + 35;
+        }
+        //kiểm tra có quá độ rộng màn hình hay k
+        if (left + clientWidth > maxWidth) {
+          left -= left + clientWidth - maxWidth + 10;
+        }
+        //set vị trí của item box theo giá trị của top
+        this.$refs.itemBox.style.top = this.top + "px";
+        //set vị trí của item box theo giá trị của left
+        this.$refs.itemBox.style.left = left + "px";
       } catch (error) {
         console.log(error);
       }
@@ -314,6 +371,7 @@ export default {
         if (this.isObject) {
           let data = item;
           this.$emit("getSelected", data);
+          // console.log('selectItem');
         }
         //set tên hiển thị
         this.selectedName = item[this.nameProp];
@@ -339,12 +397,12 @@ export default {
      */
     selectItemByArrow(item) {
       try {
-        console.log(item);
         //emit dữ liệu
         this.$emit("update:modelValue", item[this.idProp]);
         if (this.isObject) {
           let data = item;
           this.$emit("getSelected", data);
+          // console.log('selectItemByArrow');
         }
         //set tên hiển thị
         this.selectedName = item[this.nameProp];
@@ -366,6 +424,13 @@ export default {
       // đóng item box
       this.$refs.itemBox.style.display = "none";
       this.$refs.icon.style.transform = "unset";
+    },
+    pushNewObject(data){
+      try {
+        this.listItem.unshift(data);
+      } catch (error) {
+        console.log(error);
+      }
     },
     /**
      * Mô tả : Hàm set item đc mặc định chọn khi mới render
@@ -394,6 +459,7 @@ export default {
             if (this.isObject) {
               let data = element;
               this.$emit("getSelected", data);
+              // console.log('setDefaultSelected');
             }
             this.indexOfSelectedItem = index;
           }
@@ -421,12 +487,11 @@ export default {
           var total = dropdownHeight + Math.floor(scrollTop);
           //nếu bằng scrollHeight thì là đang ở bottom
           if (total >= scrollHeight) {
-            // console.log("đang ở bottom");
+
             total = 0;
             //emit tới cha load tiếp thông tin, truyền vào dữ liệu filter nếu có để lazy load tiếp thông tin đó.
             // this.$emit("eLoadNext", this.selectedText);
-            console.log("bottom");
-            this.pageSize += 10;
+            this.currentPage += 1;
             this.getDataCombo();
           }
         }
@@ -471,15 +536,15 @@ export default {
      */
     removeError() {
       try {
-        this.$refs.input.style = "";
-        this.$refs.input.title = "";
+        let target = this.$refs.input;
+        if (!target) return;
+        target.style = "";
+        target.title = "";
       } catch (error) {
         console.log(error);
       }
     },
     selectItemByButton(e) {
-      console.log(e);
-
       if (e.keyCode == 38) {
         this.openItemByFocus();
         this.indexOfSelectedItem -= 1;
@@ -527,7 +592,7 @@ export default {
       } catch (error) {
         console.log(error);
       }
-    },
+  },
     /**
      * Mô tả : setfocus cho input lỗi
      * Created by: Nguyễn Đức Toán - MF1095 (20/04/2022)
@@ -540,25 +605,63 @@ export default {
       }
     },
     /**
-    * Mô tả : lấy data từ api
-    * Created by: Nguyễn Đức Toán - MF1095 (25/05/2022)
-    */
-    getDataCombo() {
+     * Mô tả : lấy data từ api
+     * Created by: Nguyễn Đức Toán - MF1095 (25/05/2022)
+     */
+    async getDataCombo() {
       try {
         let me = this;
         // nếu api lấy danh sách item có được truyền tức là combobox muốn lấy dữ liệu từ api
         //thay thế cho danh sách mặc định
         if (me.apiData != "") {
-          axios({
+          await axios({
             method: "GET",
-            url: `${me.apiData}/filter?currentPage=${me.currentPage}&pageSize=${me.pageSize}&filterText=${me.searchText}`,
+            url: `${me.apiData}?currentPage=${me.currentPage}&pageSize=${me.pageSize}&filterText=${me.searchText}`,
+            async: true,
           })
             .then((res) => {
               //gán giá trị cho danh sách item của item box
               if (res.data.List) {
-                [...me.listItem] = [...res.data.List];
+                me.listItem = me.listItem.concat(res.data.List);
               }
+              //set mặc định chọn
+              me.setDefaultSelected();
+            })
+            .catch((res) => {
               console.log(res);
+            });
+        } else {
+          //nếu không có api lấy dữ liệu  thì dùng dữ liệu mặc định và set mặc định chọn
+          me.setDefaultSelected();
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    /**
+     * Mô tả : lấy data từ api
+     * Created by: Nguyễn Đức Toán - MF1095 (25/05/2022)
+     */
+    async getFirstCombo() {
+      try {
+        let me = this;
+        // nếu api lấy danh sách item có được truyền tức là combobox muốn lấy dữ liệu từ api
+        //thay thế cho danh sách mặc định
+        if (me.apiData != "") {
+          let api = me.apiData.replace(/filter/g, "");
+          axios({
+            method: "GET",
+            url: `${api}${me.modelValue}`,
+            async: true,
+          })
+            .then((res) => {
+              //gán giá trị cho danh sách item của item box
+              if (res.data) {
+                let count = this.listItem.filter((item) => {
+                  item[this.idProp] == res.data[this.idProp];
+                }).length;
+                if (count != 0) me.listItem.push(res.data);
+              }
               //set mặc định chọn
               me.setDefaultSelected();
             })
@@ -578,9 +681,9 @@ export default {
    * Mô tả : hàm chạy khi component được tạo
    * Created by: Nguyễn Đức Toán - MF1095 (08/04/2022)
    */
-  created() {
+  async created() {
     try {
-      this.getDataCombo();
+      await this.getDataCombo();
     } catch (error) {
       console.log(error);
     }
@@ -589,11 +692,22 @@ export default {
   watch: {
     //khi modelValue thay dổi thì set lại item được chọn
     modelValue(newVal) {
-      this.setSelectedItem(newVal);
-      this.removeError();
       if (!newVal) {
         this.selectedName = "";
+        return;
       }
+      if (this.firstLoad) {
+        this.getFirstCombo();
+        this.firstLoad = false;
+      }
+      this.setSelectedItem(newVal);
+      this.removeError();
+    },
+    listItem() {
+      if (this.firstLoad) {
+        this.getFirstCombo();
+      }
+      this.setSelectedItem(this.modelValue);
     },
   },
   /**
@@ -706,5 +820,16 @@ table {
 }
 .add-btn:hover {
   background-color: #eceef1;
+}
+tbody > tr td {
+  border-right: unset;
+  border-bottom: unset;
+}
+thead > tr th {
+  border-right: unset;
+  border-bottom: unset;
+}
+.item .data-content {
+  overflow-wrap: break-word;
 }
 </style>

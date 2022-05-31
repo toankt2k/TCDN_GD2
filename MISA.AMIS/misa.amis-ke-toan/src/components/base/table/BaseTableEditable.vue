@@ -1,12 +1,15 @@
 <template>
-  <div class="m-table">
+  <div class="m-table" v-on:clickout="clickOut">
     <div class="table-content">
       <table>
         <thead>
           <tr>
             <th class="hidden-left"></th>
             <th class="table-checkbox" style="width: 40px" v-if="checkBox">
-              <MCheckBox />
+              <MCheckBox v-model="checkAll" :rowId="'checkAll'"/>
+            </th>
+            <th class="table-checkbox" style="width: 40px" v-if="counter">
+              #
             </th>
             <th
               v-for="(col, index) in displayColumns"
@@ -32,111 +35,6 @@
             ></th>
           </tr>
         </thead>
-
-        <!-- <tbody v-show="!listEmployee.length > 0 && isLoading">
-          <tr
-            v-for="index in listEmployee.length > 0 ? listEmployee.length : 12"
-            :key="index"
-          >
-            <td class="hidden-left"></td>
-            <td class="table-checkbox">
-              <div class="loading-1" style="width: 18px"></div>
-            </td>
-            <td><div class="loading-1"></div></td>
-            <td><div class="loading-1"></div></td>
-            <td><div class="loading-1"></div></td>
-            <td><div class="loading-1"></div></td>
-            <td><div class="loading-1"></div></td>
-            <td><div class="loading-1"></div></td>
-            <td><div class="loading-1"></div></td>
-            <td><div class="loading-1"></div></td>
-            <td><div class="loading-1"></div></td>
-            <td><div class="loading-1"></div></td>
-            <td class="table-function" style="display: table-cell">
-              <div
-                class="table-function-button"
-                style="display: block; padding: 9px 0px"
-              >
-                <div class="loading-1"></div>
-              </div>
-            </td>
-            <td class="hidden-right"></td>
-          </tr>
-        </tbody>
-        <tbody v-show="!listEmployee.length > 0 && !isLoading">
-          <div class="no-content">
-            <img src="@/assets/no-employee.svg" />
-            <div class="no-content-text">Không có dữ liệu</div>
-          </div>
-        </tbody>
-        <tbody ref="tbody" id="mainTable" v-show="listEmployee.length > 0">
-          <tr
-            :class="{ checked: val.checked }"
-            v-for="(val, index) in listEmployee"
-            :key="index"
-            @dblclick="openForm(false, val)"
-          >
-            <td class="hidden-left"></td>
-            <td class="table-checkbox">
-              <MCheckBox v-model="val.checked" :rowId="`r${index}`" />
-            </td>
-            <td :title="val.EmployeeCode">
-              <div class="overflow-content">
-                {{ val.EmployeeCode }}
-              </div>
-            </td>
-            <td :title="val.EmployeeName">
-              <div class="overflow-content">
-                {{ val.EmployeeName }}
-              </div>
-            </td>
-            <td :title="val.GenderName">
-              <div class="overflow-content">{{ val.GenderName }}</div>
-            </td>
-            <td :title="dateFormat(val.DateOfBirth)" class="m-text-center">
-              <div class="overflow-content">
-                {{ dateFormat(val.DateOfBirth) }}
-              </div>
-            </td>
-            <td :title="val.IdentityNumber">
-              <div class="overflow-content">
-                {{ val.IdentityNumber }}
-              </div>
-            </td>
-            <td :title="val.PositionName">
-              <div class="overflow-content">
-                {{ val.PositionName }}
-              </div>
-            </td>
-            <td :title="val.DepartmentName">
-              <div class="overflow-content">{{ val.DepartmentName }}</div>
-            </td>
-            <td :title="val.BankAccount">
-              <div class="overflow-content">{{ val.BankAccount }}</div>
-            </td>
-            <td :title="val.BankName">
-              <div class="overflow-content">{{ val.BankName }}</div>
-            </td>
-            <td :title="val.BankBranch">
-              <div class="overflow-content">
-                {{ val.BankBranch }}
-              </div>
-            </td>
-            <td class="table-function">
-              <div class="table-function-button">
-                <div class="button-edit" @click="openForm(false, val)">Sửa</div>
-                <div class="arrow-down-button">
-                  <div
-                    class="icon"
-                    @click="tableOption($event, val, index)"
-                  ></div>
-                </div>
-              </div>
-            </td>
-            <td class="hidden-right"></td>
-          </tr>
-        </tbody> -->
-
         <tbody ref="tbody" id="mainTable">
           <tr v-for="(item, ind) in tableData" :key="'row' + ind">
             <td
@@ -144,13 +42,15 @@
               style="background-color: #fff !important"
             ></td>
             <td class="table-checkbox" v-if="checkBox">
-              <MCheckBox />
+              <MCheckBox v-model="item.checked" :rowId="`rr${ind}`"/>
+            </td>
+            <td class="table-checkbox" v-if="counter">
+              {{ ind + 1 }}
             </td>
             <td
               v-for="(col, index) in displayColumns"
               :key="'rcol' + index"
               @click="setEdit($event, `ip${ind + col.id}`, ind, col)"
-              :title="item[col.id]"
             >
               <div v-show="editRow == ind && col.edit">
                 <MInput
@@ -159,13 +59,14 @@
                   v-model="item[col.id]"
                   :align="col.align"
                   :type="col.type"
-                  @input="getDataTable(col.type)"
+                 
                 />
                 <component
                   v-if="col.component"
                   :is="col.componentData.name"
                   v-bind="col.componentData.prop"
                   v-model="item[col.id]"
+                  :ref="col.id"
                   @getSelected="
                     getName(
                       $event,
@@ -180,6 +81,7 @@
                 v-show="editRow != ind || !col.edit"
                 :style="{ textAlign: col.align }"
                 :ref="`${col.refReferent ?? col.id}${ind}/${index}`"
+                :title="item[col.id]"
               >
                 {{ !col.component ? dataFormat(item[col.id], col.type) : "" }}
               </div>
@@ -200,6 +102,7 @@
           <tr>
             <td class="hidden-left"></td>
             <td class="table-checkbox" v-if="checkBox"></td>
+            <td class="table-checkbox" v-if="counter"></td>
             <td
               v-for="(col, index) in displayColumns"
               class="m-text-right count"
@@ -224,6 +127,7 @@ import MInput from "@/components/base/input/BaseInput.vue";
 import MCombobox from "@/components/base/BaseComboBox.vue";
 //import lib
 import format from "@/js/lib/formatContent.js";
+import "clickout-event";
 
 export default {
   name: "BaseTable",
@@ -252,6 +156,16 @@ export default {
       type: Boolean,
       default: true,
     },
+    //có check box hay không
+    counter: {
+      type: Boolean,
+      default: false,
+    },
+    //disable input
+    disabled: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {
@@ -260,7 +174,6 @@ export default {
       //danh sách các cột được hiển thị
       displayColumns: this.columns,
       tableData: this.defaultData,
-      test: false,
       //show detailDialog
       infoDialog: false,
       //xác định là dialog them hay sửa
@@ -283,6 +196,7 @@ export default {
       confirmDialogData: {},
       //nếu check all đc check thì sẽ check tất cả các check trong bảng
       checkAll: false,
+      countCheck: 0,
       isConfirm: false,
       //sự kiện delay khi nhập searchtext
       delayTimer: null,
@@ -308,12 +222,17 @@ export default {
         if (!targetName) return "";
         targetName[0].innerHTML = data[`${idProp}Name`];
       });
+      this.getDataTable("number");
     },
+    /**
+     * Mô tả : emit data mỗi khi thay đổi
+     * Created by: Nguyễn Đức Toán - MF1095 (27/05/2022)
+     */
     getDataTable(type) {
       try {
-        clearTimeout(this.timeOutInput);
+        // clearTimeout(this.timeOutInput);
         let me = this;
-        this.timeOutInput = setTimeout(function () {
+        // this.timeOutInput = setTimeout(function () {
           let count = [];
           if (type == "number") {
             me.displayColumns.forEach((ele, ind) => {
@@ -322,18 +241,18 @@ export default {
                 let total = 0;
                 me.tableData.forEach((el) => {
                   if (el[ele.id]) {
-                    total += parseInt(el[ele.id]);
+                    total += new Number(el[ele.id]);
                   }
                 });
                 if (target) {
-                  target[0].innerHTML = total;
+                  target[0].innerHTML = me.formatContent(total, "currency");
                 }
                 count[ele.id] = total;
               }
             });
           }
           me.$emit("getData", me.tableData, count);
-        }, 500);
+        // }, 500);
       } catch (error) {
         console.log(error);
       }
@@ -341,8 +260,8 @@ export default {
 
     setEdit(e, refOfTagetInput, indexOfColunm, col) {
       try {
-        console.log("log");
         e.preventDefault();
+        if(this.disabled)return;
         this.editRow = indexOfColunm;
         if (col.component) return;
         this.$nextTick(() => {
@@ -420,11 +339,22 @@ export default {
       }
     },
     /**
+     * Mô tả : format đinh dạng dữ liệu
+     * Created by: Nguyễn Đức Toán - MF1095 (27/05/2022)
+     */
+    formatContent(val, key) {
+      switch (key) {
+        case "currency":
+          return format.currencyFormatDE(val);
+        default:
+          break;
+      }
+    },
+    /**
      * Mô tả : bắt emit từ dropdown
      * Created by: Nguyễn Đức Toán - MF1095 (15/04/2022)
      */
     selectDropdown(key) {
-      console.log(key);
       switch (key) {
         case "multiDelete":
           this.confirmDialogData = {
@@ -541,6 +471,7 @@ export default {
     deleteRow(ind) {
       try {
         this.tableData.splice(ind, 1);
+        this.editRow = -1;
         this.getDataTable("number");
       } catch (error) {
         console.log(error);
@@ -604,6 +535,14 @@ export default {
       this.isShow = false;
     },
     /**
+     * Mô tả : click ra ngoài dropdown list
+     * Created by: Nguyễn Đức Toán - MF1095 (10/04/2022)
+     */
+    clickOut() {
+      this.editRow = -1;
+      this.getDataTable('number')
+    },
+    /**
      * Mô tả : fomat data sang date
      * @param data dữ liệu cần format
      * @param type kiểu dữ liệu format
@@ -617,7 +556,7 @@ export default {
           case "number": //kiểu dữ liệu dạng số
             return format.numberVNFormat(data);
           case "currency": //kiểu dữ liệu dạng số
-            return format.currencyVNFormat(data);
+            return format.currencyFormatDE(data);
           case "date": //kiểu dữ liệu dạng ngày
             return format.dateFormat(data);
           default:
@@ -657,7 +596,15 @@ export default {
   watch: {
     defaultData(newVal, old) {
       try {
-        if (newVal != old) this.tableData = newVal;
+        if (newVal != old) {
+          this.tableData = newVal;
+          if (newVal) {
+            if (newVal.length > 0) {
+              if (Object.keys(newVal[0]).length > 0)
+                this.getDataTable("number");
+            }
+          }
+        }
       } catch (error) {
         console.log(error);
       }
@@ -667,7 +614,7 @@ export default {
      * Mô tả : kiểm tra nếu chọn nhiều hơn 1 em ployee thì cho phép dùng chức năng xóa nhiều
      * Created by: Nguyễn Đức Toán - MF1095 (27/04/2022)
      */
-    listEmployee: {
+    tableData: {
       deep: true,
       handler(newVal) {
         let count = 0;
@@ -676,6 +623,7 @@ export default {
             count++;
           }
         });
+        this.countCheck=count;
         let target = this.$refs.multiAction;
         if (target) {
           if (count < 1) {
@@ -696,12 +644,35 @@ export default {
      * Created by: Nguyễn Đức Toán - MF1095
      * Created date: 13:07 16/04/2022
      */
-    checkAll(newVal) {
+    checkAll(newVal,oldVal) {
       try {
-        //nếu check all được check thì check tất cả check box và ngược lại
-        this.listEmployee.forEach((ele) => {
-          ele.checked = newVal;
-        });
+        if(newVal==oldVal)return;
+        if(this.countCheck!=this.tableData.length && newVal==true){
+          //nếu check all được check thì check tất cả check box và ngược lại
+          this.tableData.forEach((ele) => {
+            ele.checked = newVal;
+          });
+        }
+        else if(newVal==false && this.countCheck != this.tableData.length-1){
+          //nếu check all được check thì check tất cả check box và ngược lại
+          this.tableData.forEach((ele) => {
+            ele.checked = newVal;
+          });
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    
+    //số item đc check
+    countCheck(newVal) {
+      try {
+        if(newVal == this.tableData.length){
+          this.checkAll=true;
+        }
+        else{
+          this.checkAll=false;
+        }
       } catch (error) {
         console.log(error);
       }

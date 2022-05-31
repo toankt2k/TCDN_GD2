@@ -1,4 +1,5 @@
-﻿using MISA.Infrastructure.Helpers;
+﻿using Microsoft.Extensions.Configuration;
+using MISA.Infrastructure.Helpers;
 using MISA.Web02.Core.Entities;
 using MISA.Web02.Core.Interfaces.Repository;
 using Npgsql;
@@ -13,6 +14,10 @@ namespace MISA.Infrastructure.Respository
 {
     public class TableOptionRepository : BaseRespository<TableOption>, ITableOptionRepository
     {
+        public TableOptionRepository(IConfiguration configuration) : base(configuration)
+        {
+        }
+
         public int PutByCode(TableOption table)
         {
             //sử dụng func update

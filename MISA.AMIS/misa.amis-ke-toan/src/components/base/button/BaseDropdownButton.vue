@@ -1,5 +1,5 @@
 <template>
-  <div class="m-dropdown-button" :class="this.typeClass">
+  <div class="m-dropdown-button" :class="[typeClass,{'diable-multi':disabled}]">
     <div class="content">{{this.text}}</div>
     <div class="icon"></div>
   </div>
@@ -21,7 +21,8 @@ export default {
         //typeClass xác định xem button này thuộc loại nào: primary / default
         typeClass:{type:String,default:''},
         //text đặt nội dung cho button
-        text:{type:String,default:''}
+        text:{type:String,default:''},
+        disabled:{type:Boolean,default:false}
     }
 }
 </script>

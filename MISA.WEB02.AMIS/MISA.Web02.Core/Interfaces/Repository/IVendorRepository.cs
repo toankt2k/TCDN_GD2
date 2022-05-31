@@ -10,5 +10,6 @@ namespace MISA.Web02.Core.Interfaces.Repository
 {
     public interface IVendorRepository:IBaseRepository<Vendor>
     {
+        public bool CheckHasPayment(Guid vendorId);
     }
 }

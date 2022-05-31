@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "RUov4sGEQTwhpXDhvQ+/Vbqd0Z/SV6I/lexomjiVJx6EJJ/X541F9zg9diURQIvYipuJOCrSrGoflZQzI86bbg==",
+  "dgSpecHash": "DDM3OlOil5V1aEfa7abcwJPbg60iweJjVU9tfEwijyTq1AFw5KyA+7NdXwFZf9Akw3nQEMtGZEALRzw4YmTvGw==",
   "success": true,
   "projectFilePath": "C:\\project\\Misa\\Misa\\edu\\TCDN_GD2\\MISA.WEB02.AMIS\\MISA.Web02.Api\\MISA.Web02.Api.csproj",
   "expectedPackageFiles": [
@@ -8,8 +8,8 @@
     "C:\\Users\\toank\\.nuget\\packages\\epplus\\6.0.3\\epplus.6.0.3.nupkg.sha512",
     "C:\\Users\\toank\\.nuget\\packages\\epplus.interfaces\\6.0.0\\epplus.interfaces.6.0.0.nupkg.sha512",
     "C:\\Users\\toank\\.nuget\\packages\\epplus.system.drawing\\6.0.0\\epplus.system.drawing.6.0.0.nupkg.sha512",
-    "C:\\Users\\toank\\.nuget\\packages\\microsoft.aspnetcore.jsonpatch\\6.0.3\\microsoft.aspnetcore.jsonpatch.6.0.3.nupkg.sha512",
-    "C:\\Users\\toank\\.nuget\\packages\\microsoft.aspnetcore.mvc.newtonsoftjson\\6.0.3\\microsoft.aspnetcore.mvc.newtonsoftjson.6.0.3.nupkg.sha512",
+    "C:\\Users\\toank\\.nuget\\packages\\microsoft.aspnetcore.jsonpatch\\6.0.5\\microsoft.aspnetcore.jsonpatch.6.0.5.nupkg.sha512",
+    "C:\\Users\\toank\\.nuget\\packages\\microsoft.aspnetcore.mvc.newtonsoftjson\\6.0.5\\microsoft.aspnetcore.mvc.newtonsoftjson.6.0.5.nupkg.sha512",
     "C:\\Users\\toank\\.nuget\\packages\\microsoft.csharp\\4.7.0\\microsoft.csharp.4.7.0.nupkg.sha512",
     "C:\\Users\\toank\\.nuget\\packages\\microsoft.extensions.apidescription.server\\3.0.0\\microsoft.extensions.apidescription.server.3.0.0.nupkg.sha512",
     "C:\\Users\\toank\\.nuget\\packages\\microsoft.extensions.configuration\\5.0.0\\microsoft.extensions.configuration.5.0.0.nupkg.sha512",

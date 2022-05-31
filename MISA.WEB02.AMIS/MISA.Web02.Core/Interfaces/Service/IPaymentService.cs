@@ -15,6 +15,6 @@ namespace MISA.Web02.Core.Interfaces.Service
         /// </summary>
         /// <param name="paymenObject"> đối tượng paymen vào payment detail có liên quan</param>
         /// <returns></returns>
-        public int AddPayment(Payment paymen);
+        public int AddPayment(Payment payment);
     }
 }

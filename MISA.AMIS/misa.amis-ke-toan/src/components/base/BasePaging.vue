@@ -6,7 +6,6 @@
         :idProp="comboboxData.maxRow.id"
         :nameProp="comboboxData.maxRow.name"
         v-model="pageSize"
-        :readonly="true"
       />
     </div>
     <div class="paging-index">
@@ -133,7 +132,7 @@ export default {
       // pageCount: this.totalPage,
       selectedPage: this.modelValue,
       //số bản ghi trong 1 trang(mặc định 10)
-      pageSize: this.dataStorage.paging.pageSize[0].id,
+      pageSize: this.dataStorage.paging.defaultPageSize,
     };
   },
   /**
@@ -147,7 +146,6 @@ export default {
      */
     selectPage(page) {
       try {
-        console.log("23");
         if (page > 0 && page <= this.totalPage) {
           //emit data
           this.$emit("selectPage", page, this.pageSize);

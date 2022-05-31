@@ -31,6 +31,9 @@ export default {
   padding: 15px 20px;
   font-weight: 400;
 }
+a{
+  color: #111;
+}
 .m-tab-bar .tab-item.selected {
   padding: 15px 20px;
   border-bottom: 4px solid #2ca01c;
@@ -38,7 +41,8 @@ export default {
   font-family: Notosans-bold;
 }
 .m-tab-bar .tab-item:hover {
-  color: #2ca01c;
+  color: #2ca01c !important;
   cursor: pointer;
 }
+
 </style>

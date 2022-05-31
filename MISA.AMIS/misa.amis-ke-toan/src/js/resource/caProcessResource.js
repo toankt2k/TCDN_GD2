@@ -7,11 +7,15 @@ const processResource = {
             id: "1",
             text: "Nhà cung cấp",
             classIcon: "ic-process-provider",
+            funcImprovConfirm: false,
+            link: '/VendorList'
         },
         {
             id: "2",
             text: "Hệ thông tài khoản",
             classIcon: "ic-process-caculator",
+            funcImprovConfirm: true,
+
         },
     ]
 }

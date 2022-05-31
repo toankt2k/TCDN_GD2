@@ -1,11 +1,15 @@
 ﻿using MISA.Web02.Core.Entities;
 using MISA.Web02.Core.Exceptions;
+using MISA.Web02.Core.Helpers;
+using MISA.Web02.Core.Helpers.ExportExcel;
 using MISA.Web02.Core.Interfaces.Base;
 using MISA.Web02.Core.Resourses;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
@@ -66,25 +70,6 @@ namespace MISA.Web02.Core.Services
             {
                 throw new MISAExceptions(MISAMessageResource.VN_DataInvalid, errorMsg);
             }
-            ////lấy code của entity truyền vào
-            //var code = typeof(T).GetProperty($"{entityName}Code").GetValue(entity).ToString();
-            ////code đúng format
-            //var rx = new Regex(@"[a-zA-Z]{2}-[0-9]+$");
-            //if (!rx.IsMatch(code.ToUpper()))
-            //{
-            //    errorMsg.Add($"{entityName}Code", MISAMessageResource.VN_CodeInvalid);
-            //}
-            ////kiểm tra mã code trùng
-            //var data = _baseRepository.FindByCode(code);
-            ////nếu có bản ghi trùng với mã hiện tại
-            //if (data != null)
-            //{
-            //    errorMsg.Add($"{entityName}Code", MISAMessageResource.VN_CodeDuplicate);
-            //}
-            //if (errorMsg.Count() > 0)//nếu danh sách lỗi có lỗi thì throw exception
-            //{
-            //    throw new MISAExceptions(MISAMessageResource.VN_DataInvalid, errorMsg);
-            //}
             //thêm mới database
             var result = _baseRepository.Insert(entity);
             return result;
@@ -111,12 +96,12 @@ namespace MISA.Web02.Core.Services
             }
             //lấy code của entity truyền vào
             var newCode = typeof(T).GetProperty($"{entityName}Code").GetValue(entity).ToString();
-            //code đúng format
-            var rx = new Regex(@"[a-zA-Z]{2}-[0-9]+$");
-            if (!rx.IsMatch(newCode.ToUpper()))
-            {
-                errorMsg.Add($"{entityName}Code", MISAMessageResource.VN_CodeInvalid);
-            }
+            ////code đúng format
+            //var rx = new Regex(@"[a-zA-Z]{2}-[0-9]+$");
+            //if (!rx.IsMatch(newCode.ToUpper()))
+            //{
+            //    errorMsg.Add($"{entityName}Code", MISAMessageResource.VN_CodeInvalid);
+            //}
             //lấy giá trị cũ trong data base
             var oldEntity = _baseRepository.GetById(id);
             //nếu không tìm thấy bản ghi / bản ghi đã bị xóa trước khi sửa 
@@ -241,6 +226,20 @@ namespace MISA.Web02.Core.Services
         public string FilterService(int currentPage, int pageSize, string? filterText)
         {
             var result = _baseRepository.Filter(currentPage, pageSize,filterText);
+            return result;
+        }
+
+        public byte[] ExportService(int currentPage, int pageSize, string? filterText, List<TableInfo> columns)
+        {
+            var res = _baseRepository.Filter(currentPage, pageSize, filterText);
+            //đổi về dang json
+            var jObj = JObject.Parse(res);
+            //đổi về dạng pascalcase
+            jObj.Capitalize();
+            //Convert từ json về object
+            var data = JsonSerializer.Deserialize<FilterResult<T>>(jObj.ToString());
+            //gọi hàm xuất dữ liệu
+            var result = BaseExportEPP.Export<T>(data.List, columns);
             return result;
         }
     }

@@ -69,7 +69,7 @@ namespace MISA.Web02.Api.Controllers
         /// </summary>
         /// <returns></returns>
         /// Author: Nguyễn Đức Toán-MF1095(24/04/2022)
-        [HttpGet("export")]
+        [HttpGet("exportEmployee")]
         public IActionResult Export()
         {
             try

@@ -13,6 +13,7 @@
               ref="multiAction"
               :typeClass="'default'"
               :text="'Tiện ích'"
+              @click="funcImprovConfirm"
             />
           </div>
           <div class="button">
@@ -29,26 +30,15 @@
       <div class="counter">
         <div class="view-total m-col-4">
           <div class="total">100,0</div>
-          <div class="text">Tổng thu đàu năm đến hiện tại</div>
+          <div class="text">Tổng thu đầu năm đến hiện tại</div>
         </div>
-        <div class="view-total m-col-4">
+        <div class="view-total m-col-4" style="background-color: #b8bcc3">
           <div class="total">100,0</div>
-          <div class="text">Tổng thu đàu năm đến hiện tại</div>
+          <div class="text">Tổng thu đầu năm đến hiện tại</div>
         </div>
-        <div class="view-total m-col-4">
+        <div class="view-total m-col-4" style="background-color: #74cb2f">
           <div class="total">100,0</div>
-          <div class="text">Tổng thu đàu năm đến hiện tại</div>
-        </div>
-      </div>
-      <div class="sub-tab">
-        <div class="tab-item selected">
-          <div class="text">Tất cả</div>
-        </div>
-        <div class="tab-item">
-          <div class="text">Thu tiền</div>
-        </div>
-        <div class="tab-item">
-          <div class="text">Chi tiền</div>
+          <div class="text">Tổng thu đầu năm đến hiện tại</div>
         </div>
       </div>
       <div class="table-tool">
@@ -60,8 +50,17 @@
             ref="multiAction"
             :typeClass="'default'"
             :text="'Thực hiện hàng loạt'"
+            :disabled="!isMulti"
             @click="multiFunction"
+            @mouseover="overMultiFunction"
           />
+          <DropdownButton
+              ref="filter"
+              :typeClass="'default'"
+              :text="'Lọc'"
+              @click="funcImprovConfirm"
+              style="margin-left:12px"
+            />
         </div>
         <div class="m-right">
           <div class="tool-search">
@@ -74,7 +73,7 @@
           </div>
           <div class="ultility-button">
             <div class="refresh" @click="reloadData"></div>
-            <div class="export"></div>
+            <div class="export" @click="exportData"></div>
             <div class="setting" @click="setting(true)"></div>
           </div>
         </div>
@@ -90,11 +89,11 @@
       </div>
       <div class="list no-content" v-if="noConTent">
         <div class="sub">
-          <img src="" />
-          <div class="no-content-text"></div>
+          <img src="@/assets/no-employee.svg" />
+          <div class="no-content-text">Không có dữ liệu</div>
         </div>
       </div>
-      <div class="paging-area">
+      <div class="paging-area" v-if="!noConTent">
         <div class="table-footer">
           <div class="footer">
             <div class="count-row">
@@ -127,7 +126,30 @@
       :data="tableOption"
       @submit="saveTableOption"
     />
-    <VendorDetail ref="vendorDetail" v-if="vendorOpen" @exitForm="exitVendor" />
+    <VendorDetail
+      ref="vendorDetail"
+      v-if="vendorOpen"
+      @exitForm="exitVendor"
+      @addToast="addToast"
+      @getVendor="getAddVendor"
+    />
+    <ConfirmDialog
+      :text="confirmDialogData.text"
+      :type="confirmDialogData.type"
+      :listButton="confirmDialogData.button"
+      :align="confirmDialogData.align"
+      @confirm="confirm"
+      :keyConfirm="confirmDialogData.key"
+      v-if="isConfirm"
+    />
+    <div class="m-toast-box">
+      <ToastMessage
+        v-for="(val, ind) in listToastMessage"
+        :key="ind"
+        :type="val.type"
+        :message="val.message"
+      />
+    </div>
   </div>
 </template>
 
@@ -140,7 +162,10 @@ import MInput from "@/components/base/input/BaseInput.vue";
 import DropdownList from "@/components/base/dialog/BaseDropdownList.vue";
 import MSetting from "@/components/base/dialog/BaseCustomSetting.vue";
 import VendorDetail from "@/view/vendor/VendorDetail.vue";
+import ConfirmDialog from "@/components/base/dialog/BaseConfirmDialog.vue";
+import ToastMessage from "@/components/base/BaseToastMessage.vue";
 
+const FileDownload = require("js-file-download");
 import axios from "axios";
 export default {
   name: "VendorList",
@@ -153,6 +178,8 @@ export default {
     MInput,
     DropdownList,
     VendorDetail,
+    ConfirmDialog,
+    ToastMessage,
   },
   data() {
     return {
@@ -174,10 +201,13 @@ export default {
       vendorOpen: false,
       //vendor được chọn
       vendorTarget: {},
+      //data cho confirm dialog
+      confirmDialogData: {},
+      isConfirm: false,
       //phân trang
       paging: {
-        pageSize: 10,
-        currentPage: 1,
+        pageSize: this.dataStorage.paging.defaultPageSize,
+        currentPage: this.dataStorage.paging.defaultCurrentPage,
         totalPage: 1,
         totalRecord: 0,
       },
@@ -188,6 +218,12 @@ export default {
       //bảng trống dữ liệu hay k
       noConTent: false,
       tableFunction: { key: "edit", name: "Sửa" },
+      //data cho toastmessage
+      listToastMessage: [],
+      //cho phép sử dụng chức nawg chọn nhiều
+      isMulti: false,
+      //danh sách id các đôi tượng đối tượng
+      listId: [],
     };
   },
   methods: {
@@ -199,10 +235,9 @@ export default {
       try {
         let me = this;
         me.$refs.VendorTable.isLoading = true;
-
         axios
           .get(
-            `http://localhost:5093/api/v1/Vendors/filter?currentPage=${me.paging.currentPage}&pageSize=${me.paging.pageSize}&filterText=${me.searchText}`
+            `${this.dataStorage.api.vendor.filter}?currentPage=${me.paging.currentPage}&pageSize=${me.paging.pageSize}&filterText=${me.searchText}`
           )
           .then((res) => {
             if (!res.data.List) {
@@ -210,6 +245,7 @@ export default {
             } else {
               me.noConTent = false;
             }
+            this.tableData = res.data.List;
             me.$refs.VendorTable.setData(res.data.List ? res.data.List : []);
             me.paging.totalPage = res.data.TotalPage;
             me.paging.totalRecord = res.data.TotalRecord;
@@ -233,12 +269,15 @@ export default {
       try {
         let me = this;
         axios
-          .get(`http://localhost:5093/api/v1/TableOptions/ByCode?code=Vendor`)
+          .get(`${this.dataStorage.api.tableOption.getByCode}?code=Vendor`)
           .then((res) => {
-            console.log(res);
             me.option = res.data;
             me.tableOption = JSON.parse(res.data.ListColumns);
-            me.$refs.VendorTable.setColumns(JSON.parse(res.data.ListColumns));
+            me.$refs.VendorTable.setColumns(
+              JSON.parse(res.data.ListColumns).filter((item) => {
+                return item.checked == true;
+              })
+            );
           })
           .catch((res) => {
             console.log(res);
@@ -246,6 +285,80 @@ export default {
       } catch (error) {
         console.log(error);
       }
+    },
+    /**
+     * Mô tả : nhận xác nhận của người dùng
+     * Created by: Nguyễn Đức Toán - MF1095 (27/05/2022)
+     */
+    confirm(key, val) {
+      let me = this;
+      switch (key) {
+        case "error": //input nhập trống
+          switch (val) {
+            case 1: //đóng
+              this.isConfirm = false;
+              break;
+            default:
+              break;
+          }
+          break;
+        case "delete": //input nhập trống
+          switch (val) {
+            case 1: //đóng
+              this.isConfirm = false;
+              break;
+            case 2: //đóng
+              this.delete(this.vendorTarget.VendorId);
+              this.isConfirm = false;
+              break;
+            default:
+              break;
+          }
+          break;
+        case "multiDelete": //input nhập trống
+          switch (val) {
+            case 1: //đóng
+              this.isConfirm = false;
+              break;
+            case 2: //ok
+              this.multiDelete();
+              this.isConfirm = false;
+              break;
+            default:
+              break;
+          }
+          break;
+        case "dataError": //input nhập trống
+          switch (val) {
+            case 1: //không
+              this.isConfirm = false;
+              this.focusErrorInput();
+              break;
+            case 2: //có
+              this.isConfirm = false;
+
+              this.getNewPaymentCode().then(() => {
+                me.savePayment();
+              });
+              break;
+            default:
+              break;
+          }
+          break;
+        case "funcImprov":
+          switch (val) {
+            case this.confirmResource.funcImprov.button[0].id:
+              this.isConfirm = false;
+              break;
+
+            default:
+              break;
+          }
+          break;
+        default:
+          break;
+      }
+      this.vendorTarget = {};
     },
     /**
      * Mô tả : bắt sự kiện click chuột vào nút sửa để hiện ra dropdown lựa chọn thực hiện hàng loạt
@@ -257,21 +370,15 @@ export default {
         //dừng sự kiện click khác
         e.stopPropagation();
         //ngăn sự kiện click khác
-        // kiểm tra sô dòng được chọn
-        let count = 3;
-        this.tableData.forEach((element) => {
-          if (element.checked == true) {
-            count++;
-          }
-        });
         //lất element đc click
         let elementTarget =
           this.$refs["multiAction"].$el.getBoundingClientRect();
         //nếu sso dòng được chọn lớn hơn 0
-        if (count > 0) {
+        if (this.isMulti) {
           this.functionDropdown = this.resource.dropdownData.multipleFunction;
         } else {
           this.functionDropdown = [];
+          return;
         }
         elementTarget.left + 100;
         elementTarget.top;
@@ -303,44 +410,66 @@ export default {
      */
     selectDropdown(key) {
       try {
+        let data;
         switch (key) {
           case "edit":
             this.openEditVendor(this.vendorTarget);
+            this.vendorTarget = {};
             break;
           case "view":
             this.openViewVendor(this.vendorTarget);
+            this.vendorTarget = {};
             break;
           case "multiDelete":
-            this.confirmDialogData = {
+            data = {
               name: "xóa",
               button: this.resource.confirmDialogData.deleteMultiple,
               type: "warning",
               text: this.resource.confirmDialogData.getMultiDeleteConfirm(),
               key: "multiDelete",
             }; //global property
-            this.isConfirm = true;
+            this.openConfirm(data);
             break;
           case "delete": //chọn xóa 1 nhân
-            // alert(this.vendorTarget.VendorId)
-            // this.confirmDialogData = {
-            //   name: "xóa",
-            //   button: this.resource.confirmDialogData.delete,
-            //   type: "warning",
-            //   text: this.resource.confirmDialogData.getDeleteConfirm(
-            //     this.selectedCode
-            //   ),
-            //   key: "delete",
-            // };
-            // this.isConfirm = true;
-            this.delete(this.vendorTarget.VendorId);
+            data = {
+              name: "xóa",
+              button: this.resource.confirmDialogData.delete,
+              type: "warning",
+              text: this.resource.confirmDialogData.getDeleteConfirm(`
+                nhà cung cấp <${this.vendorTarget.VendorCode}> `),
+              key: "delete",
+            }; //global property
+            this.openConfirm(data);
             break;
           case "duplicate":
-            this.openForm({ EmployeeId: this.selectedId });
+            this.openForm(this.vendorTarget);
             break;
           default:
             break;
         }
-        this.vendorTarget = {};
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    /**
+     * Mô tả : mở confirm dialog
+     * Created by: Nguyễn Đức Toán - MF1095 (27/05/2022)
+     */
+    openConfirm(confirm) {
+      this.confirmDialogData = confirm;
+      this.isConfirm = true;
+    },
+
+    /**
+     * Mô tả : thêm 1 thông báo vào toastmess sau 4s thì xóa
+     * Created by: Nguyễn Đức Toán - MF1095 (15/04/2022)
+     */
+    addToast(toast) {
+      try {
+        this.listToastMessage.push(toast);
+        setTimeout(() => {
+          this.listToastMessage.shift();
+        }, 4500);
       } catch (error) {
         console.log(error);
       }
@@ -368,28 +497,75 @@ export default {
       }
     },
     /**
-    * Mô tả : xóa 1 vendor  với id truyền vào
-    * Created by: Nguyễn Đức Toán - MF1095 (23/05/2022)
-    */
-    delete(id){
-        try {
-        if(!id)return;
+     * Mô tả : xóa 1 vendor  với id truyền vào
+     * Created by: Nguyễn Đức Toán - MF1095 (23/05/2022)
+     */
+    delete(id) {
+      try {
+        if (!id) return;
         // let me = this;
         axios({
           method: "DELETE",
-          url: `http://localhost:5093/api/v1/Vendors/${id}`,
-
+          url: `${this.dataStorage.api.vendor.delete}/${id}`,
         })
           .then((res) => {
             console.log(res);
+            let toast = this.resource.toastMessage.deleteSuccess;
+            this.addToast(toast);
             this.reloadData();
           })
           .catch((res) => {
-            console.log(res);
+            let responseData = res.response.data;
+            let data = {
+              name: "xóa",
+              button: this.resource.confirmDialogData.errorConfirm,
+              type: "error",
+              align: "center",
+              text: responseData.data[Object.keys(responseData.data)[0]],
+              key: "error",
+            }; //global property
+
+            this.openConfirm(data);
           });
-        } catch (error) {
-            console.log(error);
-        }
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    /**
+     * Mô tả : xóa 1 Payment  với id truyền vào
+     * Created by: Nguyễn Đức Toán - MF1095 (23/05/2022)
+     */
+    multiDelete() {
+      try {
+        if (this.listId.length <= 1) return;
+        // let me = this;
+        axios({
+          method: "DELETE",
+          url: this.dataStorage.api.vendor.multi,
+          data: this.listId,
+        })
+          .then((res) => {
+            this.reloadData();
+            console.log(res);
+            let toast = this.resource.toastMessage.deleteSuccess;
+            this.addToast(toast);
+          })
+          .catch((res) => {
+            console.log(res);
+            let responseData = res.response.data;
+            let data = {
+              name: "xóa",
+              button: this.resource.confirmDialogData.errorConfirm,
+              type: "error",
+              align: "center",
+              text: responseData.data[Object.keys(responseData.data)[0]],
+              key: "error",
+            }; //global property
+            this.openConfirm(data);
+          });
+      } catch (error) {
+        console.log(error);
+      }
     },
     /**
      * Mô tả : submit form setting
@@ -399,11 +575,15 @@ export default {
       try {
         let me = this;
         let dataRequest = JSON.parse(JSON.stringify(this.option));
+        // tableOption.forEach((item)=>{
+        //   if(item.checked)item.show = true;
+        //   else item.show=false;
+        //   item.checked = true;
+        // })
         dataRequest["ListColumns"] = JSON.stringify(tableOption);
-        console.log(dataRequest);
         axios({
           method: "Put",
-          url: "http://localhost:5093/api/v1/TableOptions/ByCode",
+          url: `${this.dataStorage.api.tableOption.updateByCode}`,
           data: dataRequest,
           contentType: "aplication/json",
         })
@@ -429,6 +609,30 @@ export default {
         this.paging.pageSize = pageSize;
         this.paging.currentPage = current;
         this.getTableData();
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    /**
+     * Mô tả : kiểm tra xem đã có bản ghi nào đc check
+     * Created by: Nguyễn Đức Toán - MF1095 (28/05/2022)
+     */
+    overMultiFunction() {
+      try {
+        let count = 0;
+        this.listId = [];
+        this.tableData.forEach((element) => {
+          if (element.checked == true) {
+            count++;
+            this.listId.push(element.VendorId);
+          }
+        });
+        //nếu sso dòng được chọn lớn hơn 0
+        if (count > 1) {
+          this.isMulti = true;
+        } else {
+          this.isMulti = false;
+        }
       } catch (error) {
         console.log(error);
       }
@@ -489,7 +693,6 @@ export default {
     openEditVendor(val) {
       try {
         let me = this;
-        console.log(val);
         this.openVendor();
         this.$nextTick(() => {
           me.$refs["vendorDetail"].isAdd = false;
@@ -506,13 +709,39 @@ export default {
     openViewVendor(val) {
       try {
         let me = this;
-        console.log(val);
         this.openVendor();
         this.$nextTick(() => {
           me.$refs["vendorDetail"].isAdd = false;
           me.$refs["vendorDetail"].getVendor(val.VendorId);
           me.$refs["vendorDetail"].readonly = true;
         });
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    getAddVendor(data) {
+      try {
+        this.tableData.unshift(data);
+        this.$refs.VendorTable.setData(this.tableData ? this.tableData : []);
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    /**
+     * Mô tả : mở confirm tính nawg đang phát triển
+     * Created by: Nguyễn Đức Toán - MF1095 (06/05/2022)
+     */
+    funcImprovConfirm() {
+      try {
+        this.confirmDialogData = {
+          name: "funcImprov",
+          type: "info",
+          key: "funcImprov",
+          button: this.confirmResource.funcImprov.button,
+          text: this.confirmResource.funcImprov.getText(),
+          align: "center",
+        };
+        this.isConfirm = true;
       } catch (error) {
         console.log(error);
       }
@@ -541,11 +770,60 @@ export default {
       this.vendorOpen = true;
     },
     /**
+     * Mô tả : xuất danh sách các cột hiện trên table
+     * Created by: Nguyễn Đức Toán - MF1095 (29/05/2022)
+     */
+    exportData() {
+      try {
+        let columns = [];
+        this.tableOption.forEach((item) => {
+          if (item.checked) {
+            columns.push({
+              Key: item.id,
+              Name: item.displayName,
+              Align: item.align,
+            });
+          }
+        });
+        axios({
+          method: "POST",
+          data: columns,
+          url: `${this.dataStorage.api.vendor.export}?currentPage=${this.paging.currentPage}&pageSize=${this.paging.pageSize}&filterText=${this.searchText}`,
+          responseType: "blob",
+        }).then((res) => {
+          FileDownload(res.data, "danh_sach_nha_cung_cap.xlsx");
+        });
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    /**
      * Mô tả : đóng form vendor detail
      * Created by: Nguyễn Đức Toán - MF1095 (21/05/2022)
      */
     exitVendor() {
       this.vendorOpen = false;
+    },
+    keyup(e) {
+      try {
+        if (e.keyCode == 112 && e.ctrlKey) {
+          e.preventDefault();
+          if (!this.isConfirm) {
+            this.openAddVendor();
+          }
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    keydown(e) {
+      try {
+        if (e.keyCode == 112 && e.ctrlKey) {
+          e.preventDefault();
+        }
+      } catch (error) {
+        console.log(error);
+      }
     },
   },
   created() {
@@ -558,6 +836,16 @@ export default {
   mounted() {
     try {
       this.getTableData();
+      window.addEventListener("keydown", this.keydown);
+      window.addEventListener("keyup", this.keyup);
+    } catch (error) {
+      console.log(error);
+    }
+  },
+  beforeUnmount() {
+    try {
+      window.removeEventListener("keydown", this.keydown);
+      window.removeEventListener("keyup", this.keyup);
     } catch (error) {
       console.log(error);
     }
@@ -625,6 +913,9 @@ export default {
   margin-inline-end: 10px;
   color: #fff;
 }
+.page-content .counter .view-total .total {
+  font-size: 24px;
+}
 .page-content .sub-tab {
   display: flex;
   align-items: center;
@@ -675,5 +966,18 @@ export default {
   background: #fff;
   height: 100%;
   width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.list.no-content .sub img {
+  max-width: 200px;
+}
+.m-toast-box {
+  position: fixed;
+  top: 24px;
+  left: 40%;
+  z-index: 20;
 }
 </style>

@@ -10,5 +10,6 @@ namespace MISA.Web02.Core.Interfaces.Service
 {
     public interface IPaymentDetailService:IBaseService<PaymentDetail>
     {
+        public IEnumerable<PaymentDetail> GetByPaymentService(Guid id);
     }
 }

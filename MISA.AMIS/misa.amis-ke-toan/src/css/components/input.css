@@ -6,6 +6,12 @@
     position: relative;
 }
 
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
 .m-input .input-area input,
 textarea {
     box-sizing: border-box;
@@ -15,8 +21,9 @@ textarea {
     padding-left: 10px;
     padding-right: 10px;
     border-radius: 2px;
-    background-color: #fff;
+    /* background-color: #fff; */
     width: 100%;
+    -moz-appearance: "textfield";
 }
 
 .m-input .input-area textarea {

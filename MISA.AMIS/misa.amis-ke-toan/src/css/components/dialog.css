@@ -90,7 +90,7 @@
 
 .content-dialog .form .row {
     display: flex;
-    align-items: center;
+    /* align-items: center; */
 }
 
 .content-dialog .form .left,
@@ -111,7 +111,7 @@
 
 .content-dialog .form .row {
     display: flex;
-    align-items: center;
+    /* align-items: center; */
     padding-bottom: 12px;
 }
 
@@ -154,7 +154,7 @@
     justify-content: space-between;
 }
 
-@media only screen and (max-width: 1050px) {
+@media only screen and (max-width: 1200px) {
     .m-dialog .dialog-info .dialog {
         width: 90%;
     }

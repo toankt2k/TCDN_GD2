@@ -18,7 +18,7 @@
     padding-left: 10px;
     padding-right: 62px;
     border-radius: 3px;
-    background-color: #fff;
+    /* background-color: #fff; */
     width: 100%;
 }
 
@@ -33,7 +33,7 @@
 
 .m-combobox input.combobox-input:focus~.combobox-icon {
     /* background-color: #E9EBEE; */
-    transform: rotate(180deg);
+    /* transform: rotate(180deg); */
 }
 
 .m-combobox input.combobox-input::placeholder {

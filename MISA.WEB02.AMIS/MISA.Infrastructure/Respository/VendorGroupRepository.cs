@@ -1,4 +1,5 @@
-﻿using MISA.Web02.Core.Entities;
+﻿using Microsoft.Extensions.Configuration;
+using MISA.Web02.Core.Entities;
 using MISA.Web02.Core.Interfaces.Repository;
 using System;
 using System.Collections.Generic;
@@ -8,7 +9,10 @@ using System.Threading.Tasks;
 
 namespace MISA.Infrastructure.Respository
 {
-    public class VendorGroupRepository:BaseRespository<VendorGroup>,IVendorGroupRepository
+    public class VendorGroupRepository : BaseRespository<VendorGroup>, IVendorGroupRepository
     {
+        public VendorGroupRepository(IConfiguration configuration) : base(configuration)
+        {
+        }
     }
 }

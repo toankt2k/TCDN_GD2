@@ -56,12 +56,12 @@ namespace MISA.Web02.Core.Entities
         /// <summary>
         /// khóa ngoại cho đối tượng(Vendor, employee,khách hàng ...)
         /// </summary>
-        public Guid? AccountObjectId { get; set; }
+        public Guid? VendorId { get; set; }
 
         /// <summary>
         /// tên đối tượng(Vendor, employee,khách hàng ...)
         /// </summary>
         [NotMap]
-        public string? AccountObjectName { get; set; }
+        public string? VendorName { get; set; }
     }
 }

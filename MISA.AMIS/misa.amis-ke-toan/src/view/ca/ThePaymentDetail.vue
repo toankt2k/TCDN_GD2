@@ -1,5 +1,5 @@
-<template>
-  <div class="m-popup">
+<template >
+  <div class="m-popup"  >
     <div class="payment-popup">
       <div class="popup-title">
         <div class="left">
@@ -8,7 +8,14 @@
             Phiếu chi {{ payment.PaymentCode }}
           </div>
           <div class="type-payment">
-            <MCombobox />
+            <MCombobox
+              :placeholder="'Loại chứng từ'"
+              :defaultList="this.dataStorage.paymentDetail.paymentTypeCombobox"
+              :idProp="'id'"
+              :nameProp="'name'"
+              v-model="paymentType"
+              :disabled="disabled"
+            />
           </div>
         </div>
         <div class="right">
@@ -23,7 +30,7 @@
             <div class="ic-help-dialog"></div>
           </div>
           <div class="exit">
-            <div class="ic-exit-dialog"></div>
+            <div class="ic-exit-dialog" @click="$router.back()"></div>
           </div>
         </div>
       </div>
@@ -37,31 +44,53 @@
                   <div class="lable"><label for="">Đối tượng</label></div>
                   <MCombobox
                     :displayProps="objectProp"
-                    :apiData="'http://localhost:5093/api/v1/Vendors'"
+                    :apiData="this.dataStorage.api.vendor.filter"
                     :isObject="true"
                     :idProp="'VendorId'"
                     :nameProp="'VendorCode'"
                     v-model="payment.VendorId"
                     @getSelected="getSelectedVendor"
+                    :disabled="disabled"
+                    ref="VendorId"
+                    :func="add"
                   />
                 </div>
                 <div class="right m-col-6">
-                  <div class="lable"><label for="">Người nhận</label></div>
-                  <MInput v-model="payment.ReceiverName" />
+                  <div class="lable"><label for="">Tên đối tượng</label></div>
+                  <MInput
+                    v-model="vendorName"
+                    :disabled="disabled"
+                    ref="VendorName"
+                  />
                 </div>
               </div>
               <div class="m-row m-col-12">
-                <div class="right m-col-12">
+                <div class="left m-col-6">
                   <div class="lable"><label for="">Địa chỉ</label></div>
-                  <MInput v-model="payment.Address" />
+                  <MInput
+                    v-model="payment.Address"
+                    :disabled="disabled"
+                    ref="Address"
+                  />
+                </div>
+
+                <div class="right m-col-6">
+                  <div class="lable"><label for="">Người nhận</label></div>
+                  <MInput
+                    v-model="payment.ReceiverName"
+                    :disabled="disabled"
+                    ref="ReceiverName"
+                  />
                 </div>
               </div>
               <div class="m-row m-col-12">
-                <div class="right m-col-12">
+                <div class="m-col-12">
                   <div class="lable"><label for="">Lý do chi</label></div>
                   <MInput
                     :placeholder="'Chi tiền cho'"
-                    v-model="payment.DescriptionPayment"
+                    v-model="descriptionPayment"
+                    :disabled="disabled"
+                    ref="DescriptionPayment"
                   />
                 </div>
               </div>
@@ -70,11 +99,13 @@
                   <div class="lable"><label for="">Nhân viên</label></div>
                   <MCombobox
                     :displayProps="employeeProp"
-                    :apiData="'http://localhost:5093/api/v1/Employees'"
+                    :apiData="this.dataStorage.api.employee.filter"
                     :isObject="true"
                     :idProp="'EmployeeId'"
-                    :nameProp="'EmployeeCode'"
+                    :nameProp="'EmployeeName'"
                     v-model="payment.EmployeeId"
+                    :disabled="disabled"
+                    ref="EmployeeId"
                   />
                 </div>
                 <div class="right m-col-6">
@@ -85,6 +116,9 @@
                         :placeholder="'Số lượng'"
                         :align="'right'"
                         v-model="payment.AttachDocumentAmount"
+                        :disabled="disabled"
+                        :type="'number'"
+                        ref="AttachDocumentAmount"
                       />
                     </div>
                     <div class="description" style="margin-left: 4px">
@@ -106,6 +140,8 @@
                     :lang="'vi'"
                     :clearable="false"
                     title-format="DD/MM/YYYY"
+                    :disabled="disabled"
+                    ref="AccountingDate"
                   />
                   <!-- eslint-enable -->
                 </div>
@@ -121,6 +157,8 @@
                     :lang="'vi'"
                     :clearable="false"
                     title-format="DD/MM/YYYY"
+                    :disabled="disabled"
+                    ref="PaymentDate"
                   />
                   <!-- eslint-enable -->
                 </div>
@@ -132,7 +170,11 @@
                       >Số phiếu chi (<span class="required">*</span>)</label
                     >
                   </div>
-                  <MInput ref="PaymentCode" v-model="payment.PaymentCode" />
+                  <MInput
+                    ref="PaymentCode"
+                    v-model="payment.PaymentCode"
+                    :disabled="disabled"
+                  />
                 </div>
               </div>
             </div>
@@ -140,7 +182,9 @@
           <div class="m-right summary-info m-col-2">
             <div class="total-payment">
               <div class="header">Tổng tiền</div>
-              <div class="total">{{totalAmount}}</div>
+              <div class="total">
+                {{ formatContent(payment.TotalAmount, "currency") }}
+              </div>
             </div>
           </div>
         </div>
@@ -149,14 +193,37 @@
             <a class="link">Hạch toán</a>
             <div class="type-currency">
               <div style="padding: 0px 10px 0px 20px">Loại tiền</div>
-              <div class="m-col-6">
+              <div class="m-col-1">
                 <MCombobox
                   :placeholder="'Loại tiền'"
                   :defaultList="this.dataStorage.paymentDetail.currencyCombobox"
-                  :idProp="'currencyId'"
-                  :nameProp="'CurrencyName'"
+                  :idProp="'id'"
+                  :nameProp="'code'"
+                  :isObject="true"
+                  :displayProps="this.dataStorage.paymentDetail.currencyProp"
+                  :quickAdd="false"
                   v-model="payment.CurrencyId"
-                  :readonly="readonly"
+                  @getSelected="getExchange"
+                  :disabled="disabled"
+                  ref="CurrencyId"
+                />
+              </div>
+              <div
+                style="padding: 0px 10px 0px 20px"
+                v-if="payment.CurrencyId != 1 && payment.CurrencyId"
+              >
+                Tỷ giá
+              </div>
+              <div
+                class="m-col-1"
+                v-if="payment.CurrencyId != 1 && payment.CurrencyId"
+              >
+                <MInput
+                  :placeholder="'Tỷ giá'"
+                  v-model="exchange"
+                  :disabled="true"
+                  :type="'currency'"
+                  :align="'right'"
                 />
               </div>
             </div>
@@ -165,12 +232,14 @@
         <div class="table-area">
           <div class="table">
             <MTableEditable
+              ref="PaymentDetailTable"
               :deleteFunc="true"
               :columns="columnOfPaymentDetail"
               :checkBox="false"
+              :counter="true"
               :defaultData="paymentDetail"
               @getData="getPaymentDetail"
-              :readonly="readonly"
+              :disabled="disabled"
             />
           </div>
         </div>
@@ -205,6 +274,8 @@
               :buttonType="'default'"
               :text="'Hủy'"
               :textColor="'#fff'"
+              ref="cancelBtn"
+              @click="$router.back()"
             />
           </div>
         </div>
@@ -215,6 +286,7 @@
               :text="'Cất'"
               :textColor="'#fff'"
               @click="savePayment"
+              ref="saveBtn"
             />
           </div>
           <div class="save-and-print-btn">
@@ -227,6 +299,13 @@
         </div>
       </div>
     </div>
+    <VendorDetail
+      ref="vendorDetail"
+      v-if="vendorOpen"
+      @exitForm="exitVendor"
+      @addToast="addToast"
+      @getVendor="getAddVendor"
+    />
     <ConfirmDialog
       :text="confirmDialogData.text"
       :type="confirmDialogData.type"
@@ -236,6 +315,14 @@
       :keyConfirm="confirmDialogData.key"
       v-if="isConfirm"
     />
+    <div class="m-toast-box">
+      <ToastMessage
+        v-for="(val, ind) in listToastMessage"
+        :key="ind"
+        :type="val.type"
+        :message="val.message"
+      />
+    </div>
   </div>
 </template>
 
@@ -247,6 +334,9 @@ import DatePicker from "vue-datepicker-next";
 import "vue-datepicker-next/index.css";
 import MTableEditable from "@/components/base/table/BaseTableEditable.vue";
 import ConfirmDialog from "@/components/base/dialog/BaseConfirmDialog.vue";
+import ToastMessage from "@/components/base/BaseToastMessage.vue";
+import VendorDetail from "@/view/vendor/VendorDetail.vue";
+import format from "@/js/lib/formatContent.js";
 import axios from "axios";
 export default {
   name: "ThePaymentDialog",
@@ -257,6 +347,8 @@ export default {
     DatePicker,
     MTableEditable,
     ConfirmDialog,
+    ToastMessage,
+    VendorDetail,
   },
   computed: {
     accountingDate: {
@@ -270,7 +362,12 @@ export default {
       },
       set(val) {
         try {
-          if(this.payment.AccountingDate==this.payment.PaymentDate)this.payment.PaymentDate = new Date(val);
+          if (
+            this.payment.AccountingDate.toDateString() ===
+            this.payment.PaymentDate.toDateString()
+          ) {
+            this.payment.PaymentDate = new Date(val);
+          }
           this.payment.AccountingDate = new Date(val);
         } catch (error) {
           return new Date();
@@ -288,14 +385,12 @@ export default {
       },
       set(val) {
         try {
-          if (new Date(val) <= new Date(this.payment.AccountingDate))
-            this.payment.PaymentDate = new Date(val);
+          this.payment.PaymentDate = new Date(val);
         } catch (error) {
           return new Date();
         }
       },
     },
-
     paymentDetail: {
       get() {
         try {
@@ -310,7 +405,7 @@ export default {
               DescriptionPaymentDetail: "",
               DebitAccountId: "",
               CreditAccountId: "",
-              CashAmount: "",
+              CashAmount: 0,
               VendorId: "",
               VendorName: "",
             },
@@ -327,7 +422,7 @@ export default {
               DescriptionPaymentDetail: "",
               DebitAccountId: "",
               CreditAccountId: "",
-              CashAmount: "",
+              CashAmount: 0,
               VendorId: "",
               VendorName: "",
             },
@@ -335,32 +430,53 @@ export default {
         }
       },
     },
+    descriptionPayment: {
+      set(val) {
+        let table = JSON.parse(this.payment.PaymentDetail);
+        if (table) {
+          table.forEach((item) => {
+            if (
+              item.DescriptionPaymentDetail == this.payment.DescriptionPayment
+            ) {
+              item.DescriptionPaymentDetail = val;
+            }
+          });
+        }
+        this.payment.PaymentDetail = JSON.stringify(table);
+        this.payment.DescriptionPayment = val;
+      },
+      get() {
+        return this.payment.DescriptionPayment;
+      },
+    },
+    vendorName: {
+      get() {
+        return this.payment.VendorName;
+      },
+      set(val) {
+        if (
+          `Chi tiền cho ${this.payment.VendorName}` ==
+            this.descriptionPayment ||
+          this.descriptionPayment == "Chi tiền cho "
+        ) {
+          this.descriptionPayment = "Chi tiền cho " + val;
+        }
+        this.payment.VendorName = val;
+      },
+    },
   },
   data() {
     return {
-      test: "1",
-      objectProp: [
-        {
-          id: "VendorName",
-          name: "Đối tượng",
-        },
-        {
-          id: "VendorCode",
-          name: "Mã đối tượng",
-        },
-        {
-          id: "Address",
-          name: "Địa chỉ",
-        },
-        {
-          id: "TaxCode",
-          name: "Mã số thuế",
-        },
-        {
-          id: "PhoneNumber",
-          name: "Số điện thoại",
-        },
-      ],
+      //data cho toastmessage
+      listToastMessage: [],
+      //tỷ lệ đổi tiền
+      exchange: 1,
+      //kiểu chi
+      paymentType: 7,
+      vendorOpen: false,
+      //vendor
+      objectProp: this.dataStorage.vendorDetail.vendorProp,
+      //prop cho combox nhân viên
       employeeProp: [
         {
           id: "EmployeeCode",
@@ -410,14 +526,15 @@ export default {
           component: true,
           componentData: {
             name: "MCombobox",
-            objectName:'DebitAccount',
+            objectName: "DebitAccount",
             prop: {
               displayProps: this.dataStorage.paymentDetail.accountDebitProp,
               defaultList: this.dataStorage.paymentDetail.accountDebit,
               isObject: true,
-              nameObject:"DebitAccountNumber",
+              quickAdd: false,
+              nameObject: "DebitAccountCode",
               idProp: "DebitAccountId",
-              nameProp: "DebitAccountNumber",
+              nameProp: "DebitAccountCode",
               ref: "DebitAccountId",
             },
           },
@@ -437,14 +554,15 @@ export default {
           component: true,
           componentData: {
             name: "MCombobox",
-            objectName:'CreditAccount',
+            objectName: "CreditAccount",
             prop: {
               displayProps: this.dataStorage.paymentDetail.accountCreditProp,
               defaultList: this.dataStorage.paymentDetail.accountCreadit,
               isObject: true,
-              nameObject:"CreditAccountNumber",
+              quickAdd: false,
+              nameObject: "CreditAccountCode",
               idProp: "CreditAccountId",
-              nameProp: "CreditAccountNumber",
+              nameProp: "CreditAccountCode",
               ref: "CreditAccountId",
             },
           },
@@ -460,7 +578,7 @@ export default {
           align: "right",
           edit: true,
           count: true,
-          type: "number",
+          type: "currency",
         },
         {
           id: "VendorId",
@@ -477,15 +595,16 @@ export default {
           component: true,
           componentData: {
             name: "MCombobox",
-            objectName:'Vendor',
+            objectName: "Vendor",
             prop: {
               displayProps: this.dataStorage.vendorDetail.vendorProp,
-              apiData: "http://localhost:5093/api/v1/Vendors",
+              apiData: this.dataStorage.api.vendor.filter,
               isObject: true,
+              quickAdd: false,
               idProp: "VendorId",
-              nameObject:"VendorName",
+              nameObject: "VendorName",
               nameProp: "VendorCode",
-              ref:"VendorId"
+              ref: "VendorId",
             },
           },
         },
@@ -501,18 +620,38 @@ export default {
           edit: false,
           count: false,
           type: "text",
-          comboboxName:true,
-          refReferent:"VendorId"
+          comboboxName: true,
+          refReferent: "VendorId",
         },
       ],
       //không cho phép sửa
-      readonly: false,
+      disabled: false,
       payment: {},
       //show confirm dialog
       isConfirm: false,
       //danh sách cac input lỗi
       listErrorInput: [],
-      totalAmount:0,
+      oldVendorId: "",
+      //tab index
+      tabIndex: [
+        "VendorId",
+        "VendorName",
+        "Address",
+        "ReceiverName",
+        "DescriptionPayment",
+        "EmployeeId",
+        "AttachDocumentAmount",
+        "AccountingDate",
+        "PaymentDate",
+        "PaymentCode",
+        "CurrencyId",
+        "saveBtn",
+        "cancelBtn",
+      ],
+      //vị trí hiện tại của tab index
+      curIndex: 0,
+      //form đang được xem
+      isView: false,
     };
   },
   methods: {
@@ -521,8 +660,8 @@ export default {
      * Created by: Nguyễn Đức Toán - MF1095 (23/05/2022)
      */
     savePayment() {
-      console.log(this.payment);
-      // if(!this.validate())return;
+      if (this.disabled) return;
+      if (!this.validate()) return;
       this.addPayment();
     },
     /**
@@ -537,14 +676,16 @@ export default {
           data.PaymentDetail = JSON.parse(data.PaymentDetail);
         axios({
           method: "POST",
-          url: "http://localhost:5093/api/v1/Payments",
+          url: this.dataStorage.api.payment.add,
           data: data,
         })
-          .then((res) => {
-            console.log(res);
+          .then(() => {
+            let toast = this.resource.toastMessage.addSuccess;
+            this.addToast(toast);
+            this.isView = true;
+            this.disabled = true;
           })
           .catch((res) => {
-            console.log(res);
             if (res.response.status == 400) {
               let confirm = {
                 name: "dataError",
@@ -561,6 +702,11 @@ export default {
         console.log(error);
       }
     },
+    //thay đổi tỷ giá tiền tệ
+    getExchange(data) {
+      this.exchange = data.exchange;
+      this.payment.TotalAmount = this.totalAmount * data.exchange;
+    },
     /**
      * Mô tả : lấy số phiếu chi mới nhất
      * Created by: Nguyễn Đức Toán - MF1095 (24/05/2022)
@@ -570,11 +716,10 @@ export default {
         let me = this;
         await axios({
           method: "GET",
-          url: "http://localhost:5093/api/v1/Payments/NewPaymentCode",
+          url: this.dataStorage.api.payment.getNewCode,
           async: true,
         })
           .then((res) => {
-            console.log(res);
             me.payment.PaymentCode = res.data;
           })
           .catch((res) => {
@@ -590,23 +735,38 @@ export default {
      */
     validate() {
       try {
-        // let inputs = this.$refs;
+        let isOk = true;
+        this.listErrorInput = [];
+        if (
+          new Date(this.payment.PaymentDate.toDateString()) >
+          new Date(this.payment.AccountingDate.toDateString())
+        ) {
+          this.listErrorInput.push({
+            id: "AccountingDate",
+            title: "Ngày hạch toán phải lớn hơn hoặc bằng ngày chứng từ.",
+          });
+          isOk = false;
+        }
         if (!this.payment.PaymentCode) {
+          this.listErrorInput.push({
+            id: "PaymentCode",
+            title: "Số phiếu chi không được trống.",
+          });
+          isOk = false;
+        }
+        if (!isOk) {
+          let input = this.listErrorInput[0];
           let confirm = {
-            name: "emptyError",
+            name: "emptyInput",
             button: this.resource.confirmDialogData.errorInputConfirm,
             align: "center",
             type: "error",
-            text: `Số phiếu chi không được trống`,
-            key: "emptyError",
+            text: input.title,
+            key: "emptyInput",
           };
           this.openConfirm(confirm);
-          this.listErrorInput.push({
-            id: "PaymentCode",
-            title: "Số phiếu chi không được trống",
-          });
         }
-        return true;
+        return isOk;
       } catch (error) {
         console.log(error);
       }
@@ -623,14 +783,14 @@ export default {
       try {
         if (this.listErrorInput.length > 0) {
           let input = this.listErrorInput[0];
-          this.$refs[input.id].setErrorFocus(input.title);
+          let target = this.$refs[input.id];
+          if (target) target.setErrorFocus(input.title);
         }
       } catch (error) {
         console.log(error);
       }
     },
     confirm(key, val) {
-      console.log(key, val);
       let me = this;
       switch (key) {
         case "emptyError": //input nhập trống
@@ -638,6 +798,37 @@ export default {
             case 1: //đóng
               this.isConfirm = false;
               this.focusErrorInput();
+              break;
+            default:
+              break;
+          }
+          break;
+        case "emptyInput": //input nhập trống
+          switch (val) {
+            case 1: //đóng
+              this.isConfirm = false;
+              break;
+            default:
+              break;
+          }
+          break;
+        case "removeAll": //input nhập trống
+          switch (val) {
+            case 1: //đóng
+              this.isConfirm = false;
+              break;
+            case 2: //đóng
+              this.payment.PaymentDetail = JSON.stringify([
+                {
+                  DescriptionPaymentDetail: this.payment.DescriptionPayment,
+                  DebitAccountId: "",
+                  CreditAccountId: "",
+                  CashAmount: 0,
+                  VendorId: this.payment.VendorId,
+                  VendorName: this.payment.VendorName,
+                },
+              ]);
+              this.isConfirm = false;
               break;
             default:
               break;
@@ -653,7 +844,6 @@ export default {
               this.isConfirm = false;
 
               this.getNewPaymentCode().then(() => {
-                console.log(me.payment);
                 me.savePayment();
               });
               break;
@@ -666,18 +856,36 @@ export default {
           break;
       }
     },
-    // /**
-    //  * Mô tả : disable ngày lớn hơn hiện tại trả về true nếu ngày lớn hơn hiện tại
-    //  * Created by: Nguyễn Đức Toán - MF1095 (06/05/2022)
-    //  */
-    // afterToday(date) {
-    //   return date > new Date();
-    // },
-    getSelectedVendor(data){
+    /**
+     * Mô tả : disabled ngày lớn hơn hiện tại trả về true nếu ngày lớn hơn hiện tại
+     * Created by: Nguyễn Đức Toán - MF1095 (06/05/2022)
+     */
+    getAddVendor(data) {
+      this.payment.VendorId = data.VendorId;
+      this.$refs["VendorId"].pushNewObject(data);
+      // let target = this.$refs["PaymentDetailTable"];
+      // if (target) target.addNewObject(data, "VendorId");
+      this.getSelectedVendor(data);
+    },
+    getSelectedVendor(data) {
       try {
-        if(data.VendorType==1)this.payment.ReceiverName = data.ReceiverName;
-        if(data.VendorType==0)this.payment.ReceiverName = data.ContactLegalRep;
+        if (this.isView) return;
+        if (data.VendorType == 1) this.payment.ReceiverName = data.ReceiverName;
+        if (data.VendorType == 0)
+          this.payment.ReceiverName = data.ContactLegalRep;
         this.payment.Address = data.Address;
+        this.vendorName = data.VendorName;
+        let table = JSON.parse(this.payment.PaymentDetail);
+        if (table) {
+          table.forEach((item) => {
+            if (item.VendorId == this.oldVendorId || !item.VendorId) {
+              item.VendorId = data.VendorId;
+              item.VendorName = data.VendorName;
+            }
+          });
+        }
+        this.payment.PaymentDetail = JSON.stringify(table);
+        this.oldVendorId = this.payment.VendorId;
       } catch (error) {
         console.log(error);
       }
@@ -686,14 +894,24 @@ export default {
      * Mô tả : lấy dữ liêu jtuwf bảng payment detail
      * Created by: Nguyễn Đức Toán - MF1095 (23/05/2022)
      */
-    getPaymentDetail(data,count) {
+    getPaymentDetail(data, count) {
       try {
-        console.log(data, count);
         this.payment.PaymentDetail = JSON.stringify(data);
-        this.totalAmount = count['CashAmount'];
+        this.totalAmount = count["CashAmount"];
+        this.payment.TotalAmount = count["CashAmount"] * this.exchange;
       } catch (error) {
         console.log(error);
       }
+    },
+    exitVendor() {
+      this.vendorOpen = false;
+    },
+    add() {
+      this.vendorOpen = true;
+      this.$nextTick(() => {
+        this.$refs["vendorDetail"].isAdd = true;
+        this.$refs["vendorDetail"].getNewVendorCode();
+      });
     },
     /**
      * Mô tả : thêm dòng cho bảng payment detail
@@ -701,14 +919,35 @@ export default {
      */
     addRow() {
       try {
-        console.log(this.payment.PaymentDetail);
+        if (this.isView) return;
         if (this.payment.PaymentDetail) {
           let temp = JSON.parse(this.payment.PaymentDetail);
-          temp.push({});
+          if (temp.length >= 1) {
+            let newRow = {};
+            Object.assign(newRow, temp[temp.length - 1]);
+            newRow.CashAmount = 0;
+            temp.push(newRow);
+          } else {
+            temp.push({
+              DescriptionPaymentDetail: this.payment.DescriptionPayment,
+              DebitAccountId: "",
+              CreditAccountId: "",
+              CashAmount: 0,
+              VendorId: this.payment.VendorId,
+              VendorName: this.payment.VendorName,
+            });
+          }
           this.payment.PaymentDetail = JSON.stringify(temp);
         } else {
-          let temp = JSON.parse(JSON.stringify([{}]));
-          temp.push({});
+          let temp = JSON.parse(JSON.stringify([]));
+          temp.push({
+            DescriptionPaymentDetail: this.payment.DescriptionPayment,
+            DebitAccountId: "",
+            CreditAccountId: "",
+            CashAmount: 0,
+            VendorId: this.payment.VendorId,
+            VendorName: this.payment.VendorName,
+          });
           this.payment.PaymentDetail = JSON.stringify(temp);
         }
       } catch (error) {
@@ -721,37 +960,192 @@ export default {
      */
     removeRow() {
       try {
-        let temp = JSON.parse(this.payment.PaymentDetail);
-        temp = [];
-        temp.push({});
-        this.payment.PaymentDetail = JSON.stringify(temp);
+        if (this.isView) return;
+        let confirm = {
+          name: "removeAll",
+          button: this.resource.confirmDialogData.delete,
+          // align: "center",
+          type: "warning",
+          text: "Bạn có thực sự muốn xóa tất cả các dòng đã nhập không?",
+          key: "removeAll",
+        };
+        this.openConfirm(confirm);
       } catch (error) {
         console.log(error);
       }
     },
+    /**
+     * Mô tả : thêm 1 thông báo vào toastmess sau 4s thì xóa
+     * Created by: Nguyễn Đức Toán - MF1095 (15/04/2022)
+     */
+    addToast(toast) {
+      try {
+        this.listToastMessage.push(toast);
+        setTimeout(() => {
+          this.listToastMessage.shift();
+        }, 4500);
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    /**
+     * Mô tả : lấy dữ liệu payment và bind lên form
+     * Created by: Nguyễn Đức Toán - MF1095 (26/05/2022)
+     */
+    getPayment(id) {
+      try {
+        if (!id) return;
+        axios({
+          url: `${this.dataStorage.api.payment.getById}/${id}`,
+          method: "GET",
+        })
+          .then((res) => {
+            this.payment = res.data;
+            if (!this.payment.CurrenceId) {
+              this.payment.CurrencyId = 1;
+            }
+          })
+          .catch((res) => {
+            console.log(res);
+          });
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    /**
+     * Mô tả : format đinh dạng dữ liệu
+     * Created by: Nguyễn Đức Toán - MF1095 (27/05/2022)
+     */
+    formatContent(val, key) {
+      switch (key) {
+        case "currency":
+          return format.currencyFormatDE(val);
+        default:
+          break;
+      }
+    },
+
+    /**
+     * Mô tả : lấy dữ liệu payment và bind lên form
+     * Created by: Nguyễn Đức Toán - MF1095 (26/05/2022)
+     */
+    getDetailOfPayment(id) {
+      try {
+        if (!id) return;
+        axios({
+          url: `${this.dataStorage.api.paymentDetail.getByPayment}/${id}`,
+          method: "GET",
+        })
+          .then((res) => {
+            this.paymentDetail = res.data;
+          })
+          .catch((res) => {
+            console.log(res);
+          });
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    //tab in dẽ
+    tab(e) {
+      try {
+        if (e.keyCode != 9) return;
+        if (this.curIndex + 1 >= this.tabIndex.length) {
+          this.curIndex = -1;
+        }
+        this.curIndex += 1;
+        let ref = this.tabIndex[this.curIndex];
+        if (!(ref == "AccountingDate" || ref == "PaymentDate")) {
+          e.preventDefault();
+          let target = this.$refs[ref];
+          if (target) {
+            target.setFocus(true);
+          }
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    keyup(e) {
+      try {
+        if (e.keyCode == 112 && e.ctrlKey) {
+          e.preventDefault();
+          if (!this.isConfirm) {
+            this.openAddVendor();
+          }
+        }
+        if (e.keyCode == 27) {
+          e.preventDefault();
+          if (!this.isConfirm) {
+            this.$router.back()
+          }
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    keydown(e) {
+      try {
+        if (e.keyCode == 112 && e.ctrlKey) {
+          e.preventDefault();
+        }
+        if (e.keyCode == 27) {
+          e.preventDefault();
+        }
+      } catch (error) {
+        console.log(error);
+      }
+      
+    },
   },
   mounted() {
     try {
+      let id = this.$route.params.id;
+      if (id) {
+        this.isView = true;
+        this.disabled = true;
+        this.getPayment(id);
+        this.getDetailOfPayment(id);
+        return;
+      }
+      if (!this.payment.CurrencyId) {
+        this.payment.CurrencyId = 1;
+      }
       if (!this.payment.AccountingDate)
         this.payment.AccountingDate = new Date();
       if (!this.payment.PaymentDate) this.payment.PaymentDate = new Date();
-      this.payment.DescriptionPayment = 'Chi tiền cho '
+      this.payment.DescriptionPayment = "Chi tiền cho ";
+      this.payment.PaymentDetail = JSON.stringify([
+        {
+          DescriptionPaymentDetail: this.payment.DescriptionPayment,
+          DebitAccountId: "1",
+          CreditAccountId: "1",
+          CashAmount: 0,
+          VendorId: this.payment.VendorId,
+          VendorName: this.payment.VendorName,
+        },
+      ]);
       this.getNewPaymentCode();
+      let firstInput = this.$refs[this.tabIndex[0]];
+      if (firstInput) {
+        firstInput.setFocus(true);
+      }
+      window.addEventListener("keydown", this.keydown);
+      window.addEventListener("keyup", this.keyup);
+    } catch (error) {
+      console.log(error);
+    }
+  },
+  beforeUnmount() {
+    try {
+      window.removeEventListener("keydown", this.keydown);
+      window.removeEventListener("keyup", this.keyup);
     } catch (error) {
       console.log(error);
     }
   },
   watch: {
-    // payment: {
-    //   handler: function(val, oldVal) {
-    //     if(oldVal == val)return;
-    //     let tempPaymentDetail = JSON.parse(this.payment.PaymentDetail);
-    //     tempPaymentDetail.forEach(element => {
-    //       element.
-    //     });
-    //   },
-    //   deep: true
-    // }
+    
   },
 };
 </script>
@@ -883,7 +1277,10 @@ export default {
   padding-left: 16px;
 }
 .m-popup .popup-content .form .input-left .left {
-  padding-right: 12px;
+  padding-right: 6px;
+}
+.m-popup .popup-content .form .input-left .right {
+  padding-left: 6px;
 }
 .m-popup .popup-content .table-area {
   background-color: #fff;
@@ -898,17 +1295,18 @@ export default {
   padding: 8px 24px 0px 24px;
   position: sticky;
   left: 0;
+  z-index: 5;
 }
 .m-popup .popup-content .table-area-1 .title {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   padding-bottom: 16px;
 }
 .m-popup .popup-content .table-area-1 .title .type-currency {
   display: flex;
   align-items: center;
   justify-content: end;
+  flex: 1;
 }
 .m-popup .popup-content .table-area-1 .title .link {
   white-space: nowrap;
@@ -1002,5 +1400,11 @@ export default {
 .m-popup .popup-footer .m-right {
   display: flex;
   align-items: center;
+}
+.m-toast-box {
+  position: fixed;
+  top: 24px;
+  left: 40%;
+  z-index: 20;
 }
 </style>

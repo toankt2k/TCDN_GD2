@@ -11,7 +11,7 @@
         @mousemove="stopDraggable"
         type="text-area"
         :rows="rows"
-        :readonly="readonly"
+        :disabled="readonly"
       ></textarea>
       <div class="input-icon" :class="classIcon" v-if="classIcon"></div>
     </div>

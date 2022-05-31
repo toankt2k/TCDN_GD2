@@ -1,5 +1,5 @@
 <template>
-  <div class="combobox-container" ref="combobox" :title="titleError">
+  <div class="combobox-container"  ref="combobox" :title="titleError" :style="{'background-color':disabled?'#3b3b3b0f':''}">
     <div class="value-combobox d-flex alignt-center">
       <div
         class="select-item"
@@ -14,22 +14,23 @@
         </div>
       </div>
       <input
+      ref="input"
         type="text"
         @keyup="deleteEvent($event)"
         v-model="valueCB"
         @keydown="handleDeleteEvent($event)"
         @input="handleInput"
-        @focus="setFocus()"
-        :readonly="readonly"
+        @focus="setFocus(true)"
+        :disabled="disabled"
       />
     </div>
     <div class="add">
-      <button>
+      <button :style="{'background-color':disabled?'#3b3b3b00':''}">
         <div class="mi mi-16"></div>
       </button>
     </div>
-    <div class="action">
-      <button @click="!this.readonly?isShow = !isShow:isShow=isShow">
+    <div class="action" style="border-left:1px solid #bbb; border-radius-top-left:0;border-radius-bottom-left:0">
+      <button @click="!this.disabled?isShow = !isShow:isShow=isShow" :style="{'background-color':disabled?'#3b3b3b00':''}">
         <div class="mi mi-16"></div>
       </button>
     </div>
@@ -41,8 +42,8 @@
       <table :class="{ 'table-one-column': isOneColumn }">
         <thead>
           <tr>
-            <th style="font-weight: 600">Mã đơn vị</th>
-            <th style="font-weight: 600">Tên đơn vị</th>
+            <th style="font-weight: 600">Mã nhóm NCC</th>
+            <th style="font-weight: 600">Tên nhóm NCC</th>
             <th></th>
           </tr>
         </thead>
@@ -91,6 +92,7 @@ export default {
 
       timeOut: null,
       model: [],
+      onFocus:false,
     };
   },
   props: {
@@ -122,7 +124,7 @@ export default {
       type: Boolean,
       default: true,
     },
-    readonly: {
+    disabled: {
       type: Boolean,
       default: false,
     },
@@ -154,8 +156,8 @@ export default {
               this.values = response.data.List;
             }
           })
-          .catch((e) => {
-            console.log(e);
+          .catch((error) => {
+            console.log(error);
           });
       } else {
         this.values = this.valueOption;
@@ -185,11 +187,15 @@ export default {
      * Created date: 14/04/2022
      */
     modelValue(newVal,oldVal) {
-      if(newVal==oldVal)return;
-      if (newVal == "") {
-        this.valueCB = "";
-      }else{
-        this.valueChecked = JSON.parse(newVal)
+      try {
+        if(newVal==oldVal)return;
+        if (newVal == "") {
+          this.valueCB = "";
+        }else{
+          this.valueChecked = JSON.parse(newVal)
+        }
+      } catch (error) {
+        console.log(error);
       }
     },
   },
@@ -211,7 +217,7 @@ export default {
               if (response.status === 200) {
                 this.values = response.data.List;
                 this.isShow = true;
-                console.log(response.data);
+
               }
             })
             .catch((e) => {
@@ -241,7 +247,6 @@ export default {
       try {
         if (this.timer === 0) {
           this.reloadOption();
-          console.log("A");
         } else {
           clearTimeout(this.timeOut);
           this.timeOut = setTimeout(() => {
@@ -283,7 +288,7 @@ export default {
      */
     handleSelect(value) {
       try {
-        
+        if(this.disabled)return;
         var checked = this.valueChecked.find((x) => x[this.id] == value[this.id]);
         if (!checked) {
           this.valueChecked.push(value);
@@ -343,9 +348,13 @@ export default {
      * Mô tả : set focus cho combobox
      * Created by: Nguyễn Đức Toán - MF1095 (18/05/2022)
      */
-    setFocus() {
+    setFocus(focus) {
       try {
-        this.$refs.combobox.style.border = "1px solid #2ca01c";
+        this.onFocus = true;
+        if (focus) {
+          this.$refs.input.focus();
+          this.focus = false;
+        }
       } catch (error) {
         console.log(error);
       }
@@ -365,6 +374,9 @@ export default {
 }
 .error {
   border: 1px solid red;
+}
+.combobox-container:focus-within {
+  border: 1px solid #2ca01c;
 }
 
 .value-combobox {

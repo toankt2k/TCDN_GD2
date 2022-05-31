@@ -145,20 +145,20 @@ body {
     /* Edge */
     font-size: 12px;
     font-style: italic;
-    font-family: MISA notosans;
+    font-family: Notosans-regular !important;
 }
 
  :-ms-input-placeholder {
     /* Internet Explorer */
     font-size: 12px;
     font-style: italic;
-    font-family: MISA notosans;
+    font-family: Notosans-regular !important;
 }
 
  ::placeholder {
     font-size: 12px;
     font-style: italic;
-    font-family: MISA notosans;
+    font-family: Notosans-regular !important;
 }
 
 .d-flex {

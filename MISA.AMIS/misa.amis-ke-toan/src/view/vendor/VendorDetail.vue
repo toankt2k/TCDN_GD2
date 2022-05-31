@@ -4,7 +4,7 @@
       <div class="dialog" id="dialog" ref="dialogDragable">
         <div class="tool">
           <div class="help-button"></div>
-          <div class="exit-button" title="Đóng (ESC)" @click="exitForm"></div>
+          <div class="exit-button" title="Đóng (ESC)" @click="exitFormConfirm"></div>
         </div>
         <div class="title-dialog">
           <div class="title">Thông tin nhà cung cấp</div>
@@ -13,7 +13,7 @@
               :button="vendorTypeRadio.button"
               :id="vendorTypeRadio.id"
               :name="vendorTypeRadio.name"
-              v-model="vendor.VendorType"
+              v-model="vendorType"
             />
           </div>
           <div class="selection-type">
@@ -36,7 +36,7 @@
                       <MInput
                         ref="TaxCode"
                         v-model="vendor.TaxCode"
-                        :readonly="readonly"
+                        :disabled="readonly"
                       />
                     </div>
                   </div>
@@ -48,7 +48,7 @@
                       <MInput
                         ref="VendorCode"
                         v-model="vendor.VendorCode"
-                        :readonly="readonly"
+                        :disabled="readonly"
                       />
                     </div>
                   </div>
@@ -62,7 +62,7 @@
                       <MInput
                         ref="VendorName"
                         v-model="vendor.VendorName"
-                        :readonly="readonly"
+                        :disabled="readonly"
                       />
                     </div>
                   </div>
@@ -74,7 +74,7 @@
                       <MTextArea
                         :placeholder="'VD: Số 82 Duy Tân, Dịch Vọng, Cầu Giấy, Hà Nội'"
                         v-model="vendor.Address"
-                        :readonly="readonly"
+                        :disabled="readonly"
                       />
                     </div>
                   </div>
@@ -88,7 +88,7 @@
                       <MInput
                         ref="PhoneNumber"
                         v-model="vendor.PhoneNumber"
-                        :readonly="readonly"
+                        :disabled="readonly"
                       />
                     </div>
                   </div>
@@ -98,7 +98,7 @@
                       <MInput
                         ref="Website"
                         v-model="vendor.Website"
-                        :readonly="readonly"
+                        :disabled="readonly"
                       />
                     </div>
                   </div>
@@ -108,13 +108,13 @@
                     <label for="">Nhóm nhà cung cấp</label>
                     <div class="field-input">
                       <MComboBoxMulti
-                        :displayProps="vendorGroupProp"
-                        :Api="'http://localhost:5093/api/v1/VendorGroups'"
+                        
+                        :Api="`${this.dataStorage.api.vendorGroup.getAll}`"
                         :id="'VendorGroupId'"
                         :name="'VendorGroupName'"
                         :code="'VendorGroupCode'"
                         v-model="vendorGroup"
-                        :readonly="readonly"
+                        :disabled="readonly"
                       />
                     </div>
                   </div>
@@ -126,12 +126,12 @@
                     >
                     <MCombobox
                       :displayProps="employeeProp"
-                      :apiData="'http://localhost:5093/api/v1/Employees'"
+                      :apiData="`${this.dataStorage.api.employee.filter}`"
                       :isObject="true"
                       :idProp="'EmployeeId'"
-                      :nameProp="'EmployeeCode'"
+                      :nameProp="'EmployeeName'"
                       v-model="vendor.EmployeeId"
-                      :readonly="readonly"
+                      :disabled="readonly"
                     />
                   </div>
                 </div>
@@ -200,7 +200,7 @@
                                     .prefixNameCombobox.name
                                 "
                                 v-model="vendor.PrefixNameId"
-                                :readonly="readonly"
+                                :disabled="readonly"
                               />
                             </div>
                           </div>
@@ -209,7 +209,7 @@
                               <MInput
                                 v-model="vendor.ContactName"
                                 :placeholder="'Họ và tên'"
-                                :readonly="readonly"
+                                :disabled="readonly"
                               />
                             </div>
                           </div>
@@ -220,8 +220,8 @@
                           <div class="field-input">
                             <MInput
                               v-model="vendor.ContactEmail"
-                              :placeholder="'ContactEmail'"
-                              :readonly="readonly"
+                              :placeholder="'Email'"
+                              :disabled="readonly"
                             />
                           </div>
                         </div>
@@ -232,7 +232,7 @@
                             <MInput
                               v-model="vendor.ContactPhoneNumber"
                               :placeholder="'Số điện thoại'"
-                              :readonly="readonly"
+                              :disabled="readonly"
                             />
                           </div>
                         </div>
@@ -251,7 +251,7 @@
                               <MInput
                                 :placeholder="'Đại diện theo pháp luật'"
                                 v-model="vendor.ContactLegalRep"
-                                :readonly="readonly"
+                                :disabled="readonly"
                               />
                             </div>
                           </div>
@@ -269,7 +269,7 @@
                               <MInput
                                 :placeholder="'Đại diện theo pháp luật'"
                                 v-model="vendor.ContactLegalRep"
-                                :readonly="readonly"
+                                :disabled="readonly"
                               />
                             </div>
                           </div>
@@ -285,7 +285,7 @@
                               <MInput
                                 :placeholder="'Họ và tên'"
                                 v-model="vendor.ContactName"
-                                :readonly="readonly"
+                                :disabled="readonly"
                               />
                             </div>
                           </div>
@@ -296,7 +296,7 @@
                               <MInput
                                 :placeholder="'Email'"
                                 v-model="vendor.ContactEmail"
-                                :readonly="readonly"
+                                :disabled="readonly"
                               />
                             </div>
                           </div>
@@ -307,7 +307,7 @@
                               <MInput
                                 :placeholder="'Số điện thoại'"
                                 v-model="vendor.ContactPhoneNumber"
-                                :readonly="readonly"
+                                :disabled="readonly"
                               />
                             </div>
                           </div>
@@ -337,7 +337,7 @@
                             :idProp="'ContractId'"
                             :nameProp="'ContractCode'"
                             v-model="vendor.ContractId"
-                            :readonly="readonly"
+                            :disabled="readonly"
                           />
                         </div>
                       </div>
@@ -349,7 +349,9 @@
                           <MInput
                             ref="MaxDebitDate"
                             v-model="vendor.MaxDebitDate"
-                            :readonly="readonly"
+                            :disabled="readonly"
+                            :type="'number'"
+                            :align="'right'"
                           />
                         </div>
                       </div>
@@ -359,7 +361,9 @@
                           <MInput
                             ref="MaxDebitAmount"
                             v-model="vendor.MaxDebitAmount"
-                            :readonly="readonly"
+                            :disabled="readonly"
+                            :type="'currency'"
+                            :align="'right'"
                           />
                         </div>
                       </div>
@@ -380,7 +384,7 @@
                             :nameProp="'DebitPaymentAccountCode'"
                             v-model="vendor.DebitPaymentAccountId"
                             ref="DebitPaymentAccountId"
-                            :readonly="readonly"
+                            :disabled="readonly"
                           />
                         </div>
                       </div>
@@ -403,7 +407,7 @@
                             :nameProp="'DebitPaymentAccountCode'"
                             v-model="vendor.DebitReceiptAccountId"
                             ref="DebitReceiptAccountId"
-                            :readonly="readonly"
+                            :disabled="readonly"
                           />
                         </div>
                       </div>
@@ -425,7 +429,7 @@
                         :checkBox="false"
                         :defaultData="bankInfo"
                         @getData="getDataOfBank"
-                        :readonly="readonly"
+                        :disabled="readonly"
                       />
                     </div>
                     <div
@@ -463,7 +467,7 @@
                                 :idProp="'CountryId'"
                                 :nameProp="'CountryName'"
                                 v-model="vendor.CountryId"
-                                :readonly="readonly"
+                                :disabled="readonly"
                               />
                             </div>
                           </div>
@@ -475,7 +479,7 @@
                                 :nameProp="'ProvinceName'"
                                 v-model="vendor.ProvinceId"
                                 :placeholder="'Tỉnh'"
-                                :readonly="readonly"
+                                :disabled="readonly"
                                 @getData="getData('Province')"
                               />
                             </div>
@@ -492,7 +496,7 @@
                                 :idProp="'DistrictId'"
                                 :nameProp="'DistrictName'"
                                 v-model="vendor.DistrictId"
-                                :readonly="readonly"
+                                :disabled="readonly"
                                 @getData="getData('District')"
                               />
                             </div>
@@ -505,7 +509,7 @@
                                 :idProp="'WardId'"
                                 :nameProp="'WardName'"
                                 v-model="vendor.WardId"
-                                :readonly="readonly"
+                                :disabled="readonly"
                                 @getData="getData('Ward')"
                               />
                             </div>
@@ -522,7 +526,7 @@
                           <div class="field-input">
                             <MInput
                               :placeholder="'Địa chỉ giao hàng'"
-                              :readonly="readonly"
+                              :disabled="readonly"
                             />
                           </div>
                         </div>
@@ -535,7 +539,7 @@
                       <MTextArea
                         :rows="11"
                         v-model="vendor.TextNote"
-                        :readonly="readonly"
+                        :disabled="readonly"
                       />
                     </div>
                   </div>
@@ -580,7 +584,7 @@
                       <MInput
                         ref="VendorCode"
                         v-model="vendor.VendorCode"
-                        :readonly="readonly"
+                        :disabled="readonly"
                       />
                     </div>
                   </div>
@@ -590,7 +594,7 @@
                       <MInput
                         ref="TaxCode"
                         v-model="vendor.TaxCode"
-                        :readonly="readonly"
+                        :disabled="readonly"
                       />
                     </div>
                   </div>
@@ -618,7 +622,7 @@
                             "
                             :placeholder="'Xưng hô'"
                             v-model="vendor.PrefixNameId"
-                            :readonly="readonly"
+                            :disabled="readonly"
                           />
                         </div>
                       </div>
@@ -627,7 +631,7 @@
                           <MInput
                             ref="VendorName"
                             v-model="vendor.VendorName"
-                            :readonly="readonly"
+                            :disabled="readonly"
                           />
                         </div>
                       </div>
@@ -641,39 +645,25 @@
                       <MTextArea
                         :placeholder="'VD: Số 82 Duy Tân, Dịch Vọng, Cầu Giấy, Hà Nội'"
                         v-model="vendor.Address"
-                        :readonly="readonly"
+                        :disabled="readonly"
                       />
                     </div>
                   </div>
                 </div>
               </div>
               <div class="right m-col-6" style="align-item: start">
-                <!-- <div class="row">
-                  <div class="m-col-5">
-                    <label for="">Điện thoại</label>
-                    <div class="field-input">
-                      <MInput ref="PhoneNumber" v-model="vendor.PhoneNumber" />
-                    </div>
-                  </div>
-                  <div class="m-col-7" style="padding-left: 16px">
-                    <label for="">Website</label>
-                    <div class="field-input">
-                      <MInput ref="Website" v-model="vendor.Website" />
-                    </div>
-                  </div>
-                </div> -->
                 <div class="row">
                   <div class="m-col-12">
                     <label for="">Nhóm nhà cung cấp</label>
                     <div class="field-input">
                       <MComboBoxMulti
-                        :displayProps="vendorGroupProp"
-                        :Api="'http://localhost:5093/api/v1/VendorGroups'"
+                        
+                        :Api="`${this.dataStorage.api.vendorGroup.getAll}`"
                         :id="'VendorGroupId'"
                         :name="'VendorGroupName'"
                         :code="'VendorGroupCode'"
                         v-model="vendor.VendorGroup"
-                        :readonly="readonly"
+                        :disabled="readonly"
                       />
                     </div>
                   </div>
@@ -686,12 +676,12 @@
                     <div class="field-input">
                       <MCombobox
                         :displayProps="employeeProp"
-                        :apiData="'http://localhost:5093/api/v1/Employees'"
+                        :apiData="`${this.dataStorage.api.employee.filter}`"
                         :isObject="true"
                         :idProp="'EmployeeId'"
                         :nameProp="'EmployeeName'"
                         v-model="vendor.EmployeeId"
-                        :readonly="readonly"
+                        :disabled="readonly"
                       />
                     </div>
                   </div>
@@ -748,7 +738,7 @@
                             <MInput
                               v-model="vendor.ContactEmail"
                               :placeholder="'Email'"
-                              :readonly="readonly"
+                              :disabled="readonly"
                             />
                           </div>
                         </div>
@@ -759,7 +749,7 @@
                             <MInput
                               v-model="vendor.ContactPhoneNumber"
                               :placeholder="'Số điện thoại'"
-                              :readonly="readonly"
+                              :disabled="readonly"
                             />
                           </div>
                         </div>
@@ -770,7 +760,7 @@
                             <MInput
                               v-model="vendor.LandLineNumber"
                               :placeholder="'Số điện thoại'"
-                              :readonly="readonly"
+                              :disabled="readonly"
                             />
                           </div>
                         </div>
@@ -784,7 +774,7 @@
                             <MInput
                               :placeholder="'Đại diện theo pháp luật'"
                               v-model="vendor.ContactLegalRep"
-                              :readonly="readonly"
+                              :disabled="readonly"
                             />
                           </div>
                         </div>
@@ -798,7 +788,7 @@
                             <MInput
                               v-model="vendor.IdentifyNumber"
                               :placeholder="'Số chứng minh nhân dân'"
-                              :readonly="readonly"
+                              :disabled="readonly"
                             />
                           </div>
                         </div>
@@ -813,8 +803,13 @@
                               :placeholder="'Ngày cấp'"
                               :lang="'vi'"
                               :clearable="false"
-                              :disabled-date="afterToday"
+                              :disabled-date="
+                                (date) => {
+                                  return date > new Date();
+                                }
+                              "
                               title-format="DD/MM/YYYY"
+                              :disabled="readonly"
                             />
                             <!-- eslint-enable -->
                           </div>
@@ -826,7 +821,7 @@
                             <MInput
                               v-model="vendor.IdentifyPlace"
                               :placeholder="'Nơi cấp'"
-                              :readonly="readonly"
+                              :disabled="readonly"
                             />
                           </div>
                         </div>
@@ -855,7 +850,7 @@
                             :idProp="'ContractId'"
                             :nameProp="'ContractCode'"
                             v-model="vendor.EmployeeId"
-                            :readonly="readonly"
+                            :disabled="readonly"
                           />
                         </div>
                       </div>
@@ -866,8 +861,10 @@
                         <div class="field-input">
                           <MInput
                             ref="LandLineNumber"
-                            :readonly="readonly"
+                            :disabled="readonly"
                             v-model="vendor.LandLineNumber"
+                            :type="'number'"
+                            :align="'right'"
                           />
                         </div>
                       </div>
@@ -877,7 +874,9 @@
                           <MInput
                             ref="Email"
                             v-model="vendor.Email"
-                            :readonly="readonly"
+                            :disabled="readonly"
+                            :type="'currnecy'"
+                            :align="'right'"
                           />
                         </div>
                       </div>
@@ -898,7 +897,7 @@
                             :nameProp="'DebitPaymentAccountCode'"
                             v-model="vendor.DebitPaymentAccountId"
                             ref="DebitPaymentAccountId"
-                            :readonly="readonly"
+                            :disabled="readonly"
                           />
                         </div>
                       </div>
@@ -921,7 +920,7 @@
                             :nameProp="'DebitPaymentAccountCode'"
                             v-model="vendor.DebitReceiptAccountId"
                             ref="DebitReceiptAccountId"
-                            :readonly="readonly"
+                            :disabled="readonly"
                           />
                         </div>
                       </div>
@@ -943,7 +942,7 @@
                         :checkBox="false"
                         :defaultData="bankInfo"
                         @getData="getDataOfBank"
-                        :readonly="readonly"
+                        :disabled="readonly"
                       />
                     </div>
                     <div
@@ -981,7 +980,7 @@
                                 :idProp="'CountryId'"
                                 :nameProp="'CountryName'"
                                 v-model="vendor.CountryId"
-                                :readonly="readonly"
+                                :disabled="readonly"
                               />
                             </div>
                           </div>
@@ -993,7 +992,7 @@
                                 :nameProp="'ProvinceName'"
                                 v-model="vendor.ProvinceId"
                                 :placeholder="'Tỉnh'"
-                                :readonly="readonly"
+                                :disabled="readonly"
                                 @getData="getData(isLoad, 'ProvinceId')"
                               />
                             </div>
@@ -1010,7 +1009,7 @@
                                 :idProp="'DistrictId'"
                                 :nameProp="'DistrictName'"
                                 v-model="vendor.DistrictId"
-                                :readonly="readonly"
+                                :disabled="readonly"
                               />
                             </div>
                           </div>
@@ -1022,7 +1021,7 @@
                                 :idProp="'WardId'"
                                 :nameProp="'WardName'"
                                 v-model="vendor.WardId"
-                                :readonly="readonly"
+                                :disabled="readonly"
                               />
                             </div>
                           </div>
@@ -1039,7 +1038,7 @@
                             <MInput
                               :placeholder="'Đại diện theo pháp luật'"
                               v-model="vendor.ContactLegalRep"
-                              :readonly="readonly"
+                              :disabled="readonly"
                             />
                           </div>
                         </div>
@@ -1052,7 +1051,7 @@
                       <MTextArea
                         :rows="11"
                         v-model="vendor.TextNote"
-                        :readonly="readonly"
+                        :disabled="readonly"
                       />
                     </div>
                   </div>
@@ -1085,7 +1084,7 @@
         </div>
       </div>
     </div>
-    <!-- <ConfirmDialog
+    <ConfirmDialog
       :text="confirmDialogData.text"
       :type="confirmDialogData.type"
       :listButton="confirmDialogData.button"
@@ -1093,7 +1092,7 @@
       @confirm="confirm"
       :keyConfirm="confirmDialogData.key"
       v-if="isConfirm"
-    /> -->
+    />
   </div>
 </template>
 
@@ -1109,7 +1108,7 @@ import MButton from "@/components/base/button/BaseButton.vue";
 import MTableEditable from "@/components/base/table/BaseTableEditable.vue";
 import DatePicker from "vue-datepicker-next";
 import "vue-datepicker-next/index.css";
-// import ConfirmDialog from "@/components/base/dialog/BaseConfirmDialog.vue";
+import ConfirmDialog from "@/components/base/dialog/BaseConfirmDialog.vue";
 import axios from "axios";
 
 export default {
@@ -1124,9 +1123,12 @@ export default {
     DatePicker,
     MTableEditable,
     MComboBoxMulti,
+    ConfirmDialog,
   },
   data() {
     return {
+      isConfirm: false,
+      confirmDialogData: {},
       vendorGroupProp: [
         {
           id: "VendorGroupName",
@@ -1228,6 +1230,7 @@ export default {
           type: "text",
         },
       ],
+      listErrorInput: [],
       //data cho radiobutton loại nhà cũng cấp
       vendorTypeRadio: this.dataStorage.vendorDetail.radioButtonTypeVendor,
       //đối tượng nhà cung cấp
@@ -1240,6 +1243,8 @@ export default {
       vendorId: "",
       //xác định form đang được xem không(xem thì k sửa và thêm)
       readonly: false,
+      oldVendorType:0,
+      oldVendor:{},
     };
   },
   computed: {
@@ -1320,6 +1325,15 @@ export default {
         }
       },
     },
+    vendorType: {
+      get() {
+        return this.vendor.VendorType;
+      },
+      set(newVal) {
+          this.vendor.VendorType = newVal;
+          this.oldVendorType = newVal;
+      },
+    },
   },
   methods: {
     /**
@@ -1339,6 +1353,7 @@ export default {
      */
     addRow() {
       try {
+        if (this.readonly) return;
         let bank = JSON.parse(this.vendor.Bank);
         bank.push({
           BankAccount: "",
@@ -1368,9 +1383,21 @@ export default {
      */
     deleteAllRow() {
       try {
+        if (this.readonly) return;
         this.vendor.Bank = JSON.stringify([
           { BankAccount: "", BankName: "", BankBranch: "", Distict: "" },
         ]);
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    /**
+     * Mô tả : thêm 1 thông báo vào toastmess sau 4s thì xóa
+     * Created by: Nguyễn Đức Toán - MF1095 (15/04/2022)
+     */
+    addToast(toast) {
+      try {
+        this.$emit("addToast", toast);
       } catch (error) {
         console.log(error);
       }
@@ -1380,8 +1407,8 @@ export default {
      * Created by: Nguyễn Đức Toán - MF1095 (21/05/2022)
      */
     saveVendor() {
-      console.log(this.vendor);
       try {
+        if (!this.validate()) return;
         if (this.isAdd) {
           this.addVendor();
         } else {
@@ -1391,6 +1418,137 @@ export default {
         console.log(error);
       }
     },
+    exitFormConfirm(){
+      if(!JSON.stringify(this.oldVendor)==JSON.stringify(this.vendor)){
+        let data = {
+            name: "exit",
+            button: this.resource.confirmDialogData.exitConfirm,
+            type: "info",
+            text: `Dữ liệu đã bị thay đổi, Bạn có muốn cất không?`,
+            key: "exit",
+          };
+          this.openConfirm(data);
+      }
+      else{
+        this.exitForm();
+      }
+    },
+    //validate dữ liệu
+    validate() {
+      try {
+        this.listErrorInput=[];
+        let isOk = true;
+        if (!this.vendor.VendorCode) {
+          this.listErrorInput.push({
+            id: "VendorCode",
+            title: "Mã nhà cung cấp không được để trống",
+          });
+          isOk = false;
+        }
+        if (!this.vendor.VendorName) {
+          this.listErrorInput.push({
+            id: "VendorName",
+            title: "Tên nhà cung cấp không được để trống",
+          });
+          isOk = false;
+        }
+        if(!isOk){
+          let input = this.listErrorInput[0];
+          let confirm = {
+            name: "emptyError",
+            button: this.resource.confirmDialogData.errorInputConfirm,
+            align: "center",
+            type: "error",
+            text: input.title,
+            key: "emptyError",
+          };
+          this.openConfirm(confirm);
+        }
+        return isOk;
+      } catch (error) {
+        console.log();
+      }
+    },
+    /**
+     * Mô tả : forcus vào ô đầu tiên lỗi
+     * Created by: Nguyễn Đức Toán - MF1095 (24/05/2022)
+     */
+    focusErrorInput() {
+      try {
+        if (this.listErrorInput.length > 0) {
+          let input = this.listErrorInput[0];
+          this.$refs[input.id].setErrorFocus(input.title);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    //nhận confirm
+    confirm(key, val) {
+      let me = this;
+      switch (key) {
+        case "emptyError": //input nhập trống
+          switch (val) {
+            case 1: //đóng
+              this.isConfirm = false;
+              this.focusErrorInput();
+              break;
+            default:
+              break;
+          }
+          break;
+        case "emptyInput": //input nhập trống
+          switch (val) {
+            case 1: //đóng
+              this.isConfirm = false;
+              break;
+            default:
+              break;
+          }
+          break;
+        case "dataError": //input nhập trống
+          switch (val) {
+            case 1: //không
+              this.isConfirm = false;
+              this.focusErrorInput();
+              break;
+            case 2: //có
+              this.isConfirm = false;
+              this.getNewVendorCode().then(() => {
+                me.savePayment();
+              });
+              break;
+            default:
+              break;
+          }
+          break;
+        case "exit": //input nhập trống
+          switch (val) {
+            case 1: //không
+              this.isConfirm = false;
+              break;
+            case 2: //có
+              this.isConfirm = false;
+              this.exitForm();
+              break;
+            case 3: //có
+              this.isConfirm = false;
+              this.saveVendor();
+              break;
+            default:
+              break;
+          }
+          break;
+
+        default:
+          break;
+      }
+    },
+    //mở confirm dialog
+    openConfirm(confirm) {
+      this.confirmDialogData = confirm;
+      this.isConfirm = true;
+    },
     /**
      * Mô tả : thêm vendor
      * Created by: Nguyễn Đức Toán - MF1095 (21/05/2022)
@@ -1399,13 +1557,16 @@ export default {
       try {
         let me = this;
         axios({
-          url: "http://localhost:5093/api/v1/Vendors",
+          url: this.dataStorage.api.vendor.add,
           method: "POST",
           contentType: "application/json",
           data: me.vendor,
         })
           .then((res) => {
-            console.log(res);
+            let toast = this.resource.toastMessage.addSuccess;
+            this.addToast(toast);
+            this.$emit("getVendor", res.data);
+            this.exitForm();
           })
           .catch((res) => {
             console.log(res);
@@ -1422,13 +1583,16 @@ export default {
       try {
         let me = this;
         axios({
-          url: `http://localhost:5093/api/v1/Vendors/${me.vendor.VendorId}`,
+          url: `${this.dataStorage.api.vendor.update}/${me.vendor.VendorId}`,
           method: "PUT",
           contentType: "application/json",
           data: me.vendor,
         })
           .then((res) => {
             console.log(res);
+            let toast = this.resource.toastMessage.editSuccess;
+            this.addToast(toast);
+            this.exitForm();
           })
           .catch((res) => {
             console.log(res);
@@ -1446,7 +1610,7 @@ export default {
         if (!id) return;
         let me = this;
         axios
-          .get(`http://localhost:5093/api/v1/Vendors/${id}`)
+          .get(`${this.dataStorage.api.vendor.getById}/${id}`)
           .then((res) => {
             console.log(res);
             me.vendor = res.data;
@@ -1466,10 +1630,10 @@ export default {
       try {
         let me = this;
         axios
-          .get(`http://localhost:5093/api/v1/Vendors/NewVendorCode`)
+          .get(this.dataStorage.api.vendor.getNewCode)
           .then((res) => {
-            console.log(res);
             me.vendor.VendorCode = res.data;
+            this.oldVendor = JSON.parse(JSON.stringify(this.vendor));
           })
           .catch((res) => {
             console.log(res);
@@ -1486,6 +1650,7 @@ export default {
       try {
         this.readonly = false;
         this.$emit("exitForm", true);
+
       } catch (error) {
         console.log(error);
       }
@@ -1494,21 +1659,21 @@ export default {
      * Mô tả : lấy ds tỉnh theo quốc gia
      * Created by: Nguyễn Đức Toán - MF1095 (22/05/2022)
      */
-    getProvince() {
+    async getProvince() {
       try {
         if (!this.vendor.CountryId) return;
         let me = this;
-        axios
+        await axios
           .get(
-            `http://wikunde.tk:5000/api/v1/Provincies/ByCountry/${me.vendor.CountryId}`
+            `${this.dataStorage.api.address.getByCountry}/${me.vendor.CountryId}`
           )
           .then((res) => {
-            me.$refs["ProvinceId"].setData(
+            this.$nextTick(()=>{
+              me.$refs["ProvinceId"].setData(
               JSON.parse(JSON.stringify(res.data))
             );
-            if (me.readonly) {
               me.getDistrict();
-            }
+            })
           })
           .catch((res) => {
             console.log(res);
@@ -1521,21 +1686,21 @@ export default {
      * Mô tả : lấy ds huyện theo tỉnh
      * Created by: Nguyễn Đức Toán - MF1095 (22/05/2022)
      */
-    getDistrict() {
+    async getDistrict() {
       try {
         if (!this.vendor.ProvinceId) return;
         let me = this;
-        axios
+        await axios
           .get(
-            `http://wikunde.tk:5000/api/v1/Districts/ByProvince/${me.vendor.ProvinceId}`
+            `${this.dataStorage.api.address.getByProvince}/${me.vendor.ProvinceId}`
           )
           .then((res) => {
-            me.$refs["DistrictId"].setData(
+            this.$nextTick(()=>{
+              me.$refs["DistrictId"].setData(
               JSON.parse(JSON.stringify(res.data))
             );
-            if (me.readonly) {
               me.getWard();
-            }
+            })
           })
           .catch((res) => {
             console.log(res);
@@ -1548,16 +1713,18 @@ export default {
      * Mô tả : lấy ds xã theo huyện
      * Created by: Nguyễn Đức Toán - MF1095 (22/05/2022)
      */
-    getWard() {
+    async getWard() {
       try {
         if (!this.vendor.DistrictId) return;
         let me = this;
-        axios
+        await axios
           .get(
-            `http://wikunde.tk:5000/api/v1/Wards/ByDistrict/${me.vendor.DistrictId}`
+            `${this.dataStorage.api.address.getByDistrict}/${me.vendor.DistrictId}`
           )
           .then((res) => {
-            me.$refs["WardId"].setData(JSON.parse(JSON.stringify(res.data)));
+            this.$nextTick(()=>{
+              me.$refs["WardId"].setData(JSON.parse(JSON.stringify(res.data)));
+            })
           })
           .catch((res) => {
             console.log(res);
@@ -1570,20 +1737,50 @@ export default {
      * Mô tả : lấy ds quốc gia
      * Created by: Nguyễn Đức Toán - MF1095 (22/05/2022)
      */
-    getCountry() {
+    async getCountry() {
       try {
         let me = this;
-        axios
-          .get(`http://wikunde.tk:5000/api/v1/Countries`)
+        await axios
+          .get(`${this.dataStorage.api.address.getAllCountries}`)
           .then((res) => {
-            me.$refs["CountryId"].setData(JSON.parse(JSON.stringify(res.data)));
-            if (me.readonly) {
+            this.$nextTick(()=>{
+              me.$refs["CountryId"].setData(JSON.parse(JSON.stringify(res.data)));
               me.getProvince();
-            }
+            });
           })
           .catch((res) => {
             console.log(res);
           });
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    keyup(e) {
+      try {
+        if (e.keyCode == 83 && e.ctrlKey) {
+          e.preventDefault();
+          if(!this.isConfirm){
+            this.saveVendor();
+          }
+        }
+        if (e.keyCode == 27) {
+          e.preventDefault();
+          if(!this.isConfirm){
+            this.exitForm();
+          }
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    keydown(e) {
+      try {
+        if (e.keyCode == 83 && e.ctrlKey) {
+          e.preventDefault();
+        }
+        if (e.keyCode == 27 && e.ctrlKey) {
+          e.preventDefault();
+        }
       } catch (error) {
         console.log(error);
       }
@@ -1618,12 +1815,30 @@ export default {
     },
   },
   watch: {
-    vendor: {
-      deep: true,
-      handler(newVal) {
-        console.log(newVal);
-      },
-    },
+    oldVendorType(newVal,oldVal){
+      this.$nextTick(() => {
+        if (newVal == 0 && oldVal!=newVal) {
+          let firstInput = this.$refs["TaxCode"];
+          if (firstInput) {
+            firstInput.setFocus(true);
+          }
+        }
+        if (newVal == 1 && oldVal!=newVal) {
+          let firstInput = this.$refs["VendorCode"];
+          if (firstInput) {
+            firstInput.setFocus(true);
+          }
+        }
+      });
+    }
+  },
+  beforeUnmount() {
+    try {
+      window.removeEventListener("keydown", this.keydown);
+      window.removeEventListener("keyup", this.keyup);
+    } catch (error) {
+      console.log(error);
+    }
   },
   mounted() {
     try {
@@ -1633,11 +1848,27 @@ export default {
       this.vendor.VendorType = "0";
       this.$nextTick(() => {
         this.getCountry();
+        if (this.vendor.VendorType == 0) {
+          let firstInput = this.$refs["TaxCode"];
+          if (firstInput) {
+            firstInput.setFocus(true);
+          }
+        }
+        if (this.vendor.VendorType == 1) {
+          let firstInput = this.$refs["VendorCode"];
+          if (firstInput) {
+            firstInput.setFocus(true);
+          }
+        }
       });
+      
+      window.addEventListener("keydown", this.keydown);
+      window.addEventListener("keyup", this.keyup);
     } catch (error) {
       console.log(error);
     }
   },
+
 };
 </script>
 
@@ -1676,7 +1907,7 @@ export default {
   text-align: center;
 }
 .content-dialog .form .tab-form .form-in-tab {
-  min-height: 220px;
+  min-height: 240px;
   border: 1px solid #babec5;
   width: 100%;
 }

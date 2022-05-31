@@ -29,7 +29,7 @@
       </div>
       <div class="container">
         <div class="table-area">
-          <MTableEditable ref="tableOption" :columns="columns" :defaultData="tableData" />
+          <MTableEditable ref="tableOption" :columns="columns" :defaultData="tableData" :isCount="false" />
         </div>
         <div class="view-other-area"></div>
       </div></div>
@@ -144,7 +144,37 @@ export default {
       } catch (error) {
         console.log(error);
       }
-    }
+    },
+    keyup(e) {
+      try {
+        if (e.keyCode == 83 && e.ctrlKey) {
+          e.preventDefault();
+          if(!this.isConfirm){
+            this.saveVendor();
+          }
+        }
+        if (e.keyCode == 27) {
+          e.preventDefault();
+          if(!this.isConfirm){
+            this.exitForm();
+          }
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    keydown(e) {
+      try {
+        if (e.keyCode == 83 && e.ctrlKey) {
+          e.preventDefault();
+        }
+        if (e.keyCode == 27 && e.ctrlKey) {
+          e.preventDefault();
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    },
   },
   watch:{
     data(newVal){
@@ -156,7 +186,19 @@ export default {
         console.log(error);
       }
     }
-  }
+  },
+  mounted() {
+    window.addEventListener("keydown", this.keydown);
+      window.addEventListener("keyup", this.keyup);
+  },
+  beforeUnMount() {
+    try {
+      window.removeEventListener("keydown", this.keydown);
+      window.removeEventListener("keyup", this.keyup);
+    } catch (error) {
+      console.log(error);
+    }
+  },
 };
 </script>
 
@@ -220,6 +262,8 @@ export default {
   bottom: 0;
   display: flex;
   justify-content: space-between;
+  z-index: 10;
+  background: #fff;
 }
 .custom-setting .dialog-content .footer-area .right {
   display: flex;

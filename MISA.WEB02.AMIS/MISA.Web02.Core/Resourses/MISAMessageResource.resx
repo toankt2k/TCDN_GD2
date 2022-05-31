@@ -122,11 +122,11 @@
     <comment>khi kiểm tra mã trùng</comment>
   </data>
   <data name="VN_CodeInvalid" xml:space="preserve">
-    <value>Mã không đúng định dạng (mã gồm 2 chữ và các chữ số: NV-12345, DP-12342).</value>
+    <value>Mã không đúng định dạng.</value>
     <comment>khi kiểm tra định dạng code</comment>
   </data>
   <data name="VN_DataDuplicate" xml:space="preserve">
-    <value>đã tồn tại trong hệ thống, vui lòng kiểm tra lại.</value>
+    <value>{0} đã tồn tại trong hệ thống, vui lòng kiểm tra lại.</value>
     <comment>khi có dữ liệu bị duplicate</comment>
   </data>
   <data name="VN_DataInvalid" xml:space="preserve">
@@ -137,6 +137,17 @@
     <value>Đối tượng không tồn tại.</value>
     <comment>khi kiểm tra tồn tại dữ liệu</comment>
   </data>
+  <data name="VN_FileNamePayment" xml:space="preserve">
+    <value>thu_chi_tien_mat</value>
+    <comment>tên file thu chi tiền mặt</comment>
+  </data>
+  <data name="VN_FileNameVendor" xml:space="preserve">
+    <value>danh_sach_nhà_cung_cap</value>
+    <comment>tên file nhà cung capa</comment>
+  </data>
+  <data name="VN_InvalidFormat" xml:space="preserve">
+    <value>{0} không đúng đinh dạng</value>
+  </data>
   <data name="VN_MisaExceptionMsg" xml:space="preserve">
     <value>Có lỗi xảy ra vui lòng liên hệ Misa để được hỗ trợ.</value>
     <comment>sử dụng msg này khi có exception</comment>
@@ -144,5 +155,18 @@
   <data name="VN_NotEmptyMsg" xml:space="preserve">
     <value>không được phép để trống.</value>
     <comment>sử dụng khi validate dữ liệu trống</comment>
+  </data>
+  <data name="VN_TitlePayment" xml:space="preserve">
+    <value>Thu chi tiền mặt</value>
+    <comment>title cho file thu chi</comment>
+  </data>
+  <data name="VN_TitleVendor" xml:space="preserve">
+    <value>danh_sach_nha_cung_cap</value>
+    <comment>titlr cho file nhà cung cap</comment>
+  </data>
+  <data name="VN_VendorHasPayment" xml:space="preserve">
+    <value>Xóa không thành công.
+Nhà cung cấp {0} đã có phát sinh. Bạn phải xóa các phát sinh liên quan trước khi xóa nhà cung cấp.</value>
+    <comment>khi xóa nhà cung cấp mà đang có dhuwnsg từ phát sinh</comment>
   </data>
 </root>

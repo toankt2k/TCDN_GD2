@@ -1,4 +1,5 @@
 ﻿using Dapper;
+using Microsoft.Extensions.Configuration;
 using MISA.Infrastructure.Helpers;
 using MISA.Web02.Core.Entities;
 using MISA.Web02.Core.Interfaces.Base;
@@ -22,14 +23,13 @@ namespace MISA.Infrastructure.Respository
     {
         #region Fields
         protected string _sqlPostgreslqString;
+        //protected string _sqlConnectionString;
 
         #endregion
         #region Constructor
-        public BaseRespository()
+        public BaseRespository(IConfiguration configuration)
         {
-            //_sqlConnectionString = "Host=3.0.89.182;Port=3306;Database=MISA.WEB02.NDTOAN;User Id=dev;Password=12345678";
-            _sqlPostgreslqString = "Host=140.238.38.197;Port=5432;Database=MISA_WEB02_AMIS;User Id=admin;Password=Anhtoankt12@";
-            //_sqlConnectionString = "Host=localhost;Port=3306;Database=MISA.WEB02.NDTOAN;User Id=root;Password=''";
+            _sqlPostgreslqString = configuration["PostgreSql"];
         }
         #endregion
         #region Methods
@@ -267,7 +267,7 @@ namespace MISA.Infrastructure.Respository
         /// <param name="pageSize"></param>
         /// <param name="filterText"></param>
         /// <returns></returns>
-        public string Filter(int currentPage, int pageSize, string? filterText)
+        public virtual string Filter(int currentPage, int pageSize, string? filterText)
         {
             var tableName = BindingEntity.ToSnakeCase(typeof(T).Name);
             //khởi tạo kết nối
@@ -289,6 +289,7 @@ namespace MISA.Infrastructure.Respository
             //trả về kết quả
             return data.Result.FirstOrDefault();
         }
+
         #endregion
     }
 }

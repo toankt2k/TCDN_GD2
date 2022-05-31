@@ -100,5 +100,10 @@ namespace MISA.Web02.Core.Services
             return result;
         }
 
+        public IEnumerable<PaymentDetail> GetByPaymentService(Guid id)
+        {
+            var res = _paymentDetailRepository.GetByPayment(id);
+            return res;
+        }
     }
 }

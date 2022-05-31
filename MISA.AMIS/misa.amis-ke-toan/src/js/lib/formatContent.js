@@ -22,6 +22,16 @@ const format = {
             console.log(error);
         }
     },
+    interger: function(value) {
+        var regex = /^(\d*)?$/;
+        if (regex.test(value)) return true
+        else return false
+    },
+    numeric: function(value) {
+        var regexDouble = /^(\d*)([,]\d{0,1})?$/;
+        if (regexDouble.test(value)) return true
+        else return false
+    },
 
     /**
      * hàm để định dạng kiểu dữ liệu tiền tệ
@@ -31,15 +41,25 @@ const format = {
     currencyVNFormat: (number) => {
         try {
             if (!number) return 0;
-            let result = Intl.NumberFormat('vi', {
+            var num = number.toString().split('.');
+            var result = Intl.NumberFormat('vi', {
                 style: 'currency',
                 currency: 'VND',
-            }).format(number);
-            return result;
+            }).format(num[0]);
+            if (num.length > 1) return `${result.toString().substring(0, result.length - 2) + ',' + num[1]}`
+            return result.toString().substring(0, result.length - 2);
         } catch (error) {
             console.log(error);
             return 0;
         }
+    },
+    currencyFormatDE: (num) => {
+        if (!num) return '0,0';
+        num = new Number(num);
+        return num
+            .toFixed(1) // always two decimal digits
+            .replace(".", ",") // replace decimal point character with ,
+            .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1."); // use . as a separator
     },
     /**
      * hàm để định dạng dữ liệu kiểu số

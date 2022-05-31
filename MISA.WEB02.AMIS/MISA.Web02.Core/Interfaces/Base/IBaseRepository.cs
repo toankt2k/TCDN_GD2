@@ -79,6 +79,5 @@ namespace MISA.Web02.Core.Interfaces.Base
         /// Author: Nguyễn Đức Toán-MF1095 (13/04/2022)
         public string Filter(int currentPage, int pageSize, string? filterText);
 
-
     }
 }

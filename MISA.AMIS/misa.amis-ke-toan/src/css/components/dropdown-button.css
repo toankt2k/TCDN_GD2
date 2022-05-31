@@ -99,5 +99,13 @@
     content: '';
 }
 
+.diable-multi {
+    cursor: not-allowed !important;
+}
+
+.diable-multi:hover {
+    background: unset !important;
+}
+
 
 /*end active button*/

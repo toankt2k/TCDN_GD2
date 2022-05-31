@@ -77,7 +77,6 @@ export default {
     keyDownListenner(e) {
       if (e.keyCode == 49 && e.ctrlKey == true) {
         e.preventDefault();
-        console.log("down: ", e);
       }
     },
     keyUpListenner() {
@@ -92,7 +91,6 @@ export default {
       try {
         if (e.keyCode == 49 && e.ctrlKey == true) {
           e.preventDefault();
-          console.log("up: ", e);
           me.addEmployeeButton(true);
         }
       } catch (error) {

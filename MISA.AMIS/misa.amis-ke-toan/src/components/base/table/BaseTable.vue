@@ -12,7 +12,7 @@
               <MCheckBox v-model="checkAll" :rowId="'All'" />
             </th>
             <th
-              v-for="(item, index) in displayColunms"
+              v-for="(item, index) in displayColumns"
               :key="`th${index}`"
               :style="{
                 width: `${item.width.replace(/\D/g, '')}px`,
@@ -24,8 +24,9 @@
                 textAlign: item.align,
               }"
               :class="item.classList"
+              :title="item.descriptionName"
             >
-              {{ item.name }}
+              {{ item.displayName }}
             </th>
             <th class="table-function" style="min-width: 100px">Chức năng</th>
             <th
@@ -53,7 +54,7 @@
               <MCheckBox v-model="val.checked" :rowId="`r${index}`" />
             </td>
             <td
-              v-for="(item, ind) in displayColunms"
+              v-for="(item, ind) in displayColumns"
               :key="`td${ind}`"
               :title="val[item.id]"
               :style="{
@@ -82,7 +83,7 @@
             </td>
             <td class="table-function">
               <div class="table-function-button">
-                <div class="button-edit" @click="openForm(val,tableFunc.key)">
+                <div class="button-edit" @click="openForm(val, tableFunc.key)">
                   {{ tableFunc.name }}
                 </div>
                 <div class="arrow-down-button">
@@ -92,6 +93,51 @@
                   ></div>
                 </div>
               </div>
+            </td>
+            <td
+              class="hidden-right"
+              style="right: 20px; background-color: #fff !important"
+            ></td>
+            <td
+              class="hidden-right"
+              style="background-color: #f4f5f8 !important"
+            ></td>
+          </tr>
+          <tr class="footer" v-if="isCount">
+            <td
+              class="hidden-left"
+              style="background-color: #fff !important"
+            ></td>
+            <td class="table-checkbox"></td>
+            <td
+              v-for="(item, ind) in displayColumns"
+              :key="`td${ind}`"
+              :style="{
+                width: `${item.width.replace(/\D/g, '')}px`,
+                minWidth: `${
+                  item.width.replace(/\D/g, '') != 0
+                    ? item.width.replace(/\D/g, '')
+                    : item.minWidth.replace(/\D/g, '')
+                }px`,
+                textAlign: item.align,
+              }"
+            >
+              <div
+                :style="{
+                  width: `${item.width.replace(/\D/g, '')}px`,
+                  minWidth: `${
+                    item.width.replace(/\D/g, '') != 0
+                      ? item.width.replace(/\D/g, '')
+                      : item.minWidth.replace(/\D/g, '')
+                  }px`,
+                  overflowWrap: 'break-word',
+                }"
+              >
+                {{ item.count?getCount(item.id):"" }}
+              </div>
+            </td>
+            <td class="table-function">
+              <div class="table-function-button"></div>
             </td>
             <td
               class="hidden-right"
@@ -113,7 +159,7 @@
               <div class="loading-1" style="width: 18px"></div>
             </td>
             <td
-              v-for="(item, ind) in displayColunms"
+              v-for="(item, ind) in displayColumns"
               :key="`td${ind}`"
               :title="val[item.id]"
               :style="{
@@ -141,12 +187,12 @@
           </tr>
         </tbody>
       </table>
-      <div v-show="!isLoading && tableData.length <= 0">
+      <!-- <div v-show="!isLoading && tableData.length <= 0">
         <div class="no-content">
           <img src="@/assets/no-employee.svg" />
           <div class="no-content-text">Không có dữ liệu</div>
         </div>
-      </div>
+      </div> -->
     </div>
   </div>
 </template>
@@ -165,6 +211,10 @@ export default {
     MCheckBox,
   },
   props: {
+    isCount:{
+      type:Boolean,
+      default:false,
+    },
     //các cột hiển thị
     columns: {
       type: Array,
@@ -186,7 +236,7 @@ export default {
   data() {
     return {
       //các cột hiển thị trong table
-      displayColunms: this.columns,
+      displayColumns: this.columns,
       //các chức nawg có trogn table
       tableFunc: this.tableFunction,
       /**
@@ -231,6 +281,7 @@ export default {
       isLoading: false,
       //cho phep thực hiện xóa nhiều
       multiFlag: false,
+      
     };
   },
   /**
@@ -293,7 +344,6 @@ export default {
           url: `${this.dataStorage.api.filter}?currentPage=${me.pagingOption.currentPage}&pageSize=${me.pagingOption.pageSize}&filterText=${me.pagingOption.filterText}`,
         })
           .then((res) => {
-            console.log(res);
             if (res.status == 200) {
               me.tableData = res.data.list;
               me.pagingOption.totalRecord = res.data.totalRecord;
@@ -336,9 +386,9 @@ export default {
         //mã nhân viên được chọn
         this.selectedCode = val.EmployeeCode;
         let event = {
-          left : this.X,
-          top : this.Y,
-          height : tagetElement.height,
+          left: this.X,
+          top: this.Y,
+          height: tagetElement.height,
         };
         this.tableEvent("tableOption", val, event);
       } catch (error) {
@@ -366,14 +416,14 @@ export default {
     setColumns(columns) {
       try {
         if (columns) {
-          this.displayColunms = columns;
+          this.displayColumns = columns;
         }
       } catch (error) {
         console.log(error);
       }
     },
 
-    openForm(val,key) {
+    openForm(val, key) {
       try {
         this.tableEvent(key, val);
       } catch (error) {
@@ -409,6 +459,19 @@ export default {
     salaryFormat(salary) {
       return format.salaryFormat(salary);
     },
+    //tính tổng cho các hàng đc tính
+    getCount(id) {
+      try {
+        let count = 0;
+        this.tableData.forEach((item) => {
+          count += item[id];
+        });
+        return format.currencyFormatDE(count);
+      } catch (error) {
+        console.log(error);
+        return 0;
+      }
+    },
     /**
      * Mô tả : fomat data sang date
      * @param data dữ liệu cần format
@@ -423,7 +486,7 @@ export default {
           case "number": //kiểu dữ liệu dạng số
             return format.numberVNFormat(data);
           case "currency": //kiểu dữ liệu dạng số
-            return format.currencyVNFormat(data);
+            return format.currencyFormatDE(data);
           case "date": //kiểu dữ liệu dạng ngày
             return format.dateFormat(data);
           default:
@@ -544,6 +607,18 @@ export default {
   pointer-events: none;
   background-color: #fff !important;
 }
+
+tr.footer td{
+  background: #e8eaef !important;
+  border: unset;
+  position: sticky;
+  bottom: 56px;
+}
+tr.footer td{
+  font-weight: 700;
+}
+
+
 .v-enter-active,
 .v-leave-active {
   transition: opacity 0.5s ease-in-out;

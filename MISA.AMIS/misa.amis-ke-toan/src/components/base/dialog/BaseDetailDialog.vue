@@ -398,7 +398,6 @@ export default {
             data: me.employee,
           })
             .then((res) => {
-              console.log(res);
               if (res.status == 200) {
                 //thêm toast vào danh sách toast
                 me.addToast(this.resource.toastMessage.editSuccess);
@@ -466,7 +465,7 @@ export default {
             data: me.employee,
           })
             .then((res) => {
-              console.log(res);
+
               if (res.status == 201) {
                 //thêm toast vào danh sách toast
                 me.addToast(this.resource.toastMessage.addSuccess);
@@ -492,7 +491,6 @@ export default {
             data: me.employee,
           })
             .then((res) => {
-              console.log(res);
               if (res.status == 200) {
                 //thêm toast vào danh sách toast
                 me.addToast(this.resource.toastMessage.editSuccess);
@@ -740,7 +738,6 @@ export default {
           url: this.dataStorage.api.getNewEmployeeCode,
         })
           .then((res) => {
-            console.log(res);
             if (res.status == 200) {
               //gán newEmployeeCode cho employee.EmployeeCode
               me.employee.EmployeeCode = res.data;
@@ -899,7 +896,6 @@ export default {
         }
         //Ctrl + S
         if (e.keyCode == 83 && e.ctrlKey == true) {
-          console.log("ok");
           this.saveEmployee();
         }
       } catch (error) {

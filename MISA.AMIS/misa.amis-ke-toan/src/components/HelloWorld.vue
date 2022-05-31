@@ -13,12 +13,21 @@
       :isDropdown="true"
     />
     <component :is="theComponent" v-bind="somethingWeWantToPass"></component>
-    <MSetting v-if="isSetting" @exitSetting="exitSetting"/>
-    <VendorDetail v-if="vendorOpen" @exitForm="exitVendor"/>
-    <MTextArea :placeholder="'VD: Số 82 Duy Tân, Dịch Vọng, Cầu Giấy, Hà Nội'" />
+    <MSetting v-if="isSetting" @exitSetting="exitSetting" />
+    <VendorDetail v-if="vendorOpen" @exitForm="exitVendor" />
+    <MTextArea
+      :placeholder="'VD: Số 82 Duy Tân, Dịch Vọng, Cầu Giấy, Hà Nội'"
+    />
 
-    
+    <MInput
+      v-model.number="test"
+      :placeholder="'Họ và tên'"
+      type="number"
+    />
+    <input v-model.number="test" type="number">
+    {{test}}
 
+    <currency-input v-model="test" />
   </div>
 </template>
 
@@ -28,24 +37,30 @@ import MButton from "@/components/base/button/BaseButton.vue";
 import MSetting from "@/components/base/dialog/BaseCustomSetting.vue";
 import VendorDetail from "@/view/vendor/VendorDetail.vue";
 import MTextArea from "@/components/base/input/BaseTextArea.vue";
+import MInput from "@/components/base/input/BaseInput.vue";
+import {VueCurrencyInput} from 'vue-currency-input';
 export default {
   name: "HelloWorld",
   components: {
     // ThePaymentDetail,
     MButton,
+    MInput,
     MSetting,
     VendorDetail,
     MTextArea,
+    VueCurrencyInput,
   },
   props: {},
   data() {
     return {
-      theComponent:'MButton',
-      somethingWeWantToPass:{
-        text:"Tùy chỉnh giao diện",
+      test:0,
+      test1:'',
+      theComponent: "MButton",
+      somethingWeWantToPass: {
+        text: "Tùy chỉnh giao diện",
         // @click="openSetting"
-        buttonType:"primary",
-        isDropdown:"true",
+        buttonType: "primary",
+        isDropdown: "true",
       },
       isSetting: false,
       vendorOpen: false,
@@ -55,15 +70,16 @@ export default {
     openSetting() {
       this.isSetting = true;
     },
-    exitSetting(){
-      this.isSetting=false;
+    exitSetting() {
+      this.isSetting = false;
     },
     openVendor() {
       this.vendorOpen = true;
     },
-    exitVendor(){
-      this.vendorOpen=false;
-    }
+    exitVendor() {
+      this.vendorOpen = false;
+    },
+
   },
 };
 </script>

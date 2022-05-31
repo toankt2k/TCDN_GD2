@@ -10,5 +10,6 @@ namespace MISA.Web02.Core.Interfaces.Repository
 {
     public interface IPaymentDetailRepository:IBaseRepository<PaymentDetail>
     {
+        public IEnumerable<PaymentDetail> GetByPayment(Guid id);
     }
 }

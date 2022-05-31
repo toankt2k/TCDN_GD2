@@ -5,13 +5,13 @@
         <div class="process">
           <div class="title">Nghiệp vụ tiền mặt</div>
           <div class="process-button">
-            <div class="btn-recive"  @click="funcImprovConfirm">
+            <div class="btn-recive" @click="funcImprovConfirm">
               <div class="title">Thu tiền</div>
             </div>
-            <a class="btn-payment" href="/ThePaymentDetail" >
-              <div class="title" style="color:#111">Chi tiền</div>
+            <a class="btn-payment" href="/ThePaymentDetail">
+              <div class="title" style="color: #111">Chi tiền</div>
             </a>
-            <div class="btn-audit"  @click="funcImprovConfirm">
+            <div class="btn-audit" @click="funcImprovConfirm">
               <div class="title">Kiểm kê quỹ</div>
             </div>
           </div>
@@ -21,6 +21,7 @@
             class="utility-btn m-col-3"
             v-for="item in utilityBtn"
             :key="item.id"
+            @click="redict(item)"
           >
             <div class="icon" :class="item.classIcon"></div>
             <div class="text">{{ item.text }}</div>
@@ -66,9 +67,7 @@
             </div>
           </div>
         </div>
-        <div class="report-footer" style="cursor: pointer">
-          Tất cả báo cáo
-        </div>
+        <div class="report-footer" style="cursor: pointer">Tất cả báo cáo</div>
       </div>
     </div>
     <!-- dialog confirm -->
@@ -122,7 +121,6 @@ export default {
      * Created by: Nguyễn Đức Toán - MF1095 (06/05/2022)
      */
     confirm(key, btnKey) {
-      console.log(key, btnKey);
       try {
         switch (key) {
           case "funcImprov":
@@ -130,12 +128,12 @@ export default {
               case this.confirmResource.funcImprov.button[0].id:
                 this.exitConfirm();
                 break;
-            
+
               default:
                 break;
             }
             break;
-        
+
           default:
             break;
         }
@@ -149,7 +147,6 @@ export default {
      */
     funcImprovConfirm() {
       try {
-        console.log("ok");
         this.confirmDialogData = {
           name: "funcImprov",
           type: "info",
@@ -164,16 +161,39 @@ export default {
       }
     },
     /**
-    * Mô tả : đóng confirm dialog
-    * Created by: Nguyễn Đức Toán - MF1095 (06/05/2022)
-    */
-   exitConfirm(){
-     try {
-       this.isConfirm=false;
-     } catch (error) {
-       console.log(error);
-     }
-   }
+     * Mô tả : mở confirm tính nawg đang phát triển
+     * Created by: Nguyễn Đức Toán - MF1095 (06/05/2022)
+     */
+    redict(item) {
+      try {
+        if (item.funcImprovConfirm) {
+          this.confirmDialogData = {
+            name: "funcImprov",
+            type: "info",
+            key: "funcImprov",
+            button: this.confirmResource.funcImprov.button,
+            text: this.confirmResource.funcImprov.getText(),
+            align: "center",
+          };
+          this.isConfirm = true;
+          return;
+        }
+        this.$router.push(item.link);
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    /**
+     * Mô tả : đóng confirm dialog
+     * Created by: Nguyễn Đức Toán - MF1095 (06/05/2022)
+     */
+    exitConfirm() {
+      try {
+        this.isConfirm = false;
+      } catch (error) {
+        console.log(error);
+      }
+    },
   },
 };
 </script>

@@ -68,6 +68,12 @@ const resources = {
                 align: "right",
             },
         ],
+        errorConfirm: [{
+            id: 1,
+            name: "Đóng",
+            type: "primary",
+            align: "center",
+        }, ],
         /**
          * Mô tả : danh sách các button cho confirm khi có response trả về
          * Created by: Nguyễn Đức Toán - MF1095 (27/04/2022)
@@ -118,14 +124,14 @@ const resources = {
          * Created by: Nguyễn Đức Toán - MF1095 (27/04/2022)
          */
         getMultiDeleteConfirm() {
-            return `Bạn có thực sự muốn xóa những nhân viên đã chọn không?`
+            return `Bạn có thực sự muốn xóa những bản ghi đã chọn không?`
         },
         /**
          * Mô tả : trả về text confirm cho confirm xóa 1 người
          * Created by: Nguyễn Đức Toán - MF1095 (27/04/2022)
          */
-        getDeleteConfirm(employeeCode) {
-            return `Bạn có thực sự muốn xóa nhân viên <${employeeCode}> không?`
+        getDeleteConfirm(msg) {
+            return `Bạn có thực sự muốn xóa ${msg} này không?`
         }
     },
     /**
@@ -157,15 +163,27 @@ const resources = {
     toastMessage: {
         addSuccess: {
             type: "success",
-            message: `Bạn vừa thêm nhân viên thành công`,
+            message: `Bạn vừa thêm bản ghi thành công`,
+        },
+        addError: {
+            type: "erorr",
+            message: `Bạn vừa thêm bản ghi thất bại`,
         },
         editSuccess: {
             type: "success",
-            message: `Bạn vừa sửa nhân viên thành công`,
+            message: `Bạn vừa sửa bản ghi thành công`,
+        },
+        editError: {
+            type: "erorr",
+            message: `Bạn vừa sửa bản ghi thất bại`,
         },
         deleteSuccess: {
             type: "success",
-            message: `Bạn vừa xóa nhân viên thành công`,
+            message: `Bạn vừa xóa bản ghi thành công`,
+        },
+        deleteError: {
+            type: "erorr",
+            message: `Bạn vừa xóa bản ghi thất bại`,
         }
 
     }
